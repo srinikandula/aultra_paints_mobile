@@ -1,21 +1,17 @@
-const BASE_URL = 'http://localhost:8080/api/'; //QA
+// const BASE_URL = 'http://localhost:8080/api/'; //QA
+const BASE_URL = 'http://192.168.29.161:8080/api/'; //QA
 // const BASE_URL = 'https://logifreightapp.mahindralogistics.com/api/'; //PROD
 
 //Logifreight
 const IOS_APP_VERSION = '1.0.0';
 
 const POST_LOGIN_DETAILS = "auth/login";
+const REGISTER_USER = "auth/register";
+
+const CREATE_ORDER = "order/orders/createOrder";
 
 const API_LOGOUT = "login/logout";
 const POST_DRIVER_OTP = "login/validateOTP";
-const GET_USER_DETAILS = "login/getUserDetails";
-const VALIDATE_LOGIN_USER = "login/validateUser?userName="; //old
-
-const VALIDATE_LOGIN_USER_SSO = "login/validateUserFromSSO"; //login screen
-const AUTHENTICATE_LOGIN_USER_SSO =
-    "login/authenticateUsersFromSSO"; //password screen
-
-const SIGNUP_USER = "register/createUser";
 
 const GET_DASHBOARD_COUNTS = "dashboard/getTripsReport"; //Dashboard count
 const DASHBOARD_SEARCH = "dashboard/search"; //Dashboard search

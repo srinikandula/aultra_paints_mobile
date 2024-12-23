@@ -35,7 +35,6 @@ class _SignupPageState extends State<SignupPage> {
 
   late TextEditingController _userName;
   late TextEditingController _userEmail;
-  late TextEditingController _userMobileNumber;
   late TextEditingController _userNewPassword;
   late TextEditingController _userConfirmPassword;
 
@@ -44,7 +43,6 @@ class _SignupPageState extends State<SignupPage> {
     super.initState();
     _userName = TextEditingController();
     _userEmail = TextEditingController();
-    _userMobileNumber = TextEditingController();
     _userNewPassword = TextEditingController();
     _userConfirmPassword = TextEditingController();
   }
@@ -53,7 +51,6 @@ class _SignupPageState extends State<SignupPage> {
   void dispose() {
     _userName.dispose();
     _userEmail.dispose();
-    _userMobileNumber.dispose();
     _userNewPassword.dispose();
     _userConfirmPassword.dispose();
     super.dispose();
@@ -70,45 +67,33 @@ class _SignupPageState extends State<SignupPage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  postSignupDetails() async {
+  postRegisterDetails() async {
     Utils.returnScreenLoader(context);
     http.Response response;
     Map map = {
       "name": _userName.text,
       "email": _userEmail.text,
-      "mobileNumber": _userMobileNumber.text,
       "password": _userConfirmPassword.text
     };
     var body = json.encode(map);
-    // print('signup body===>$body');
-    response = await http.post(Uri.parse(BASE_URL + SIGNUP_USER),
+    print('register body===>$body');
+    response = await http.post(Uri.parse(BASE_URL + REGISTER_USER),
         headers: {"Content-Type": "application/json"}, body: body);
     mapResponse = json.decode(response.body);
     if (response.statusCode == 200) {
-      // print('signup resp ==== $mapResponse');
       Navigator.pop(context);
-      _showSnackBar(mapResponse['message'], context,
-          mapResponse["status"] == "success", false);
-      if (mapResponse["status"] == "success") {
-        Navigator.pop(context, true);
-      } else {
-        _showSnackBar(mapResponse['message'], context, false, false);
-      }
+      _showSnackBar(mapResponse['message'], context, true, false);
+      Navigator.pop(context, true);
     } else {
-      returnError(mapResponse['message']);
+      _showSnackBar(mapResponse['message'], context, false, false);
+      Navigator.pop(context);
     }
-  }
-
-  returnError(errorMessage) {
-    _showSnackBar(errorMessage, context, false, false);
-    Navigator.pop(context);
   }
 
   validateFeilds() {
     Utils.clearToasts(context);
     final nameRegex = RegExp(r"^[a-zA-Z\s]{3,}$");
     final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
-    final mobileRegex = RegExp(r"^\d{10}$");
     final passwordRegex = RegExp(
         r'^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z0-9!@#$%^&*(),.?":{}|<>]{8,}$');
 
@@ -118,10 +103,6 @@ class _SignupPageState extends State<SignupPage> {
     } else if (_userEmail.text.isEmpty ||
         !emailRegex.hasMatch(_userEmail.text)) {
       _showSnackBar('Enter a valid email', context, false, true);
-    } else if (_userMobileNumber.text.isEmpty ||
-        !mobileRegex.hasMatch(_userMobileNumber.text)) {
-      _showSnackBar(
-          'Enter a valid 10-digit mobile number', context, false, true);
     } else if (_userNewPassword.text.isEmpty ||
         !passwordRegex.hasMatch(_userNewPassword.text)) {
       _showSnackBar('Enter a valid new password', context, false, true);
@@ -131,7 +112,7 @@ class _SignupPageState extends State<SignupPage> {
     } else if (_userNewPassword.text != _userConfirmPassword.text) {
       _showSnackBar('Passwords are not matching', context, false, true);
     } else {
-      postSignupDetails();
+      postRegisterDetails();
     }
   }
 
@@ -154,9 +135,10 @@ class _SignupPageState extends State<SignupPage> {
         body: Column(
           children: [
             SingleParamHeader(
-              'Register',
+              'User\nRegistration',
               '',
-              context,true,
+              context,
+              false,
               () => Navigator.pop(context, true),
             ),
             Expanded(
@@ -298,52 +280,6 @@ class _SignupPageState extends State<SignupPage> {
                         final cursorPosition = _userEmail.selection;
                         _userEmail.text = value;
                         _userEmail.selection = cursorPosition;
-                      }
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
-          //user mobile number
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Utils.returnInvoiceRedStar('Mobile Number'),
-              Container(
-                margin: const EdgeInsets.only(top: 5),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: textinputBgColor,
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                width: screenWidth * 0.9,
-                child: TextFormField(
-                  onTapOutside: (event) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                  autofocus: false,
-                  keyboardType: TextInputType.phone,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(10),
-                  ],
-                  controller: _userMobileNumber,
-                  decoration: const InputDecoration(
-                      hintText: 'Enter Mobile Number',
-                      hintStyle: TextStyle(
-                          fontFamily: ffGMedium,
-                          fontSize: 15.0,
-                          color: Colors.grey),
-                      contentPadding: EdgeInsets.all(15),
-                      border: InputBorder.none),
-                  onChanged: (value) {
-                    setState(() {
-                      if (_userMobileNumber.text != value) {
-                        final cursorPosition = _userMobileNumber.selection;
-                        _userMobileNumber.text = value;
-                        _userMobileNumber.selection = cursorPosition;
                       }
                     });
                   },

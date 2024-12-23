@@ -28,6 +28,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
   var accesstoken;
   var USER_ID;
+  var USER_FULL_NAME;
+  var USER_EMAIL;
   String USER_NAME = "";
   String USER_ROLE = "";
   String BACKEND_ROLE = "";
@@ -83,7 +85,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   void initState() {
-    // fetchLocalStorageData();
+    fetchLocalStorageData();
     super.initState();
 
     _focusNode.addListener(() {
@@ -117,6 +119,12 @@ class _DashboardPageState extends State<DashboardPage> {
   fetchLocalStorageData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     accesstoken = prefs.getString('accessToken');
+    USER_FULL_NAME = prefs.getString('USER_FULL_NAME');
+    USER_ID = prefs.getString('USER_ID');
+    USER_EMAIL = prefs.getString('USER_EMAIL');
+
+    print(
+        'dashboard====>${accesstoken}=====>${USER_FULL_NAME}===>${USER_EMAIL}');
 
     // getDashboardCounts();
   }
@@ -129,38 +137,35 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void logOut(context) async {
+    clearStorage();
     // print('logout api check====');
-    Utils.returnScreenLoader(context);
-    http.Response response;
-    Map map = {
-      "userid": USER_ID,
-    };
-    var body = json.encode(map);
-    response = await http.post(
-      Uri.parse(BASE_URL + API_LOGOUT),
-      headers: {
-        "Content-Type": "application/json",
-        "accesstoken": accesstoken,
-        "authorization": accesstoken
-      },
-      body: body,
-    );
-    stringResponse = response.body;
-    mapResponse = json.decode(response.body);
-    if (response.statusCode == 200) {
-      Navigator.pop(context);
-      if (mapResponse["status"] == "success") {
-        _showSnackBar(mapResponse['message'], context, true);
-        clearStorage();
-      } else {
-        error_handling.errorValidation(
-            context, response.statusCode, mapResponse['message'], false);
-      }
-    } else {
-      Navigator.pop(context);
-      error_handling.errorValidation(
-          context, response.statusCode, mapResponse['message'], false);
-    }
+    // Utils.returnScreenLoader(context);
+    // http.Response response;
+    // Map map = {
+    //   "userid": USER_ID,
+    // };
+    // var body = json.encode(map);
+    // response = await http.post(
+    //   Uri.parse(BASE_URL + API_LOGOUT),
+    //   headers: {"Content-Type": "application/json", "accesstoken": accesstoken},
+    //   body: body,
+    // );
+    // stringResponse = response.body;
+    // mapResponse = json.decode(response.body);
+    // if (response.statusCode == 200) {
+    //   Navigator.pop(context);
+    //   if (mapResponse["status"] == "success") {
+    //     _showSnackBar(mapResponse['message'], context, true);
+    //     clearStorage();
+    //   } else {
+    //     error_handling.errorValidation(
+    //         context, response.statusCode, mapResponse['message'], false);
+    //   }
+    // } else {
+    //   Navigator.pop(context);
+    //   error_handling.errorValidation(
+    //       context, response.statusCode, mapResponse['message'], false);
+    // }
   }
 
   Future getDashboardCounts() async {
@@ -485,10 +490,10 @@ class _DashboardPageState extends State<DashboardPage> {
         key: _scaffoldKey,
         backgroundColor: white,
         drawer: MyDrawer(
-          accountName: USER_NAME,
-          accountRole: USER_ROLE,
+          accountName: USER_FULL_NAME.toString(),
+          accountRole: USER_ID.toString(),
           backendRole: BACKEND_ROLE,
-          accountEmail: USER_ID.toString(),
+          accountEmail: USER_EMAIL.toString(),
           onLogout: () => {logOut(context)},
         ),
         body: Form(
@@ -1100,7 +1105,7 @@ class MyDrawer extends StatelessWidget {
             Text(
               // accountEmail,
               // accountRole,
-              backendRole,
+              accountEmail,
               style: TextStyle(
                 color: drawerTitleColor,
                 fontFamily: ffGMedium,
@@ -1138,42 +1143,6 @@ class MyDrawer extends StatelessWidget {
                           },
                         )
                       : SizedBox.shrink(),
-                  // ListTile(
-                  //   title: Text(
-                  //     'Drivers & Vehicle List',
-                  //     style: drawerItemStyle,
-                  //   ),
-                  //   onTap: () {
-                  //     _navigateTo(context, '/vehicleAndDriversList');
-                  //   },
-                  // ),
-                  // ListTile(
-                  //   title: Text(
-                  //     'EPOD Download',
-                  //     style: drawerItemStyle,
-                  //   ),
-                  //   onTap: () {
-                  //     Navigator.pop(context);
-                  //   },
-                  // ),
-                  // ListTile(
-                  //   title: Text(
-                  //     'Help Centre',
-                  //     style: drawerItemStyle,
-                  //   ),
-                  //   onTap: () {
-                  //     Navigator.pop(context);
-                  //   },
-                  // ),
-                  // ListTile(
-                  //   title: Text(
-                  //     'Settings',
-                  //     style: drawerItemStyle,
-                  //   ),
-                  //   onTap: () {
-                  //     Navigator.pop(context);
-                  //   },
-                  // ),
                 ],
               ),
             ),

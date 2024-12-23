@@ -1,3 +1,3 @@
 import 'package:flutter/material.dart';
 
-class InvoiceDetailsFormViewModel with ChangeNotifier {}
+class CreateOrdersModel with ChangeNotifier {}

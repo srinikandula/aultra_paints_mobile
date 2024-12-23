@@ -65,62 +65,70 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.pop(context, true);
   }
 
-  Future<void> checkUserLogin() async {
-    bool isConnected = await CheckInternet.isInternet();
-    if (!isConnected) {
-      _showSnackBar(
-          "No internet connection. Please try again.", context, false);
-      return;
-    }
-
-    Loader.showLoader(context);
-    http.Response response;
-    var apiURL = BASE_URL + POST_LOGIN_DETAILS;
-
-    Map map = {
-      // "name": _loginRequest.username,
-      // "email": _loginRequest.email,
-      // "_id": _loginRequest.password
-      "name": 'PRAVEEN',
-      "email": 'praveen@email.com',
-      // "_id": '12345'
-    };
-    var body = json.encode(map);
-    print('body====>${body}=====>${apiURL}');
-
-    response = await http.post(Uri.parse(apiURL),
-        headers: {"Content-Type": "application/json"}, body: body);
-
-    print('apiResp====>${response.statusCode}======>');
-    var apiResp = json.decode(response.body);
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      Loader.hideLoader(context);
-      if (apiResp["status"] == "success") {
-        Navigator.pushNamed(context, '/dashboardPage', arguments: {});
-      } else {
-        _showSnackBar(apiResp['message'], context, false);
+  Future<void> checkUserLogin(
+      String tempFirstValue, String tempSecondValue) async {
+    try {
+      bool isConnected = await CheckInternet.isInternet();
+      if (!isConnected) {
+        _showSnackBar(
+          "No internet connection. Please try again.",
+          context,
+          false,
+        );
+        return;
       }
-    } else {
-      _showSnackBar(
-          apiResp['message'] ?? "Unexpected error occurred.", context, false);
+
+      Loader.showLoader(context);
+
+      final apiURL = '$BASE_URL$POST_LOGIN_DETAILS';
+      Map<String, String> requestBody = {
+        "email": tempFirstValue,
+        "password": tempSecondValue,
+      };
+      final body = json.encode(requestBody);
+
+      final response = await http.post(
+        Uri.parse(apiURL),
+        headers: {"Content-Type": "application/json"},
+        body: body,
+      );
+
+      // Parse the response
+      final apiResp = json.decode(response.body);
+      print('API Response: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        Loader.hideLoader(context);
+        onLogin(apiResp);
+      } else {
+        Loader.hideLoader(context);
+        _showSnackBar(
+          apiResp['message'] ?? "Unexpected error occurred.",
+          context,
+          false,
+        );
+      }
+    } catch (e) {
+      // Handle errors
       Loader.hideLoader(context);
+      _showSnackBar(
+        "An error occurred: ${e.toString()}",
+        context,
+        false,
+      );
+      print('Error: $e');
     }
   }
 
   onLogin(userData) async {
-    // print('userdata====>${userData}');
+    print('userdata====>${userData}');
     FocusScope.of(context).unfocus();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('USER_ID', userData['userId'] ?? 0);
-    await prefs.setString('loggedUserName', userData['userName']);
-    await prefs.setString('loggedUserRole', userData['userType']!);
+    await prefs.setString('accessToken', userData['token']);
+    await prefs.setString('USER_FULL_NAME', userData['fullName']);
+    await prefs.setString('USER_ID', userData['id']);
+    await prefs.setString('USER_EMAIL', userData['email']);
 
-    // if (userData['requestForOtp']) {
-    //   await prefs.setString('loggedUserPhoneNumber', userData['mobileNumber']);
-    //   driverMobileCheck(userData);
-    // } else {
-    //   Navigator.pushNamed(context, '/passwordPage', arguments: {});
-    // }
     Navigator.pushNamed(context, '/dashboardPage', arguments: {});
   }
 
@@ -258,7 +266,7 @@ class _LoginPageState extends State<LoginPage> {
                                         ?.unfocus();
                                   },
                                   decoration: const InputDecoration(
-                                    labelText: 'Enter Username/Email/Phone',
+                                    labelText: 'Enter Email',
                                     labelStyle: TextStyle(
                                       fontFamily: ffGMedium,
                                       fontSize: 18.0,
@@ -313,19 +321,24 @@ class _LoginPageState extends State<LoginPage> {
                               SizedBox(height: 30),
                               InkWell(
                                 onTap: () {
-                                  checkUserLogin();
+                                  // checkUserLogin();
                                   // Navigator.pushNamed(context, '/dashboardPage',
                                   //     arguments: {});
-                                  // Utils.clearToasts(context);
-                                  // var tempValue = _loginRequest.username.trim();
-                                  // if (tempValue == '') {
-                                  //   _showSnackBar(
-                                  //       "Please enter username/email/phoneNumber",
-                                  //       context,
-                                  //       false);
-                                  // } else {
-                                  //   checkUserLogin(tempValue);
-                                  // }
+                                  Utils.clearToasts(context);
+                                  var tempFirstValue =
+                                      _loginRequest.username.trim();
+                                  var tempSecondValue =
+                                      _loginRequest.password.trim();
+                                  if (tempFirstValue == '') {
+                                    _showSnackBar(
+                                        "Please enter email", context, false);
+                                  } else if (tempSecondValue == '') {
+                                    _showSnackBar("Please enter password",
+                                        context, false);
+                                  } else {
+                                    checkUserLogin(
+                                        tempFirstValue, tempSecondValue);
+                                  }
                                 },
                                 child: Container(
                                   margin: EdgeInsets.only(
@@ -359,6 +372,26 @@ class _LoginPageState extends State<LoginPage> {
                                         ),
                                       ),
                                     ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.pushNamed(context, '/signupPage');
+                                },
+                                child: Container(
+                                  alignment: Alignment.centerRight,
+                                  margin: EdgeInsets.only(
+                                      right: screenWidth * 0.11),
+                                  child: Text(
+                                    'Register',
+                                    style: TextStyle(
+                                        decoration: TextDecoration.underline,
+                                        decorationThickness: 1.5,
+                                        fontSize: 16,
+                                        fontFamily: ffGMedium,
+                                        color: appThemeColor),
                                   ),
                                 ),
                               ),
