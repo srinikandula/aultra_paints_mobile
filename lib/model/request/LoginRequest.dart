@@ -2,6 +2,7 @@ class LoginRequest {
   String username = "";
   String password = "";
   String phoneNumber = "";
+  String email = "";
 
   String otp1 = "";
   String otp2 = "";
@@ -13,13 +14,15 @@ class LoginRequest {
     username = data['username'];
     password = data['password'];
     phoneNumber = data['phoneNumber'];
+    email = data['email'];
   }
 
   Map<String, dynamic> toMap() {
     return {
       'username': username,
       'password': password,
-      'phoneNumber': phoneNumber
+      'phoneNumber': phoneNumber,
+      'email': email
     };
   }
 }

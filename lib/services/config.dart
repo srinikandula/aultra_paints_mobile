@@ -1,11 +1,11 @@
-const BASE_URL = 'https://dealerportal.mllqa.com/api/'; //QA
+const BASE_URL = 'http://localhost:8080/api/'; //QA
 // const BASE_URL = 'https://logifreightapp.mahindralogistics.com/api/'; //PROD
 
 //Logifreight
 const IOS_APP_VERSION = '1.0.0';
 
-// const API_LOGIN = "login/authenticateUsers";
-const POST_LOGIN_DETAILS = "login/userType";
+const POST_LOGIN_DETAILS = "auth/login";
+
 const API_LOGOUT = "login/logout";
 const POST_DRIVER_OTP = "login/validateOTP";
 const GET_USER_DETAILS = "login/getUserDetails";
@@ -79,5 +79,3 @@ const DOWNLOAD_DRIVER_INVOICE_PDF = "trip/downloadInvoice?tripId=";
 const EPOD_DOWNLOAD_API = "dashboard/getDownloadUrl?lrNumber=";
 
 const DOWNTIME_CHECK = "/user/downtime";
-
- 

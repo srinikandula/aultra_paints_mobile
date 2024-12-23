@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -47,13 +46,11 @@ class _SplashPageState extends State<SplashPage> {
     super.initState();
     // certificateCheck();
 
-
     onCallTimer();
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     // //   checkToken();
     //   apicall();
     // });
-
   }
 
   // Future<void> apicall() async {
@@ -133,13 +130,15 @@ class _SplashPageState extends State<SplashPage> {
   Future<void> apicall() async {
     bool isConnected = await CheckInternet.isInternet();
     if (!isConnected) {
-      _showSnackBar("No internet connection. Please try again.", context, false);
+      _showSnackBar(
+          "No internet connection. Please try again.", context, false);
       return;
     }
 
     // Loader.showLoader(context);
     http.Response response;
-    var apiURL = "https://safetyapi.mahindralogistics.com/api/v1/user/getDepartment?topic_id=24";
+    var apiURL =
+        "https://safetyapi.mahindralogistics.com/api/v1/user/getDepartment?topic_id=24";
 
     try {
       // error = "1.0.1";
@@ -183,7 +182,8 @@ class _SplashPageState extends State<SplashPage> {
       // This can be triggered for SSL handshake failures
       // msg = "5";
       // error = 'HandshakeException: SSL Handshake error: ${e.message} ${e.toString()}';
-      print('HandshakeException: SSL Handshake error: ${e.message} ${e.toString()}');
+      print(
+          'HandshakeException: SSL Handshake error: ${e.message} ${e.toString()}');
     } catch (e) {
       // Handles other types of errors
       // msg = "6";
@@ -191,9 +191,7 @@ class _SplashPageState extends State<SplashPage> {
       // error = 'Unexpected error: $e ${e.toString()}';
     }
 
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   checkToken() async {
@@ -358,8 +356,7 @@ class _SplashPageState extends State<SplashPage> {
                       height: MediaQuery.of(context).size.width * 0.6,
                       decoration: const BoxDecoration(
                           image: DecorationImage(
-                              image: AssetImage(
-                                  'assets/images/logiFreight_logo.png'),
+                              image: AssetImage('assets/images/app_logo.png'),
                               fit: BoxFit.fitWidth)),
                     ),
                     // Container(

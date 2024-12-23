@@ -75,18 +75,28 @@ class _LoginPageState extends State<LoginPage> {
 
     Loader.showLoader(context);
     http.Response response;
-    var apiURL = BASE_URL + VALIDATE_LOGIN_USER;
+    var apiURL = BASE_URL + POST_LOGIN_DETAILS;
 
-    response = await http.get(Uri.parse(apiURL), headers: {
-      "Content-Type": "application/json"
-    }).timeout(const Duration(seconds: 15));
+    Map map = {
+      // "name": _loginRequest.username,
+      // "email": _loginRequest.email,
+      // "_id": _loginRequest.password
+      "name": 'PRAVEEN',
+      "email": 'praveen@email.com',
+      // "_id": '12345'
+    };
+    var body = json.encode(map);
+    print('body====>${body}=====>${apiURL}');
 
+    response = await http.post(Uri.parse(apiURL),
+        headers: {"Content-Type": "application/json"}, body: body);
+
+    print('apiResp====>${response.statusCode}======>');
     var apiResp = json.decode(response.body);
     if (response.statusCode == 200 || response.statusCode == 201) {
       Loader.hideLoader(context);
       if (apiResp["status"] == "success") {
-        var userData = apiResp['data'];
-        onLogin(userData);
+        Navigator.pushNamed(context, '/dashboardPage', arguments: {});
       } else {
         _showSnackBar(apiResp['message'], context, false);
       }
@@ -202,7 +212,7 @@ class _LoginPageState extends State<LoginPage> {
                                 child: Row(
                                   children: [
                                     Image.asset(
-                                      'assets/images/logiFreight_logo.png',
+                                      'assets/images/app_logo.png',
                                       height: getProportionateScreenHeight(40),
                                     ),
                                   ],
@@ -303,10 +313,10 @@ class _LoginPageState extends State<LoginPage> {
                               SizedBox(height: 30),
                               InkWell(
                                 onTap: () {
-                                  // checkUserLogin();
-                                  Navigator.pushNamed(context, '/dashboardPage',
-                                      arguments: {});
-                                  Utils.clearToasts(context);
+                                  checkUserLogin();
+                                  // Navigator.pushNamed(context, '/dashboardPage',
+                                  //     arguments: {});
+                                  // Utils.clearToasts(context);
                                   // var tempValue = _loginRequest.username.trim();
                                   // if (tempValue == '') {
                                   //   _showSnackBar(

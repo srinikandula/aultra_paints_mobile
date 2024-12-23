@@ -221,7 +221,7 @@ class _PasswordPageState extends State<PasswordPage> {
                                 child: Row(
                                   children: [
                                     Image.asset(
-                                      'assets/images/logiFreight_logo.png',
+                                      'assets/images/app_logo.png',
                                       height: getProportionateScreenHeight(40),
                                     ),
                                   ],
