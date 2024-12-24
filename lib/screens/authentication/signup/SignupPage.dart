@@ -1,10 +1,10 @@
 import 'dart:convert';
 
+import 'package:aultra_paints_mobile/utility/FooterButton.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../services/config.dart';
-import '../../../utility/BottomButton.dart';
 import '../../../utility/SingleParamHeader.dart';
 import '../../../utility/Utils.dart';
 import '/utility/Colors.dart';
@@ -153,8 +153,9 @@ class _SignupPageState extends State<SignupPage> {
                     child: Column(
                       children: [
                         returnFormFeilds(),
-                        BottomButton(
+                        FooterButton(
                           "Register",
+                          'fullWidth',
                           context,
                           () => validateFeilds(),
                         )

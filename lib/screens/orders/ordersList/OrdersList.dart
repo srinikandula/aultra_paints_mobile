@@ -4,14 +4,8 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
-import '../../../model/request/SearchDataHandling.dart';
 import '../../../services/error_handling.dart';
-import '../../../utility/FooterButton.dart';
-import '../../../utility/SearchDataPopUp.dart';
 import '../../../utility/SingleParamHeader.dart';
-import '../../../utility/logger.dart';
 import '../../../utility/size_config.dart';
 import '/utility/Colors.dart';
 import '/utility/Fonts.dart';
@@ -124,8 +118,7 @@ class _OrdersListState extends State<OrdersList> {
     response = await http.get(Uri.parse(BASE_URL + GET_ORDERS), headers: {
       "Content-Type": "application/json",
       "Authorization": accesstoken
-    });
-    // Logger.showLogging(response.body);
+    }); 
     print('${BASE_URL + GET_ORDERS}==== list resp==>${response.statusCode}');
 
     if (response.statusCode == 200) {

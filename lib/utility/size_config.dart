@@ -1,6 +1,5 @@
 
 
-import '/utility/logger.dart';
 import 'package:flutter/material.dart';
 
 class SizeConfig {
@@ -24,7 +23,7 @@ double getProportionateScreenHeight(double inputHeight) { // Height
 }
 
 double getProportionateScreenWidth(double inputWidth) { // Width, Font
-  // Logger.showLogging(SizeConfig.screenWidth);
+ 
   double screenWidth = SizeConfig.screenWidth;
   return (inputWidth / 375.0) * screenWidth;
 }

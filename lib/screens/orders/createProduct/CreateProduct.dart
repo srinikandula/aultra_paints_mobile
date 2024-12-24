@@ -8,10 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../../../services/config.dart';
 import '../../../services/error_handling.dart';
-import '../../../utility/BottomButton.dart';
 import '../../../utility/FooterButton.dart';
 import '../../../utility/SingleParamHeader.dart';
-import '../../../utility/size_config.dart';
 import '/utility/Colors.dart';
 import '/utility/Fonts.dart';
 import '/utility/Utils.dart';
@@ -130,25 +128,25 @@ class _CreateProductState extends State<CreateProduct> {
       // "expiryDate": _expiryDateController.text,
       "expiryDate": returnFormattedDate(),
     };
-    var body = json.encode(map);
+    // var body = json.encode(map);
 
-    print('add product body====>$body');
-    response = await http.post(Uri.parse(BASE_URL + SAVE_INVOICE_DETAILS),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": accesstoken
-        },
-        body: body);
-    var productResp = json.decode(response.body);
-    if (response.statusCode == 200) {
-      Navigator.pop(context);
-      _showSnackBar(productResp['message'], context, true);
-      Navigator.pop(context, true);
-    } else {
-      Navigator.pop(context);
-      error_handling.errorValidation(
-          context, response.statusCode, productResp['message'], false);
-    }
+    // print('add product body====>$body');
+    // response = await http.post(Uri.parse(BASE_URL + ),
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       "Authorization": accesstoken
+    //     },
+    //     body: body);
+    // var productResp = json.decode(response.body);
+    // if (response.statusCode == 200) {
+    //   Navigator.pop(context);
+    //   _showSnackBar(productResp['message'], context, true);
+    //   Navigator.pop(context, true);
+    // } else {
+    //   Navigator.pop(context);
+    //   error_handling.errorValidation(
+    //       context, response.statusCode, productResp['message'], false);
+    // }
   }
 
   Future<void> _selectExpirationDate(BuildContext context) async {
