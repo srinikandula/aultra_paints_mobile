@@ -77,8 +77,12 @@ class _DashboardPageState extends State<DashboardPage> {
   List dashboardArray = [];
 
   var dashBoardList = [
-    {"title": "PENDING", "description": "Orders pending", "count": "0"},
-    {"title": "BOOKED", "description": "Orders booked", "count": "0"},
+    {
+      "title": "PENDING CONFIRMATION",
+      "description": "Pending Confirmation",
+      "count": "0"
+    },
+    {"title": "CONFIRMED", "description": "Orders Confirmed", "count": "0"},
     {"title": "INTRANSIT", "description": "Orders Intransit", "count": "0"},
     {"title": "DELIVERED", "description": "Orders Delivered", "count": "0"},
   ];
@@ -396,31 +400,31 @@ class _DashboardPageState extends State<DashboardPage> {
                                         ),
                                       ),
                                     ),
-                                    // InkWell(
-                                    //   onTap: () {
-                                    //     Navigator.pushNamed(
-                                    //         context, '/qrScanner');
-                                    //   },
-                                    //   child: Container(
-                                    //     height: 30,
-                                    //     width: 30,
-                                    //     decoration: BoxDecoration(
-                                    //       color: loginBgColor,
-                                    //       borderRadius:
-                                    //           BorderRadius.circular(15),
-                                    //     ),
-                                    //     child: Padding(
-                                    //       padding: const EdgeInsets.all(6.0),
-                                    //       child: Center(
-                                    //         child: Icon(
-                                    //           FontAwesomeIcons.qrcode,
-                                    //           size: 22,
-                                    //           color: Colors.black,
-                                    //         ),
-                                    //       ),
-                                    //     ),
-                                    //   ),
-                                    // ),
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                            context, '/qrScanner');
+                                      },
+                                      child: Container(
+                                        height: 30,
+                                        width: 30,
+                                        decoration: BoxDecoration(
+                                          color: loginBgColor,
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(6.0),
+                                          child: Center(
+                                            child: Icon(
+                                              FontAwesomeIcons.qrcode,
+                                              size: 22,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 )),
                             //dashboard search
