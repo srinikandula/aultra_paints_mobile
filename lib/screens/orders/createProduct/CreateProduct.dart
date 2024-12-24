@@ -136,7 +136,7 @@ class _CreateProductState extends State<CreateProduct> {
     response = await http.post(Uri.parse(BASE_URL + SAVE_INVOICE_DETAILS),
         headers: {
           "Content-Type": "application/json",
-          "accesstoken": accesstoken
+          "Authorization": accesstoken
         },
         body: body);
     var productResp = json.decode(response.body);
