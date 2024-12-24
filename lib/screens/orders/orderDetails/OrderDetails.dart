@@ -70,7 +70,7 @@ class _OrderDetailsState extends State<OrderDetails> {
         Uri.parse('$BASE_URL$GET_ORDER_BY_ID$orderId'),
         headers: {
           "Content-Type": "application/json",
-          "accesstoken": accessToken ?? '',
+          "Authorization": accessToken ?? '',
         },
       );
 

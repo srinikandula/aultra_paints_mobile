@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../services/config.dart';
 import '/utility/Colors.dart';
@@ -121,10 +120,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   onLogin(userData) async {
-    print('userdata====>${userData}');
+    // print('userdata====>${userData}');
     FocusScope.of(context).unfocus();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('accessToken', userData['token']);
+    var tempToken = "Bearer" + ' ' + userData['token'];
+    await prefs.setString('accessToken', tempToken);
     await prefs.setString('USER_FULL_NAME', userData['fullName']);
     await prefs.setString('USER_ID', userData['id']);
     await prefs.setString('USER_EMAIL', userData['email']);

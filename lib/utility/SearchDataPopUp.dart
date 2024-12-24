@@ -92,13 +92,13 @@ class SearchDataPopUp {
         response = await http.post(Uri.parse(apiURL),
             headers: {
               "Content-Type": "application/json",
-              "accesstoken": accesstoken
+              "Authorization": accesstoken
             },
             body: tempBody);
       } else {
         response = await http.get(Uri.parse(apiURL), headers: {
           "Content-Type": "application/json",
-          "accesstoken": accesstoken
+          "Authorization": accesstoken
         });
       }
       stringResponse = response.body;
@@ -131,13 +131,13 @@ class SearchDataPopUp {
         response = await http.post(Uri.parse(apiURL),
             headers: {
               "Content-Type": "application/json",
-              "accesstoken": accesstoken
+              "Authorization": accesstoken
             },
             body: tempBody);
       } else {
         response = await http.get(Uri.parse(apiURL), headers: {
           "Content-Type": "application/json",
-          "accesstoken": accesstoken
+          "Authorization": accesstoken
         });
       }
       stringResponse = response.body;

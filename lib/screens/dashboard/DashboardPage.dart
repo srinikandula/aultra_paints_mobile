@@ -77,11 +77,7 @@ class _DashboardPageState extends State<DashboardPage> {
   List dashboardArray = [];
 
   var dashBoardList = [
-    {
-      "title": "PENDING CONFIRMATION",
-      "description": "Pending Confirmation",
-      "count": "0"
-    },
+    {"title": "PENDING", "description": "Pending Confirmation", "count": "0"},
     {"title": "CONFIRMED", "description": "Orders Confirmed", "count": "0"},
     {"title": "INTRANSIT", "description": "Orders Intransit", "count": "0"},
     {"title": "DELIVERED", "description": "Orders Delivered", "count": "0"},
@@ -151,7 +147,7 @@ class _DashboardPageState extends State<DashboardPage> {
     // var body = json.encode(map);
     // response = await http.post(
     //   Uri.parse(BASE_URL + API_LOGOUT),
-    //   headers: {"Content-Type": "application/json", "accesstoken": accesstoken},
+    //   headers: {"Content-Type": "application/json", "Authorization": accesstoken},
     //   body: body,
     // );
     // stringResponse = response.body;
@@ -178,8 +174,7 @@ class _DashboardPageState extends State<DashboardPage> {
     http.Response response;
     Map<String, String> headers = {
       "Content-Type": "application/json",
-      "accesstoken": accesstoken,
-      "authorization": accesstoken
+      "Authorization": accesstoken
     };
     response = await http.get(Uri.parse(BASE_URL + GET_DASHBOARD_COUNTS),
         headers: headers);
@@ -282,11 +277,11 @@ class _DashboardPageState extends State<DashboardPage> {
     http.Response response;
     Map map = {"vinOrLrOrInvoiceNo": searchValue};
     var body = json.encode(map);
-    print('search body=======>${body}=======${BASE_URL + DASHBOARD_SEARCH}');
+    // print('search body=======>${body}=======${BASE_URL + DASHBOARD_SEARCH}');
     response = await http.post(Uri.parse(BASE_URL + DASHBOARD_SEARCH),
         headers: {
           "Content-Type": "application/json",
-          "accesstoken": accesstoken
+          "Authorization": accesstoken
         },
         body: body);
     stringResponse = response.body;
@@ -344,6 +339,7 @@ class _DashboardPageState extends State<DashboardPage> {
     // final double screenHeight = MediaQuery.of(context).size.height;
     // FocusNode _focusNode = FocusNode();
     // TextEditingController _searchController = TextEditingController();
+    final double screenWidth = MediaQuery.of(context).size.width;
     SizeConfig().init(context);
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -361,7 +357,7 @@ class _DashboardPageState extends State<DashboardPage> {
             key: _formKey,
             child: SingleChildScrollView(
               child: SizedBox(
-                height: MediaQuery.of(context).size.height * 1.02,
+                height: MediaQuery.of(context).size.height * 1,
                 child: Center(
                     child: Container(
                         color: white,
@@ -370,162 +366,80 @@ class _DashboardPageState extends State<DashboardPage> {
                             Container(
                                 margin: EdgeInsets.only(
                                     top: MediaQuery.of(context).size.height *
-                                        0.1,
+                                        0.07,
                                     left: MediaQuery.of(context).size.width *
                                         0.05,
                                     right: MediaQuery.of(context).size.width *
                                         0.05),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                child: Column(
                                   children: [
-                                    InkWell(
-                                      onTap: () {
-                                        _scaffoldKey.currentState?.openDrawer();
-                                      },
-                                      child: Container(
-                                        height: 30,
-                                        width: 30,
-                                        decoration: BoxDecoration(
-                                          color: loginBgColor,
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(4.0),
-                                          child: Image.asset(
-                                            'assets/images/menu@3x.png',
-                                            fit: BoxFit.fill,
+                                    Container(
+                                      child: Row(
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/app_logo.png',
+                                            height: getScreenHeight(50),
                                           ),
-                                        ),
+                                        ],
                                       ),
                                     ),
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                            context, '/qrScanner');
-                                      },
-                                      child: Container(
-                                        height: 30,
-                                        width: 30,
-                                        decoration: BoxDecoration(
-                                          color: loginBgColor,
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(6.0),
-                                          child: Center(
-                                            child: Icon(
-                                              FontAwesomeIcons.qrcode,
-                                              size: 22,
-                                              color: Colors.black,
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            _scaffoldKey.currentState
+                                                ?.openDrawer();
+                                          },
+                                          child: Container(
+                                            height: 30,
+                                            width: 30,
+                                            decoration: BoxDecoration(
+                                              color: loginBgColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                            ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(4.0),
+                                              child: Image.asset(
+                                                'assets/images/menu@3x.png',
+                                                fit: BoxFit.fill,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
+                                        InkWell(
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                                context, '/qrScanner');
+                                          },
+                                          child: Container(
+                                            height: 30,
+                                            width: 30,
+                                            decoration: BoxDecoration(
+                                              color: loginBgColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                            ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(6.0),
+                                              child: Center(
+                                                child: Icon(
+                                                  FontAwesomeIcons.qrcode,
+                                                  size: 22,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 )),
-                            //dashboard search
-                            // Container(
-                            //   padding: EdgeInsets.symmetric(horizontal: 10),
-                            //   margin: EdgeInsets.only(
-                            //       top: MediaQuery.of(context).size.width * 0.08,
-                            //       left:
-                            //           MediaQuery.of(context).size.width * 0.03,
-                            //       right:
-                            //           MediaQuery.of(context).size.width * 0.03),
-                            //   decoration: BoxDecoration(
-                            //       borderRadius: BorderRadius.circular(10),
-                            //       border: Border.all(
-                            //           width: 0,
-                            //           color: white,
-                            //           style: BorderStyle.solid)),
-                            //   child: Container(
-                            //     color: Color.fromRGBO(248, 250, 251, 1),
-                            //     child: Row(
-                            //       // mainAxisAlignment:
-                            //       //     MainAxisAlignment.spaceAround,
-                            //       children: [
-                            //         Container(
-                            //           margin:
-                            //               EdgeInsets.symmetric(horizontal: 10),
-                            //           width: MediaQuery.of(context).size.width *
-                            //               0.05,
-                            //           height:
-                            //               MediaQuery.of(context).size.width *
-                            //                   0.05,
-                            //           decoration: const BoxDecoration(
-                            //               image: DecorationImage(
-                            //                   image: AssetImage(
-                            //                       'assets/images/search.png'),
-                            //                   fit: BoxFit.fill)),
-                            //         ),
-                            //         Container(
-                            //           width: MediaQuery.of(context).size.width *
-                            //               0.63,
-                            //           child: TextFormField(
-                            //             onTapOutside: (event) {
-                            //               FocusManager.instance.primaryFocus
-                            //                   ?.unfocus();
-                            //             },
-                            //             controller: _searchController,
-                            //             focusNode: _focusNode,
-                            //             decoration: const InputDecoration(
-                            //                 hintText: 'Search',
-                            //                 hintStyle: TextStyle(
-                            //                     fontFamily: ffGMedium,
-                            //                     fontSize: 14.0,
-                            //                     color: searchHintTextColor),
-                            //                 contentPadding:
-                            //                     EdgeInsets.symmetric(
-                            //                   vertical: 15,
-                            //                 ),
-                            //                 border: InputBorder.none),
-                            //             onChanged: (value) {
-                            //               // if (value.length >= 8) {
-                            //               setState(() {
-                            //                 searchValue = value;
-                            //                 searchListData = [];
-                            //               });
-                            //               // }
-                            //             },
-                            //           ),
-                            //         ),
-                            //         Container(
-                            //           child: searchValue.length >= 1
-                            //               ? InkWell(
-                            //                   onTap: () {
-                            //                     setState(() {
-                            //                       Utils.clearToasts(context);
-                            //                       searchData();
-                            //                     });
-                            //                   },
-                            //                   child: Container(
-                            //                     padding: EdgeInsets.symmetric(
-                            //                         horizontal: 5, vertical: 5),
-                            //                     decoration: const BoxDecoration(
-                            //                       color: Colors.blue,
-                            //                       borderRadius:
-                            //                           BorderRadius.all(
-                            //                               Radius.circular(10)),
-                            //                     ),
-                            //                     child: const Text(
-                            //                       "Search",
-                            //                       style: TextStyle(
-                            //                           fontFamily: ffGSemiBold,
-                            //                           fontSize: 12.0,
-                            //                           color: whiteBgColor),
-                            //                     ),
-                            //                   ),
-                            //                 )
-                            //               : null,
-                            //         ),
-                            //       ],
-                            //     ),
-                            //   ),
-                            // ),
                             Container(
                               child: searchListData.length >= 2
                                   ? Container(
@@ -590,7 +504,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                           //         color: hintTextColor),
                                           //   ),
                                           // ),
-                                          SizedBox(height: 16),
+                                          // SizedBox(height: 16),
                                           Text(
                                             ' Dashboard',
                                             style: TextStyle(

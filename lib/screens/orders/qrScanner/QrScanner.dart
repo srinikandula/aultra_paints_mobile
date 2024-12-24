@@ -42,7 +42,7 @@ class _QrScannerState extends State<QrScanner> {
   fetchLocalStorageDate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     accesstoken = prefs.getString('accessToken');
-    // sendScannedValue('43de1475-360d-413d-b019-e4faf2942fbf');
+    // sendScannedValue('faa928fa-b05d-43e7-a2d7-92985a011c36');
   }
 
   void _showSnackBar(String message, BuildContext context, ColorCheck) {
@@ -61,7 +61,7 @@ class _QrScannerState extends State<QrScanner> {
 
     response = await http.patch(Uri.parse(apiUrl), headers: {
       "Content-Type": "application/json",
-      "accesstoken": accesstoken
+      "Authorization": accesstoken
     });
     // print('--=scan url===>${apiUrl}');
     if (response.statusCode == 200) {
