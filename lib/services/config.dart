@@ -1,7 +1,7 @@
 // const BASE_URL = 'http://localhost:8080/api/'; //QA
-const BASE_URL = 'http://10.72.24.149:8080/api/'; //QA
+// const BASE_URL = 'http://10.72.24.149:8080/api/'; //QA
+const BASE_URL = 'http://10.72.25.115:4300/api/'; //QA
 
-//Logifreight
 const IOS_APP_VERSION = '1.0.0';
 
 const POST_LOGIN_DETAILS = "auth/login";

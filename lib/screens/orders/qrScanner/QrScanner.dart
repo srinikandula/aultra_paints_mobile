@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../services/config.dart';
@@ -40,6 +42,7 @@ class _QrScannerState extends State<QrScanner> {
   fetchLocalStorageDate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     accesstoken = prefs.getString('accessToken');
+    // sendScannedValue('43de1475-360d-413d-b019-e4faf2942fbf');
   }
 
   void _showSnackBar(String message, BuildContext context, ColorCheck) {
@@ -54,16 +57,18 @@ class _QrScannerState extends State<QrScanner> {
     Utils.clearToasts(context);
     Utils.returnScreenLoader(context);
     http.Response response;
+    var apiUrl = BASE_URL + GET_SCANNED_DATA + scannedValue;
 
-    response = await http
-        .patch(Uri.parse(BASE_URL + GET_SCANNED_DATA + scannedValue), headers: {
+    response = await http.patch(Uri.parse(apiUrl), headers: {
       "Content-Type": "application/json",
       "accesstoken": accesstoken
     });
-    print('--=scan url===>${BASE_URL + GET_SCANNED_DATA + scannedValue}');
+    // print('--=scan url===>${apiUrl}');
     if (response.statusCode == 200) {
       Navigator.pop(context);
-      print('scan resp=====>${response.body}');
+      var apiResp = json.decode(response.body);
+      // print('scan resp=====>${apiResp}');
+      _showSnackBar(apiResp['message'], context, true);
       Navigator.pop(context, true);
     } else {
       Navigator.pop(context);
