@@ -152,7 +152,6 @@
 				DFD2B6D85D2A5B1289F21045 /* Pods-RunnerTests.release.xcconfig */,
 				7D70FA7E684D125EBFEAD3A0 /* Pods-RunnerTests.profile.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -474,10 +473,12 @@
 				DEVELOPMENT_TEAM = 2VX5N6Q835;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Aultra Paints";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aultrapaints.aultraPaintsMobile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -657,10 +658,12 @@
 				DEVELOPMENT_TEAM = 2VX5N6Q835;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Aultra Paints";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aultrapaints.aultraPaintsMobile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -680,10 +683,12 @@
 				DEVELOPMENT_TEAM = 2VX5N6Q835;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Aultra Paints";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aultrapaints.aultraPaintsMobile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";

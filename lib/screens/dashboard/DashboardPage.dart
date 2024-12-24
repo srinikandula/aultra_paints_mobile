@@ -77,10 +77,10 @@ class _DashboardPageState extends State<DashboardPage> {
   List dashboardArray = [];
 
   var dashBoardList = [
-    {"title": "PENDING", "description": "Orders pending", "count": "100"},
-    {"title": "BOOKED", "description": "Orders booked", "count": "50"},
-    {"title": "INTRANSIT", "description": "Orders Intransit", "count": "60"},
-    {"title": "DELIVERED", "description": "Orders Delivered", "count": "05"},
+    {"title": "PENDING", "description": "Orders pending", "count": "0"},
+    {"title": "BOOKED", "description": "Orders booked", "count": "0"},
+    {"title": "INTRANSIT", "description": "Orders Intransit", "count": "0"},
+    {"title": "DELIVERED", "description": "Orders Delivered", "count": "0"},
   ];
 
   @override
@@ -123,8 +123,8 @@ class _DashboardPageState extends State<DashboardPage> {
     USER_ID = prefs.getString('USER_ID');
     USER_EMAIL = prefs.getString('USER_EMAIL');
 
-    print(
-        'dashboard====>${accesstoken}=====>${USER_FULL_NAME}===>${USER_EMAIL}');
+    // print(
+    //     'dashboard====>${accesstoken}=====>${USER_FULL_NAME}===>${USER_EMAIL}');
 
     // getDashboardCounts();
   }
@@ -335,149 +335,6 @@ class _DashboardPageState extends State<DashboardPage> {
     return false;
   }
 
-  void _showBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: white,
-      barrierColor: Colors.black.withOpacity(0.7),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(20.0),
-        ),
-      ),
-      builder: (
-        BuildContext context,
-      ) {
-        return StatefulBuilder(builder: (BuildContext context, setState) {
-          return Container(
-            padding: EdgeInsets.all(25.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Select from below options',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontFamily: ffGMedium,
-                  ),
-                ),
-                SizedBox(height: 20.0),
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.only(top: 5),
-                      backgroundColor: buttonTextBgColor,
-                      // primary: buttonTextBgColor,
-                      // onPrimary: Colors.red,
-                    ),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      await prefs.setInt('Selected_indentId', 00);
-                      await prefs.setBool('Indent_Editing', true);
-                      await prefs.setBool('fromDashboardScreen', true);
-                      // Navigator.pushNamed(context, '/tripCreation',
-                      //     arguments: {}).then((_) {
-                      //   setState(() {
-                      //     // _selectedRadioButtonOption = 1;
-                      //   });
-                      // });
-                      Navigator.pushNamed(context, '/creationFirstScreen')
-                          .then((result) {
-                        setState(() {
-                          searchValue = '';
-                          searchListData = [];
-                          _searchController.clear();
-                        });
-                      });
-                    },
-                    child: ListTile(
-                      leading: Radio<int>(
-                        activeColor: _selectedRadioButtonOption == 1
-                            ? appButtonColor
-                            : chatFromUserColor,
-                        value: 1,
-                        groupValue: _selectedRadioButtonOption,
-                        onChanged: (int? value) {
-                          setState(() {
-                            _selectedRadioButtonOption = 1;
-                          });
-                        },
-                      ),
-                      title: Text('Create Indent',
-                          style: TextStyle(
-                            fontFamily: ffGSemiBold,
-                            color: popUpListColor,
-                            fontSize: 20.0,
-                          )),
-                      contentPadding: EdgeInsets.zero,
-                    )),
-                SizedBox(height: 3.0),
-                // ElevatedButton(
-                //   style: ElevatedButton.styleFrom(
-                //     padding: EdgeInsets.only(top: 5),
-                //     primary: buttonTextBgColor,
-                //     onPrimary: Colors.red,
-                //   ),
-                //   onPressed: () {
-                //     Navigator.pop(context);
-                //     Navigator.pushNamed(context, '/tripsList', arguments: {})
-                //         .then((_) {
-                //       setState(() {
-                //         _selectedRadioButtonOption = 2;
-                //       });
-                //     });
-                //   },
-                //   child: ListTile(
-                //     leading: Radio<int>(
-                //       activeColor: _selectedRadioButtonOption == 2
-                //           ? appButtonColor
-                //           : chatFromUserColor,
-                //       value: 2,
-                //       groupValue: _selectedRadioButtonOption,
-                //       onChanged: (int? value) {
-                //         setState(() {
-                //           _selectedRadioButtonOption = 2;
-                //         });
-                //       },
-                //     ),
-                //     title: Text('Create LR',
-                //         style: TextStyle(
-                //           fontFamily: ffGSemiBold,
-                //           color: popUpListColor,
-                //           fontSize: 20.0,
-                //         )),
-                //     contentPadding: EdgeInsets.zero,
-                //   ),
-                // ),
-                SizedBox(height: 20.0),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Cancel',
-                      style: TextStyle(
-                        fontFamily: ffGMedium,
-                        color: buttonBorderColor,
-                        fontSize: 16.0,
-                      )),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: white, // White background color
-                    // primary: white, // White background color
-                    side: BorderSide(
-                        color: buttonBorderColor), // Red border color
-                    minimumSize: Size(double.infinity, 50), // Full-width button
-                  ),
-                ),
-              ],
-            ),
-          );
-        });
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     // final double screenHeight = MediaQuery.of(context).size.height;
@@ -539,31 +396,31 @@ class _DashboardPageState extends State<DashboardPage> {
                                         ),
                                       ),
                                     ),
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                            context, '/qrScanner');
-                                      },
-                                      child: Container(
-                                        height: 30,
-                                        width: 30,
-                                        decoration: BoxDecoration(
-                                          color: loginBgColor,
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(6.0),
-                                          child: Center(
-                                            child: Icon(
-                                              FontAwesomeIcons.qrcode,
-                                              size: 22,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                    // InkWell(
+                                    //   onTap: () {
+                                    //     Navigator.pushNamed(
+                                    //         context, '/qrScanner');
+                                    //   },
+                                    //   child: Container(
+                                    //     height: 30,
+                                    //     width: 30,
+                                    //     decoration: BoxDecoration(
+                                    //       color: loginBgColor,
+                                    //       borderRadius:
+                                    //           BorderRadius.circular(15),
+                                    //     ),
+                                    //     child: Padding(
+                                    //       padding: const EdgeInsets.all(6.0),
+                                    //       child: Center(
+                                    //         child: Icon(
+                                    //           FontAwesomeIcons.qrcode,
+                                    //           size: 22,
+                                    //           color: Colors.black,
+                                    //         ),
+                                    //       ),
+                                    //     ),
+                                    //   ),
+                                    // ),
                                   ],
                                 )),
                             //dashboard search
@@ -752,7 +609,46 @@ class _DashboardPageState extends State<DashboardPage> {
                                                     child: ListView(
                                                       physics:
                                                           AlwaysScrollableScrollPhysics(), // Ensures scroll behavior
-                                                      children: [],
+                                                      children: [
+                                                        InkWell(
+                                                          onTap: () {
+                                                            Utils.clearToasts(
+                                                                context);
+                                                            Navigator.pushNamed(
+                                                              context,
+                                                              // '/orderDetails',
+                                                              '/ordersList',
+                                                              arguments: {
+                                                                'argumentStatus':
+                                                                    '',
+                                                              },
+                                                            ).then((result) {
+                                                              if (result ==
+                                                                  true) {
+                                                                // getDashboardCounts();
+                                                                setState(() {
+                                                                  searchValue =
+                                                                      '';
+                                                                  searchListData =
+                                                                      [];
+                                                                  _searchController
+                                                                      .clear();
+                                                                });
+                                                              }
+                                                            });
+                                                          },
+                                                          child:
+                                                              _buildDashboardCard(
+                                                            'ORDERS LIST',
+                                                            'Orders list',
+                                                            '#123',
+                                                            buttonTextBgColor,
+                                                            buttonTextBgColor,
+                                                            '',
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 5),
+                                                      ],
                                                     ),
                                                   )
                                                 : ListView.builder(
@@ -773,37 +669,36 @@ class _DashboardPageState extends State<DashboardPage> {
                                                         children: [
                                                           InkWell(
                                                             onTap: () {
-                                                              if (dashboardCard[
-                                                                      'count'] !=
-                                                                  '0') {
-                                                                Utils.clearToasts(
-                                                                    context);
-                                                                Navigator
-                                                                    .pushNamed(
-                                                                  context,
-                                                                  '/orderDetails',
-                                                                  arguments: {
-                                                                    'argumentStatus':
-                                                                        dashboardCard[
-                                                                            'status'],
-                                                                  },
-                                                                ).then(
-                                                                    (result) {
-                                                                  if (result ==
-                                                                      true) {
-                                                                    // getDashboardCounts();
-                                                                    setState(
-                                                                        () {
-                                                                      searchValue =
-                                                                          '';
-                                                                      searchListData =
-                                                                          [];
-                                                                      _searchController
-                                                                          .clear();
-                                                                    });
-                                                                  }
-                                                                });
-                                                              }
+                                                              // if (dashboardCard[
+                                                              //         'count'] !=
+                                                              //     '0') {
+                                                              Utils.clearToasts(
+                                                                  context);
+                                                              Navigator
+                                                                  .pushNamed(
+                                                                context,
+                                                                // '/orderDetails',
+                                                                '/ordersList',
+                                                                arguments: {
+                                                                  'argumentStatus':
+                                                                      dashboardCard[
+                                                                          'status'],
+                                                                },
+                                                              ).then((result) {
+                                                                if (result ==
+                                                                    true) {
+                                                                  // getDashboardCounts();
+                                                                  setState(() {
+                                                                    searchValue =
+                                                                        '';
+                                                                    searchListData =
+                                                                        [];
+                                                                    _searchController
+                                                                        .clear();
+                                                                  });
+                                                                }
+                                                              });
+                                                              // }
                                                             },
                                                             child:
                                                                 _buildDashboardCard(
@@ -868,53 +763,6 @@ class _DashboardPageState extends State<DashboardPage> {
                         ))),
               ),
             )),
-        //   floatingActionButton: Stack(
-        //     children: [
-        //       // Padding(
-        //       //   padding: const EdgeInsets.only(left: 50),
-        //       //   child: Align(
-        //       //     alignment: Alignment.bottomLeft,
-        //       //     child: ElevatedButton(
-        //       //       onPressed: () {
-        //       //         _showBottomSheet(context);
-        //       //       },
-        //       //       child: Icon(
-        //       //         Icons.add,
-        //       //         color: floatingIconButtonColor,
-        //       //         size: 40,
-        //       //       ),
-        //       //       style: ElevatedButton.styleFrom(
-        //       //         backgroundColor: floatingIconButtonBgColor,
-        //       //         shape: CircleBorder(),
-        //       //         padding: EdgeInsets.all(10),
-        //       //       ),
-        //       //     ),
-        //       //   ),
-        //       // ),
-        //       Align(
-        //         alignment: Alignment.bottomRight,
-        //         child: ElevatedButton(
-        //           onPressed: () {},
-        //           child: Text(
-        //             'SOS',
-        //             style: TextStyle(
-        //                 color: appButtonColor,
-        //                 fontSize: 16,
-        //                 fontFamily: ffGSemiBold),
-        //           ),
-        //           style: ElevatedButton.styleFrom(
-        //             backgroundColor: floatingButtonBgColor,
-        //             shape: CircleBorder(),
-        //             padding: EdgeInsets.all(18),
-        //             side: BorderSide(
-        //               width: 3.0,
-        //               color: appButtonColor,
-        //             ),
-        //           ),
-        //         ),
-        //       ),
-        //     ],
-        //   ),
       ),
     );
   }

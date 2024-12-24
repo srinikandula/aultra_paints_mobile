@@ -96,7 +96,7 @@ class _CreateOrdersState extends State<CreateOrders> {
     } else if (_volumeController.text.isEmpty) {
       _showSnackBar("Please enter Volume", context, false);
     } else if (_quantityController.text.isEmpty) {
-      _showSnackBar("Please select Quantity", context, false);
+      _showSnackBar("Please enter Quantity", context, false);
     } else {
       createOrder();
     }
@@ -120,15 +120,18 @@ class _CreateOrdersState extends State<CreateOrders> {
           "accesstoken": accesstoken
         },
         body: body);
-    var apiResp = json.decode(response.body);
-    if (response.statusCode == 200) {
+    print(
+        'create order statusCode====>${response.statusCode}====>${response.body}');
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      var apiResp = json.decode(response.body);
       Navigator.pop(context);
       _showSnackBar(apiResp['message'], context, true);
       Navigator.pop(context, true);
     } else {
       Navigator.pop(context);
       error_handling.errorValidation(
-          context, response.statusCode, apiResp['message'], false);
+          context, response.statusCode, response.body, false);
     }
   }
 
@@ -317,7 +320,7 @@ class _CreateOrdersState extends State<CreateOrders> {
               ),
             ),
           ),
-
+          SizedBox(height: 5),
           //Volume
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -335,10 +338,7 @@ class _CreateOrdersState extends State<CreateOrders> {
                     FocusManager.instance.primaryFocus?.unfocus();
                   },
                   autofocus: false,
-                  keyboardType: defaultTargetPlatform == TargetPlatform.iOS
-                      ? TextInputType.numberWithOptions(
-                          decimal: true, signed: true)
-                      : TextInputType.number,
+                  keyboardType: TextInputType.number,
                   controller: _volumeController,
                   decoration: const InputDecoration(
                       hintText: 'Enter Volume',
@@ -355,6 +355,47 @@ class _CreateOrdersState extends State<CreateOrders> {
                         final cursorPosition = _volumeController.selection;
                         _volumeController.text = value;
                         _volumeController.selection = cursorPosition;
+                      }
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 5),
+          //Quantity
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Utils.returnInvoiceRedStar('Quantity'),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: textinputBgColor,
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                width: screenWidth * 0.9,
+                child: TextFormField(
+                  onTapOutside: (event) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
+                  autofocus: false,
+                  keyboardType: TextInputType.number,
+                  controller: _quantityController,
+                  decoration: const InputDecoration(
+                      hintText: 'Enter Quantity',
+                      hintStyle: TextStyle(
+                          fontFamily: ffGMedium,
+                          fontSize: 15.0,
+                          color: Colors.grey),
+                      contentPadding: EdgeInsets.all(15),
+                      border: InputBorder.none),
+                  onChanged: (value) {
+                    setState(() {
+                      if (_quantityController.text != value) {
+                        final cursorPosition = _quantityController.selection;
+                        _quantityController.text = value;
+                        _quantityController.selection = cursorPosition;
                       }
                     });
                   },
