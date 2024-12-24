@@ -13,11 +13,8 @@ import 'package:provider/provider.dart';
 
 import '/screens/authentication/login/LoginPage.dart';
 import '/screens/authentication/login/LoginViewModel.dart';
-import 'screens/authentication/password/PasswordPage.dart';
-import 'screens/authentication/password/PasswordViewModel.dart';
 import 'screens/splash/SplashPage.dart';
 import '/screens/dashboard/DashboardPage.dart';
-import '/screens/authentication/otp/OtpPage.dart';
 import '/screens/authentication/signup/SignupPage.dart';
 
 Future<void> main() async {
@@ -25,9 +22,6 @@ Future<void> main() async {
     providers: [
       ChangeNotifierProvider<LoginViewModel>(
         create: (context) => LoginViewModel(),
-      ),
-      ChangeNotifierProvider<PasswordViewModel>(
-        create: (context) => PasswordViewModel(),
       ),
     ],
     child: MyApp(),
@@ -84,14 +78,12 @@ class MyAppState extends State<MyApp> {
       routes: {
         "/splashPage": (context) => const SplashPage(),
         "/loginPage": (context) => const LoginPage(),
-        "/passwordPage": (context) => const PasswordPage(),
         "/dashboardPage": (context) => const DashboardPage(),
         "/createOrders": (context) => const CreateOrders(),
         "/qrScanner": (context) => const QrScanner(),
         "/orderDetails": (context) => const OrderDetails(),
         "/createProduct": (context) => const CreateProduct(),
         "/ordersList": (context) => const OrdersList(),
-        "/otpPage": (context) => const OtpPage(),
         "/signupPage": (context) => const SignupPage(),
       },
     );

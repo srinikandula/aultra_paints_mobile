@@ -5,11 +5,7 @@ import '/utility/size_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:lodash_flutter/lodash_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../model/request/inbound_pdi_request.dart';
-import '../model/request/outbound_pdi_request.dart';
 import 'Colors.dart';
 import 'Fonts.dart';
 
@@ -19,32 +15,7 @@ import 'Fonts.dart';
 
 class Utils {
   static var labelLarge;
-  static List<OutboundPDIRequest> pdiRequest = [];
-  static List<InboundPDIRequest> pdiRequestInbound = [];
-
-  static String pdiToJson() {
-    List<Map<String, dynamic>> jsonList =
-        Utils.pdiRequest.map((pdi) => pdi.toJson()).toList();
-    return jsonEncode(jsonList);
-  }
-
-  // Convert a JSON string to a list of UserModel objects
-  static List<OutboundPDIRequest> pdiFromJson(String jsonString) {
-    List<dynamic> jsonList = jsonDecode(jsonString);
-    return jsonList.map((json) => OutboundPDIRequest.fromJson(json)).toList();
-  }
-
-  static String pdiToJsonInbound() {
-    List<Map<String, dynamic>> jsonList =
-        Utils.pdiRequestInbound.map((pdi) => pdi.toJson()).toList();
-    return jsonEncode(jsonList);
-  }
-
-  // Convert a JSON string to a list of UserModel objects
-  static List<InboundPDIRequest> pdiFromJsonInbound(String jsonString) {
-    List<dynamic> jsonList = jsonDecode(jsonString);
-    return jsonList.map((json) => InboundPDIRequest.fromJson(json)).toList();
-  }
+ 
 
   static List<Widget> modelBuilder<M>(
           List<M> models, Widget Function(int index, M model) builder) =>
