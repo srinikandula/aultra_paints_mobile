@@ -3,6 +3,7 @@ import 'dart:io';
 import 'screens/orders/createOrder/CreateOrders.dart';
 import 'screens/orders/createProduct/CreateProduct.dart';
 import 'screens/orders/orderDetails/OrderDetails.dart';
+import 'screens/orders/ordersList/OrdersList.dart';
 import 'screens/orders/qrScanner/QrScanner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -89,6 +90,7 @@ class MyAppState extends State<MyApp> {
         "/qrScanner": (context) => const QrScanner(),
         "/orderDetails": (context) => const OrderDetails(),
         "/createProduct": (context) => const CreateProduct(),
+        "/ordersList": (context) => const OrdersList(),
         "/otpPage": (context) => const OtpPage(),
         "/signupPage": (context) => const SignupPage(),
       },
