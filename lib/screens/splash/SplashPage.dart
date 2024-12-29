@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../utility/Utils.dart';
 import '../authentication/login/LoginPage.dart';
 import '../dashboard/DashboardPage.dart';
 
@@ -22,6 +25,15 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
     callTimer();
+    // certificateCheck();
+  }
+
+  void _showSnackBar(String message, BuildContext context, ColorCheck) {
+    final snackBar = SnackBar(
+        content: Text(message),
+        backgroundColor: ColorCheck ? Colors.green : Colors.red,
+        duration: Utils.returnStatusToastDuration(ColorCheck));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   callTimer() {
@@ -38,6 +50,40 @@ class _SplashPageState extends State<SplashPage> {
     } else {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => const LoginPage()));
+    }
+  }
+
+  Future<HttpClient> createHttpClientWithCertificate() async {
+    SecurityContext context = SecurityContext.defaultContext;
+    try {
+      // final certData =
+      //     await rootBundle.load('assets/certificate/STAR_mlldev_com.crt'); //dev
+      final certData =
+          await rootBundle.load('assets/certificate/STAR_mllqa_com.crt'); //QA
+      context.setTrustedCertificatesBytes(certData.buffer.asUint8List());
+    } catch (e) {
+      print("Error loading certificate: $e");
+      throw Exception("Failed to load certificate");
+    }
+    return HttpClient(context: context)
+      ..badCertificateCallback = (cert, host, port) => false;
+  }
+
+  Future certificateCheck() async {
+    HttpClient client = await createHttpClientWithCertificate();
+
+    final request =
+        await client.getUrl(Uri.parse('https://dealerportal.mllqa.com'));
+
+    final response = await request.close();
+
+    if (response.statusCode == 200) {
+      callTimer();
+    } else {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const LoginPage()));
+
+      _showSnackBar('certification verification failed', context, false);
     }
   }
 

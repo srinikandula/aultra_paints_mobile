@@ -30,6 +30,7 @@ class _DashboardPageState extends State<DashboardPage> {
   var USER_ID;
   var USER_FULL_NAME;
   var USER_EMAIL;
+  var USER_MOBILE_NUMBER;
   String USER_NAME = "";
   String USER_ROLE = "";
   String BACKEND_ROLE = "";
@@ -77,10 +78,10 @@ class _DashboardPageState extends State<DashboardPage> {
   List dashboardArray = [];
 
   var dashBoardList = [
-    {"title": "PENDING", "description": "Pending Confirmation", "count": "0"},
-    {"title": "CONFIRMED", "description": "Orders Confirmed", "count": "0"},
-    {"title": "INTRANSIT", "description": "Orders Intransit", "count": "0"},
-    {"title": "DELIVERED", "description": "Orders Delivered", "count": "0"},
+    // {"title": "PENDING", "description": "Pending Confirmation", "count": "0"},
+    // {"title": "CONFIRMED", "description": "Orders Confirmed", "count": "0"},
+    // {"title": "INTRANSIT", "description": "Orders Intransit", "count": "0"},
+    // {"title": "DELIVERED", "description": "Orders Delivered", "count": "0"},
   ];
 
   @override
@@ -122,11 +123,9 @@ class _DashboardPageState extends State<DashboardPage> {
     USER_FULL_NAME = prefs.getString('USER_FULL_NAME');
     USER_ID = prefs.getString('USER_ID');
     USER_EMAIL = prefs.getString('USER_EMAIL');
+    USER_MOBILE_NUMBER = prefs.getString('USER_MOBILE_NUMBER');
 
-    // print(
-    //     'dashboard====>${accesstoken}=====>${USER_FULL_NAME}===>${USER_EMAIL}');
-
-    // getDashboardCounts();
+    getDashboardCounts();
   }
 
   clearStorage() async {
@@ -134,6 +133,43 @@ class _DashboardPageState extends State<DashboardPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.clear();
     Navigator.of(context).pushNamed('/splashPage');
+  }
+
+  Future getDashboardCounts() async {
+    Utils.clearToasts(context);
+    Utils.returnScreenLoader(context);
+    http.Response response;
+    var apiUrl = BASE_URL + GET_USER_DETAILS + USER_ID;
+
+    response = await http.get(Uri.parse(apiUrl), headers: {
+      "Content-Type": "application/json",
+      "Authorization": accesstoken
+    });
+
+    if (response.statusCode == 200) {
+      Navigator.pop(context);
+      var tempResp = json.decode(response.body);
+      var apiResp = tempResp['data'];
+      dashBoardList = [
+        {
+          "title": "Redeemed Points",
+          "description": "Redeemed Points Confirmation",
+          "count": apiResp['redeemablePoints']
+        },
+        {
+          "title": "Earned Cash Reward",
+          "description": "Earned Cash Reward Confirmation",
+          "count": apiResp['cash']
+        },
+      ];
+      setState(() {
+        dashBoardList = dashBoardList;
+      });
+    } else {
+      Navigator.pop(context);
+      error_handling.errorValidation(
+          context, response.body, response.body, false);
+    }
   }
 
   void logOut(context) async {
@@ -372,46 +408,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                                     child: ListView(
                                                       physics:
                                                           AlwaysScrollableScrollPhysics(), // Ensures scroll behavior
-                                                      children: [
-                                                        InkWell(
-                                                          onTap: () {
-                                                            Utils.clearToasts(
-                                                                context);
-                                                            Navigator.pushNamed(
-                                                              context,
-                                                              // '/orderDetails',
-                                                              '/ordersList',
-                                                              arguments: {
-                                                                'argumentStatus':
-                                                                    '',
-                                                              },
-                                                            ).then((result) {
-                                                              if (result ==
-                                                                  true) {
-                                                                // getDashboardCounts();
-                                                                setState(() {
-                                                                  searchValue =
-                                                                      '';
-                                                                  searchListData =
-                                                                      [];
-                                                                  _searchController
-                                                                      .clear();
-                                                                });
-                                                              }
-                                                            });
-                                                          },
-                                                          child:
-                                                              _buildDashboardCard(
-                                                            'ORDERS LIST',
-                                                            'Orders list',
-                                                            '#123',
-                                                            buttonTextBgColor,
-                                                            buttonTextBgColor,
-                                                            '',
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: 5),
-                                                      ],
+                                                      children: [],
                                                     ),
                                                   )
                                                 : ListView.builder(
@@ -435,32 +432,32 @@ class _DashboardPageState extends State<DashboardPage> {
                                                               // if (dashboardCard[
                                                               //         'count'] !=
                                                               //     '0') {
-                                                              Utils.clearToasts(
-                                                                  context);
-                                                              Navigator
-                                                                  .pushNamed(
-                                                                context,
-                                                                // '/orderDetails',
-                                                                '/ordersList',
-                                                                arguments: {
-                                                                  'argumentStatus':
-                                                                      dashboardCard[
-                                                                          'status'],
-                                                                },
-                                                              ).then((result) {
-                                                                if (result ==
-                                                                    true) {
-                                                                  // getDashboardCounts();
-                                                                  setState(() {
-                                                                    searchValue =
-                                                                        '';
-                                                                    searchListData =
-                                                                        [];
-                                                                    _searchController
-                                                                        .clear();
-                                                                  });
-                                                                }
-                                                              });
+                                                              // Utils.clearToasts(
+                                                              //     context);
+                                                              // Navigator
+                                                              //     .pushNamed(
+                                                              //   context,
+                                                              //   // '/orderDetails',
+                                                              //   '/ordersList',
+                                                              //   arguments: {
+                                                              //     'argumentStatus':
+                                                              //         dashboardCard[
+                                                              //             'status'],
+                                                              //   },
+                                                              // ).then((result) {
+                                                              //   if (result ==
+                                                              //       true) {
+                                                              //     // getDashboardCounts();
+                                                              //     setState(() {
+                                                              //       searchValue =
+                                                              //           '';
+                                                              //       searchListData =
+                                                              //           [];
+                                                              //       _searchController
+                                                              //           .clear();
+                                                              //     });
+                                                              //   }
+                                                              // });
                                                               // }
                                                             },
                                                             child:
@@ -486,38 +483,38 @@ class _DashboardPageState extends State<DashboardPage> {
                                                   ),
                                           ),
 
-                                          Divider(),
+                                          // Divider(),
 
-                                          InkWell(
-                                            onTap: () async {
-                                              SharedPreferences prefs =
-                                                  await SharedPreferences
-                                                      .getInstance();
-                                              await prefs.setInt(
-                                                  'Selected_indentId', 00);
-                                              await prefs.setBool(
-                                                  'Indent_Editing', true);
-                                              await prefs.setBool(
-                                                  'fromDashboardScreen', true);
+                                          // InkWell(
+                                          //   onTap: () async {
+                                          //     SharedPreferences prefs =
+                                          //         await SharedPreferences
+                                          //             .getInstance();
+                                          //     await prefs.setInt(
+                                          //         'Selected_indentId', 00);
+                                          //     await prefs.setBool(
+                                          //         'Indent_Editing', true);
+                                          //     await prefs.setBool(
+                                          //         'fromDashboardScreen', true);
 
-                                              Navigator.pushNamed(
-                                                      context, '/createOrders')
-                                                  .then((result) {
-                                                setState(() {
-                                                  searchValue = '';
-                                                  searchListData = [];
-                                                  _searchController.clear();
-                                                });
-                                              });
-                                            },
-                                            child: _buildDashboardCard(
-                                                'CREATE ORDER ',
-                                                'A new order can be created in next screen',
-                                                "#123",
-                                                buttonTextBgColor,
-                                                buttonTextBgColor,
-                                                'indent_create'),
-                                          )
+                                          //     Navigator.pushNamed(
+                                          //             context, '/createOrders')
+                                          //         .then((result) {
+                                          //       setState(() {
+                                          //         searchValue = '';
+                                          //         searchListData = [];
+                                          //         _searchController.clear();
+                                          //       });
+                                          //     });
+                                          //   },
+                                          //   child: _buildDashboardCard(
+                                          //       'CREATE ORDER ',
+                                          //       'A new order can be created in next screen',
+                                          //       "#123",
+                                          //       buttonTextBgColor,
+                                          //       buttonTextBgColor,
+                                          //       'indent_create'),
+                                          // )
                                         ],
                                       ),
                                     ),

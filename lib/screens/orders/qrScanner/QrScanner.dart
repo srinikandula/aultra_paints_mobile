@@ -42,7 +42,19 @@ class _QrScannerState extends State<QrScanner> {
   fetchLocalStorageDate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     accesstoken = prefs.getString('accessToken');
-    // sendScannedValue('faa928fa-b05d-43e7-a2d7-92985a011c36');
+    // sendScannedValue('a5be85ed-4b0d-480c-9851-9864638b89f5');
+
+    // final apiResponse = {
+    //   "message": "Coupon redeemed Successfully..!",
+    //   "data": {
+    //     "qr_code_id": "433b889c-b38f-4bd9-89f9-0498a5d8dfa6",
+    //     "isProcessed": true,
+    //     "updatedBy": "6771ab7eedc91a9596744def",
+    //     "redeemablePoints": 5
+    //   }
+    // };
+
+    // showApiResponsePopup(context, apiResponse);
   }
 
   void _showSnackBar(String message, BuildContext context, ColorCheck) {
@@ -63,13 +75,14 @@ class _QrScannerState extends State<QrScanner> {
       "Content-Type": "application/json",
       "Authorization": accesstoken
     });
-    // print('--=scan url===>${apiUrl}');
+    print('--=scan url===>${apiUrl}');
     if (response.statusCode == 200) {
       Navigator.pop(context);
       var apiResp = json.decode(response.body);
-      // print('scan resp=====>${apiResp}');
-      _showSnackBar(apiResp['message'], context, true);
-      Navigator.pop(context, true);
+      print('scan resp=====>${apiResp}');
+      // _showSnackBar(apiResp['message'], context, true);
+      // Navigator.pop(context, true);
+      showApiResponsePopup(context, apiResp);
     } else {
       Navigator.pop(context);
       error_handling.errorValidation(
@@ -137,6 +150,51 @@ class _QrScannerState extends State<QrScanner> {
           ],
         ),
       ),
+    );
+  }
+
+  void showApiResponsePopup(
+      BuildContext context, Map<String, dynamic> response) {
+    final message = response["message"] ?? "No message";
+    final data = response["data"] ?? {};
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Scanned Details"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(message, style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 10),
+              Text("Batch Name: ${data['batchName'] ?? 0}"),
+              SizedBox(height: 2),
+              Text("Batch Number: ${data['batchNumber'] ?? 0}"),
+              SizedBox(height: 2),
+              Text("Processed: ${data['isProcessed'] ?? false ? 'Yes' : 'No'}"),
+              SizedBox(height: 2),
+              Text("Redeemable Points: ${data['redeemablePoints'] ?? 0}"),
+              SizedBox(height: 2),
+              Text("Coupon: ${data['couponCode'] ?? 0}"),
+              SizedBox(height: 2),
+              Text("Cash: ${data['cash'] ?? 0}"),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Navigator.of(context).pop(); // Close the dialog
+                // Navigator.pop(context);
+                Navigator.pop(context, true);
+                Navigator.pop(context, true);
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
     );
   }
 }
