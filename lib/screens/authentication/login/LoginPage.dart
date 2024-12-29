@@ -81,16 +81,20 @@ class _LoginPageState extends State<LoginPage> {
 
       final apiURL = '$BASE_URL$POST_LOGIN_DETAILS';
       Map<String, String> requestBody = {
-        "email": tempFirstValue,
+        "mobile": tempFirstValue,
         "password": tempSecondValue,
       };
       final body = json.encode(requestBody);
+
+      // print('login body===>${body}=========>${apiURL}');
 
       final response = await http.post(
         Uri.parse(apiURL),
         headers: {"Content-Type": "application/json"},
         body: body,
       );
+
+      // print('API Response checl: ${response.body}');
 
       // Parse the response
       final apiResp = json.decode(response.body);
@@ -128,6 +132,7 @@ class _LoginPageState extends State<LoginPage> {
     await prefs.setString('USER_FULL_NAME', userData['fullName']);
     await prefs.setString('USER_ID', userData['id']);
     await prefs.setString('USER_EMAIL', userData['email']);
+    await prefs.setString('USER_MOBILE_NUMBER', userData['mobile']);
 
     Navigator.pushNamed(context, '/dashboardPage', arguments: {});
   }
@@ -266,7 +271,7 @@ class _LoginPageState extends State<LoginPage> {
                                         ?.unfocus();
                                   },
                                   decoration: const InputDecoration(
-                                    labelText: 'Enter Email',
+                                    labelText: 'Enter Mobile Number',
                                     labelStyle: TextStyle(
                                       fontFamily: ffGMedium,
                                       fontSize: 18.0,
@@ -276,7 +281,7 @@ class _LoginPageState extends State<LoginPage> {
                                     border: InputBorder.none,
                                   ),
                                   onChanged: (value) {
-                                    _loginRequest.username = value.trim();
+                                    _loginRequest.phoneNumber = value.trim();
                                   },
                                 ),
                               ),
@@ -326,12 +331,12 @@ class _LoginPageState extends State<LoginPage> {
                                   //     arguments: {});
                                   Utils.clearToasts(context);
                                   var tempFirstValue =
-                                      _loginRequest.username.trim();
+                                      _loginRequest.phoneNumber.trim();
                                   var tempSecondValue =
                                       _loginRequest.password.trim();
                                   if (tempFirstValue == '') {
-                                    _showSnackBar(
-                                        "Please enter email", context, false);
+                                    _showSnackBar("Please enter Mobile Number",
+                                        context, false);
                                   } else if (tempSecondValue == '') {
                                     _showSnackBar("Please enter password",
                                         context, false);

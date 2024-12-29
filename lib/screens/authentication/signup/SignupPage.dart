@@ -37,6 +37,7 @@ class _SignupPageState extends State<SignupPage> {
   late TextEditingController _userEmail;
   late TextEditingController _userNewPassword;
   late TextEditingController _userConfirmPassword;
+  late TextEditingController _userMobileNumber;
 
   @override
   void initState() {
@@ -45,6 +46,7 @@ class _SignupPageState extends State<SignupPage> {
     _userEmail = TextEditingController();
     _userNewPassword = TextEditingController();
     _userConfirmPassword = TextEditingController();
+    _userMobileNumber = TextEditingController();
   }
 
   @override
@@ -53,6 +55,7 @@ class _SignupPageState extends State<SignupPage> {
     _userEmail.dispose();
     _userNewPassword.dispose();
     _userConfirmPassword.dispose();
+    _userMobileNumber.dispose();
     super.dispose();
   }
 
@@ -73,13 +76,16 @@ class _SignupPageState extends State<SignupPage> {
     Map map = {
       "name": _userName.text,
       "email": _userEmail.text,
-      "password": _userConfirmPassword.text
+      "password": _userConfirmPassword.text,
+      "mobile": _userMobileNumber.text
     };
     var body = json.encode(map);
     print('register body===>$body');
     response = await http.post(Uri.parse(BASE_URL + REGISTER_USER),
         headers: {"Content-Type": "application/json"}, body: body);
+    // print('register statusCode====>${response.statusCode}');
     mapResponse = json.decode(response.body);
+    // print('register resp====>${mapResponse}');
     if (response.statusCode == 200) {
       Navigator.pop(context);
       _showSnackBar(mapResponse['message'], context, true, false);
@@ -96,6 +102,7 @@ class _SignupPageState extends State<SignupPage> {
     final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
     final passwordRegex = RegExp(
         r'^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z0-9!@#$%^&*(),.?":{}|<>]{8,}$');
+    final phoneNumberRegax = RegExp(r'^[0-9]{10}$');
 
     if (_userName.text.isEmpty || !nameRegex.hasMatch(_userName.text)) {
       _showSnackBar('Enter a valid name (only letters, min 3 characters)',
@@ -103,6 +110,9 @@ class _SignupPageState extends State<SignupPage> {
     } else if (_userEmail.text.isEmpty ||
         !emailRegex.hasMatch(_userEmail.text)) {
       _showSnackBar('Enter a valid email', context, false, true);
+    } else if (_userMobileNumber.text.isEmpty ||
+        !phoneNumberRegax.hasMatch(_userMobileNumber.text)) {
+      _showSnackBar('Enter a valid Mobile Number', context, false, true);
     } else if (_userNewPassword.text.isEmpty ||
         !passwordRegex.hasMatch(_userNewPassword.text)) {
       _showSnackBar('Enter a valid new password', context, false, true);
@@ -201,7 +211,7 @@ class _SignupPageState extends State<SignupPage> {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      height: screenHeight * 0.75,
+      height: screenHeight * 0.73,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -281,6 +291,48 @@ class _SignupPageState extends State<SignupPage> {
                         final cursorPosition = _userEmail.selection;
                         _userEmail.text = value;
                         _userEmail.selection = cursorPosition;
+                      }
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 5),
+          //mobile number
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Utils.returnInvoiceRedStar('Mobile Number'),
+              Container(
+                margin: const EdgeInsets.only(top: 5),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: textinputBgColor,
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                width: screenWidth * 0.9,
+                child: TextFormField(
+                  onTapOutside: (event) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
+                  autofocus: false,
+                  keyboardType: TextInputType.phone,
+                  controller: _userMobileNumber,
+                  decoration: const InputDecoration(
+                      hintText: 'Enter Mobile Number',
+                      hintStyle: TextStyle(
+                          fontFamily: ffGMedium,
+                          fontSize: 15.0,
+                          color: Colors.grey),
+                      contentPadding: EdgeInsets.all(15),
+                      border: InputBorder.none),
+                  onChanged: (value) {
+                    setState(() {
+                      if (_userMobileNumber.text != value) {
+                        final cursorPosition = _userMobileNumber.selection;
+                        _userMobileNumber.text = value;
+                        _userMobileNumber.selection = cursorPosition;
                       }
                     });
                   },
