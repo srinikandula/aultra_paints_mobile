@@ -1,5 +1,5 @@
 // const BASE_URL = 'http://localhost:8080/api/'; //QA
-// const BASE_URL = 'http://192.168.29.161:4300/api/'; //QA
+// const BASE_URL = 'http://192.168.1.9:4300/api/'; //QA
 const BASE_URL = 'http://paintsapi.whizzard.in/api/'; //QA
 
 const IOS_APP_VERSION = '1.0.0';

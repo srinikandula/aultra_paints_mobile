@@ -113,13 +113,19 @@ class _SignupPageState extends State<SignupPage> {
     } else if (_userMobileNumber.text.isEmpty ||
         !phoneNumberRegax.hasMatch(_userMobileNumber.text)) {
       _showSnackBar('Enter a valid Mobile Number', context, false, true);
-    } else if (_userNewPassword.text.isEmpty ||
-        !passwordRegex.hasMatch(_userNewPassword.text)) {
+    } else if (_userNewPassword.text.isEmpty ) {
       _showSnackBar('Enter a valid new password', context, false, true);
-    } else if (_userConfirmPassword.text.isEmpty ||
-        !passwordRegex.hasMatch(_userConfirmPassword.text)) {
+    } else if (_userConfirmPassword.text.isEmpty ) {
       _showSnackBar('Enter a valid confirm password', context, false, true);
-    } else if (_userNewPassword.text != _userConfirmPassword.text) {
+    }
+    // else if (_userNewPassword.text.isEmpty ||
+    //     !passwordRegex.hasMatch(_userNewPassword.text)) {
+    //   _showSnackBar('Enter a valid new password', context, false, true);
+    // } else if (_userConfirmPassword.text.isEmpty ||
+    //     !passwordRegex.hasMatch(_userConfirmPassword.text)) {
+    //   _showSnackBar('Enter a valid confirm password', context, false, true);
+    // }
+    else if (_userNewPassword.text != _userConfirmPassword.text) {
       _showSnackBar('Passwords are not matching', context, false, true);
     } else {
       postRegisterDetails();

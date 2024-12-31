@@ -294,7 +294,14 @@ class _DashboardPageState extends State<DashboardPage> {
                                         InkWell(
                                           onTap: () {
                                             Navigator.pushNamed(
-                                                context, '/qrScanner');
+                                                context, '/qrScanner').then((result) {
+                                              if (result == true) {
+                                                getDashboardCounts();
+                                                setState(() {
+
+                                                });
+                                              }
+                                            });
                                           },
                                           child: Container(
                                             height: 30,
