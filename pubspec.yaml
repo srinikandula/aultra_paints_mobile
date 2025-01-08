@@ -60,50 +60,53 @@ flutter:
   assets:
     - assets/
     - assets/images/
-    - assets/certificate/STAR_mlldev_com.crt
-    - assets/certificate/STAR_mllqa_com.crt
+#    - assets/certificate/STAR_mlldev_com.crt
+#    - assets/certificate/STAR_mllqa_com.crt
+    - assets/certificate/AultraPaints_b20bd50c61d9d911.crt
+    - assets/certificate/AultraPaints_b20bd50c61d9d911.pem
+    - assets/certificate/AultraPaints_gd_bundle-g2-g1.crt
 
-
-  fonts:
-    - family: Helvetica
-      fonts:
-        - asset: assets/font/Helvetica.ttf
-
-    - family: HelveticaMedium
-      fonts:
-        - asset: assets/font/HelveticaMedium.ttf
-
-    - family: HelveticaBold
-      fonts:
-        - asset: assets/font/HelveticaBold.ttf
-
-    - family: GeoramaSemiExpandedBold
-      fonts:
-        - asset: assets/font/georama_semiexpanded_bold.ttf
-
-    - family: GeoramaSemiExpandedExtraBold
-      fonts:
-        - asset: assets/font/georama_semiexpanded_extrabold.ttf
-
-    - family: GeoramaSemiExpandedLight
-      fonts:
-        - asset: assets/font/georama_semiexpanded_light.ttf
-
-    - family: GeoramaSemiExpandedMediumItalic
-      fonts:
-        - asset: assets/font/georama_semiexpanded_medium_italic.ttf
-
-    - family: GeoramaSemiExpandedMedium
-      fonts:
-        - asset: assets/font/georama_semiexpanded_medium.ttf
-
-    - family: GeoramaSemiExpandedRegular
-      fonts:
-        - asset: assets/font/georama_semiexpanded_regular.ttf
-
-    - family: GeoramaSemiExpandedSemiBold
-      fonts:
-        - asset: assets/font/georama_semiexpanded_semibold.ttf
+#
+#  fonts:
+#    - family: Helvetica
+#      fonts:
+#        - asset: assets/font/Helvetica.ttf
+#
+#    - family: HelveticaMedium
+#      fonts:
+#        - asset: assets/font/HelveticaMedium.ttf
+#
+#    - family: HelveticaBold
+#      fonts:
+#        - asset: assets/font/HelveticaBold.ttf
+#
+#    - family: GeoramaSemiExpandedBold
+#      fonts:
+#        - asset: assets/font/georama_semiexpanded_bold.ttf
+#
+#    - family: GeoramaSemiExpandedExtraBold
+#      fonts:
+#        - asset: assets/font/georama_semiexpanded_extrabold.ttf
+#
+#    - family: GeoramaSemiExpandedLight
+#      fonts:
+#        - asset: assets/font/georama_semiexpanded_light.ttf
+#
+#    - family: GeoramaSemiExpandedMediumItalic
+#      fonts:
+#        - asset: assets/font/georama_semiexpanded_medium_italic.ttf
+#
+#    - family: GeoramaSemiExpandedMedium
+#      fonts:
+#        - asset: assets/font/georama_semiexpanded_medium.ttf
+#
+#    - family: GeoramaSemiExpandedRegular
+#      fonts:
+#        - asset: assets/font/georama_semiexpanded_regular.ttf
+#
+#    - family: GeoramaSemiExpandedSemiBold
+#      fonts:
+#        - asset: assets/font/georama_semiexpanded_semibold.ttf
 
  
 

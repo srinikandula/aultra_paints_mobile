@@ -107,10 +107,12 @@ class _SignupPageState extends State<SignupPage> {
     if (_userName.text.isEmpty || !nameRegex.hasMatch(_userName.text)) {
       _showSnackBar('Enter a valid name (only letters, min 3 characters)',
           context, false, true);
-    } else if (_userEmail.text.isEmpty ||
-        !emailRegex.hasMatch(_userEmail.text)) {
-      _showSnackBar('Enter a valid email', context, false, true);
-    } else if (_userMobileNumber.text.isEmpty ||
+    }
+    // else if (_userEmail.text.isEmpty ||
+    //     !emailRegex.hasMatch(_userEmail.text)) {
+    //   _showSnackBar('Enter a valid email', context, false, true);
+    // }
+    else if (_userMobileNumber.text.isEmpty ||
         !phoneNumberRegax.hasMatch(_userMobileNumber.text)) {
       _showSnackBar('Enter a valid Mobile Number', context, false, true);
     } else if (_userNewPassword.text.isEmpty ) {
@@ -264,47 +266,47 @@ class _SignupPageState extends State<SignupPage> {
           ),
           SizedBox(height: 5),
           //user email
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Utils.returnInvoiceRedStar('Email'),
-              Container(
-                margin: const EdgeInsets.only(top: 5),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: textinputBgColor,
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                width: screenWidth * 0.9,
-                child: TextFormField(
-                  onTapOutside: (event) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                  autofocus: false,
-                  keyboardType: TextInputType.emailAddress,
-                  controller: _userEmail,
-                  decoration: const InputDecoration(
-                      hintText: 'Enter Email',
-                      hintStyle: TextStyle(
-                          fontFamily: ffGMedium,
-                          fontSize: 15.0,
-                          color: Colors.grey),
-                      contentPadding: EdgeInsets.all(15),
-                      border: InputBorder.none),
-                  onChanged: (value) {
-                    setState(() {
-                      if (_userEmail.text != value) {
-                        final cursorPosition = _userEmail.selection;
-                        _userEmail.text = value;
-                        _userEmail.selection = cursorPosition;
-                      }
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
+          // Column(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: [
+          //     Utils.returnInvoiceRedStar('Email'),
+          //     Container(
+          //       margin: const EdgeInsets.only(top: 5),
+          //       padding: const EdgeInsets.symmetric(vertical: 10),
+          //       decoration: BoxDecoration(
+          //         color: textinputBgColor,
+          //         borderRadius: BorderRadius.circular(5.0),
+          //       ),
+          //       width: screenWidth * 0.9,
+          //       child: TextFormField(
+          //         onTapOutside: (event) {
+          //           FocusManager.instance.primaryFocus?.unfocus();
+          //         },
+          //         autofocus: false,
+          //         keyboardType: TextInputType.emailAddress,
+          //         controller: _userEmail,
+          //         decoration: const InputDecoration(
+          //             hintText: 'Enter Email',
+          //             hintStyle: TextStyle(
+          //                 fontFamily: ffGMedium,
+          //                 fontSize: 15.0,
+          //                 color: Colors.grey),
+          //             contentPadding: EdgeInsets.all(15),
+          //             border: InputBorder.none),
+          //         onChanged: (value) {
+          //           setState(() {
+          //             if (_userEmail.text != value) {
+          //               final cursorPosition = _userEmail.selection;
+          //               _userEmail.text = value;
+          //               _userEmail.selection = cursorPosition;
+          //             }
+          //           });
+          //         },
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          // SizedBox(height: 5),
           //mobile number
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
