@@ -326,14 +326,17 @@ class Utils {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(
-                  // width: getProportionateScreenWidth(500),
-                  // height: getProportionateScreenWidth(250),
-                  child: Image.asset(
-                    'assets/images/loader.gif',
-                    fit: BoxFit.fill,
+                Container(
+                  margin: EdgeInsets.only(left: getProportionateScreenHeight(80), right: getProportionateScreenHeight(10)),
+                  child: SizedBox(
+                    // width: getProportionateScreenWidth(500),
+                    // height: getProportionateScreenWidth(250),
+                    child: Image.asset(
+                      'assets/images/app_logo_load.png',
+                      fit: BoxFit.fill,
+                    ),
                   ),
-                ),
+                )
               ],
             ),
             Column(
@@ -343,11 +346,9 @@ class Utils {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      margin: EdgeInsets.only(
-                          top: getProportionateScreenHeight(80),
-                          right: getProportionateScreenHeight(10)),
+                      // margin: EdgeInsets.only(top: getProportionateScreenHeight(80), right: getProportionateScreenHeight(10)),
                       child: Text(
-                        "Loading",
+                        "Loading...",
                         style: TextStyle(
                             fontSize: getProportionateScreenWidth(20),
                             fontFamily: ffGBold,
@@ -380,14 +381,17 @@ class Utils {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(
-                  // width: getProportionateScreenWidth(500),
-                  // height: getProportionateScreenWidth(250),
-                  child: Image.asset(
-                    'assets/images/loader.gif',
-                    fit: BoxFit.fill,
+                Container(
+                  margin: EdgeInsets.only(left: getProportionateScreenHeight(80), right: getProportionateScreenHeight(10)),
+                  child: SizedBox(
+                    // width: getProportionateScreenWidth(500),
+                    // height: getProportionateScreenWidth(250),
+                    child: Image.asset(
+                      'assets/images/app_logo_load.png',
+                      fit: BoxFit.fill,
+                    ),
                   ),
-                ),
+                )
               ],
             ),
             Column(
@@ -397,11 +401,9 @@ class Utils {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      margin: EdgeInsets.only(
-                          top: getProportionateScreenHeight(80),
-                          right: getProportionateScreenHeight(10)),
+                      // margin: EdgeInsets.only(top: getProportionateScreenHeight(80), right: getProportionateScreenHeight(10)),
                       child: Text(
-                        "Loading",
+                        "Loading...",
                         style: TextStyle(
                             fontSize: getProportionateScreenWidth(20),
                             fontFamily: ffGBold,

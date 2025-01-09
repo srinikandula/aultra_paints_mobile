@@ -25,7 +25,7 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
     callTimer();
-    // certificateCheck();
+    certificateCheck();
   }
 
   void _showSnackBar(String message, BuildContext context, ColorCheck) {
@@ -58,8 +58,7 @@ class _SplashPageState extends State<SplashPage> {
     try {
       // final certData =
       //     await rootBundle.load('assets/certificate/STAR_mlldev_com.crt'); //dev
-      final certData =
-          await rootBundle.load('assets/certificate/STAR_mllqa_com.crt'); //QA
+      final certData = await rootBundle.load('assets/certificate/AultraPaints_b20bd50c61d9d911.crt'); //QA
       context.setTrustedCertificatesBytes(certData.buffer.asUint8List());
     } catch (e) {
       print("Error loading certificate: $e");
@@ -72,16 +71,15 @@ class _SplashPageState extends State<SplashPage> {
   Future certificateCheck() async {
     HttpClient client = await createHttpClientWithCertificate();
 
-    final request =
-        await client.getUrl(Uri.parse('https://dealerportal.mllqa.com'));
+    // final request = await client.getUrl(Uri.parse('https://dealerportal.mllqa.com'));
+    final request = await client.getUrl(Uri.parse('https://api.aultrapaints.com'));
 
     final response = await request.close();
 
     if (response.statusCode == 200) {
       callTimer();
     } else {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const LoginPage()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
 
       _showSnackBar('certification verification failed', context, false);
     }

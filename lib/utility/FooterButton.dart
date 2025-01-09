@@ -30,7 +30,7 @@ Widget FooterButton(String ButtonTitle, String buttonFrom, BuildContext context,
           ),
           child: Container(
             decoration: BoxDecoration(
-              color: appDarkRed,
+              color: appThemeColor,
               borderRadius:
                   BorderRadius.all(Radius.circular(getScreenWidth(10))),
             ),

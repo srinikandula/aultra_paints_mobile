@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-const Color appColor = Color(0xFFD00924);
+const Color appColor = Color(0xFF2C3E50);
 const Color white = Color(0xFFFFFFFF);
 const Color black = Color(0xFF000000);
 const Color border = Color(0xFFDBDBDB);
@@ -55,10 +55,10 @@ const Color chatToUserColor = Color.fromRGBO(255, 229, 229, 0.62);
 const Color color2424 = Color.fromRGBO(24, 24, 24, 1);
 const Color color139 = Color.fromRGBO(139, 139, 139, 1);
 
-const Color appButtonColor = Color.fromRGBO(214, 34, 58, 1);
+const Color appButtonColor = Color.fromRGBO(44, 62, 80, 1);
 const Color subHeadingColor = Color.fromRGBO(24, 24, 24, 1);
 
-const Color appThemeColor = Color.fromRGBO(214, 34, 58, 1);
+const Color appThemeColor = Color.fromRGBO(44, 62, 80, 1);
 const Color loginBgColor = Color.fromRGBO(250, 250, 252, 1);
 const Color textInputPlaceholderColor = Color.fromRGBO(139, 139, 139, 1);
 const Color buttonTextWhiteColor = Color.fromRGBO(255, 255, 255, 1);

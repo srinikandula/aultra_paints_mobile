@@ -232,6 +232,7 @@ class _DashboardPageState extends State<DashboardPage> {
           accountRole: USER_ID.toString(),
           backendRole: BACKEND_ROLE,
           accountEmail: USER_EMAIL.toString(),
+          accountMobile: USER_MOBILE_NUMBER.toString(),
           onLogout: () => {logOut(context)},
         ),
         body: Form(
@@ -467,17 +468,10 @@ class _DashboardPageState extends State<DashboardPage> {
                                                               // });
                                                               // }
                                                             },
-                                                            child:
-                                                                _buildDashboardCard(
-                                                              dashboardCard[
-                                                                      'title']
-                                                                  .toString(),
-                                                              dashboardCard[
-                                                                      'description']
-                                                                  .toString(),
-                                                              dashboardCard[
-                                                                      'count']
-                                                                  .toString(),
+                                                            child: _buildDashboardCard(
+                                                              dashboardCard['title'].toString(),
+                                                              dashboardCard['description'].toString(),
+                                                              dashboardCard['count'].toString(),
                                                               buttonTextBgColor,
                                                               buttonTextBgColor,
                                                               '',
@@ -654,6 +648,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       count,
                       style: TextStyle(
                           fontSize: 37,
+                          fontWeight: FontWeight.bold,
                           color: appButtonColor,
                           fontFamily: ffGBold),
                     ),
@@ -682,6 +677,7 @@ class MyDrawer extends StatelessWidget {
   final String accountRole;
   final String backendRole;
   final String accountEmail;
+  final String accountMobile;
   final VoidCallback onLogout;
 
   MyDrawer({
@@ -689,6 +685,7 @@ class MyDrawer extends StatelessWidget {
     required this.accountRole,
     required this.backendRole,
     required this.accountEmail,
+    required this.accountMobile,
     required this.onLogout,
   });
   @override
@@ -706,8 +703,7 @@ class MyDrawer extends StatelessWidget {
           ),
         ),
         child: ListView(
-          padding: EdgeInsets.symmetric(
-              vertical: screenHeight * 0.1, horizontal: 20),
+          padding: EdgeInsets.symmetric(vertical: screenHeight * 0.1, horizontal: 20),
           children: <Widget>[
             Text(
               accountName,
@@ -720,7 +716,7 @@ class MyDrawer extends StatelessWidget {
             Text(
               // accountEmail,
               // accountRole,
-              accountEmail,
+              accountMobile,
               style: TextStyle(
                 color: drawerTitleColor,
                 fontFamily: ffGMedium,
@@ -728,8 +724,7 @@ class MyDrawer extends StatelessWidget {
               ),
             ),
             Divider(thickness: 1),
-            SizedBox(
-                height: 15), // Consistent spacing before the ListTile items
+            SizedBox(height: 15), // Consistent spacing before the ListTile items
             Container(
               height: screenHeight * 0.7,
               child: Column(
