@@ -58,7 +58,8 @@ class _SplashPageState extends State<SplashPage> {
     try {
       // final certData =
       //     await rootBundle.load('assets/certificate/STAR_mlldev_com.crt'); //dev
-      final certData = await rootBundle.load('assets/certificate/AultraPaints_b20bd50c61d9d911.crt'); //QA
+      final certData = await rootBundle
+          .load('assets/certificate/AultraPaints_b20bd50c61d9d911.crt'); //QA
       context.setTrustedCertificatesBytes(certData.buffer.asUint8List());
     } catch (e) {
       print("Error loading certificate: $e");
@@ -68,20 +69,29 @@ class _SplashPageState extends State<SplashPage> {
       ..badCertificateCallback = (cert, host, port) => false;
   }
 
-  Future certificateCheck() async {
-    HttpClient client = await createHttpClientWithCertificate();
+  Future<void> certificateCheck() async {
+    try {
+      HttpClient client = await createHttpClientWithCertificate();
 
-    // final request = await client.getUrl(Uri.parse('https://dealerportal.mllqa.com'));
-    final request = await client.getUrl(Uri.parse('https://api.aultrapaints.com'));
+      final request =
+          await client.getUrl(Uri.parse('https://api.aultrapaints.com'));
 
-    final response = await request.close();
+      final response = await request.close();
 
-    if (response.statusCode == 200) {
-      callTimer();
-    } else {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+      if (response.statusCode == 200) {
+        callTimer();
+      } else {
+        if (!mounted) return; // Ensure the widget is still mounted
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
 
-      _showSnackBar('certification verification failed', context, false);
+        // _showSnackBar('Certification verification failed', context, false);
+      }
+    } catch (e) {
+      if (!mounted) return; // Ensure the widget is still mounted
+      _showSnackBar('An error occurred: $e', context, false);
     }
   }
 

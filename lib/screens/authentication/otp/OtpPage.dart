@@ -101,7 +101,7 @@ class _OtpPageState extends State<OtpPage> {
     Utils.clearToasts(context);
     Utils.returnScreenLoader(context);
     http.Response response;
-    Map map = {"mobile": loggedUserPhoneNumber, "otp": otpCodes};
+    Map map = {"mobile": loggedUserPhoneNumber, "otp": int.parse(otpCodes)};
     var body = json.encode(map);
     print('otp body===>${body}');
     response = await http.post(Uri.parse(BASE_URL + POST_VERIFY_LOGIN_OTP),
@@ -113,12 +113,9 @@ class _OtpPageState extends State<OtpPage> {
     if (response.statusCode == 200 || response.statusCode == 201) {
       print('otp resp ==== $mapResponse');
       Navigator.pop(context);
-      _showSnackBar(
-          mapResponse['message'], context, mapResponse["status"] == "success");
-      if (mapResponse["status"] == "success") {
-        var userData = mapResponse['data'];
-        onSuccess(userData);
-      }
+      _showSnackBar(mapResponse['message'], context, true);
+      var userData = mapResponse;
+      onSuccess(userData);
     } else {
       _showSnackBar(mapResponse['message'], context, false);
       Navigator.pop(context);
@@ -133,8 +130,9 @@ class _OtpPageState extends State<OtpPage> {
     await prefs.setString('accessToken', tempToken);
     await prefs.setString('USER_FULL_NAME', userData['fullName']);
     await prefs.setString('USER_ID', userData['id']);
-    await prefs.setString('USER_EMAIL', userData['email']);
+    // await prefs.setString('USER_EMAIL', userData['email']);
     await prefs.setString('USER_MOBILE_NUMBER', userData['mobile']);
+    // await prefs.setString('USER_ACCOUNT_TYPE', userData['accountType']);
 
     Navigator.pushNamed(context, '/dashboardPage', arguments: {});
   }

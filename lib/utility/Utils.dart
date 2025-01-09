@@ -15,7 +15,6 @@ import 'Fonts.dart';
 
 class Utils {
   static var labelLarge;
- 
 
   static List<Widget> modelBuilder<M>(
           List<M> models, Widget Function(int index, M model) builder) =>
@@ -327,7 +326,9 @@ class Utils {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  margin: EdgeInsets.only(left: getProportionateScreenHeight(80), right: getProportionateScreenHeight(10)),
+                  margin: EdgeInsets.only(
+                      left: getProportionateScreenHeight(80),
+                      right: getProportionateScreenHeight(10)),
                   child: SizedBox(
                     // width: getProportionateScreenWidth(500),
                     // height: getProportionateScreenWidth(250),
@@ -382,7 +383,9 @@ class Utils {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  margin: EdgeInsets.only(left: getProportionateScreenHeight(80), right: getProportionateScreenHeight(10)),
+                  margin: EdgeInsets.only(
+                      left: getProportionateScreenHeight(80),
+                      right: getProportionateScreenHeight(10)),
                   child: SizedBox(
                     // width: getProportionateScreenWidth(500),
                     // height: getProportionateScreenWidth(250),
