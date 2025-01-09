@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../../utility/loader.dart';
 import '/utility/check_internet.dart';
 import '/utility/size_config.dart';
@@ -363,42 +365,56 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 50),
-                              // InkWell(
-                              //   onTap: () async {
-                              //     var url = Uri.parse(
-                              //         "https://mahindralogistics.com/privacy-policy/");
-                              //     try {
-                              //       if (await canLaunchUrl(url)) {
-                              //         Utils.openUrl(url);
-                              //       } else {
-                              //         _showSnackBar(
-                              //             "Could not open URL in browser.",
-                              //             context,
-                              //             false);
-                              //       }
-                              //     } catch (e) {
-                              //       _showSnackBar(
-                              //           "Failed to open URL in browser.",
-                              //           context,
-                              //           false);
-                              //     }
-                              //   },
-                              //   child: Container(
-                              //     alignment: Alignment.center,
-                              //     margin: EdgeInsets.only(
-                              //         right: screenWidth * 0.11),
-                              //     child: Text(
-                              //       'Privacy Policy',
-                              //       style: TextStyle(
-                              //           decoration: TextDecoration.underline,
-                              //           decorationThickness: 1.5,
-                              //           fontSize: 16,
-                              //           fontFamily: ffGMedium,
-                              //           color: appThemeColor),
-                              //     ),
-                              //   ),
-                              // ),
+                              SizedBox(height: getScreenHeight(100)),
+                              InkWell(
+                                // onTap: () async {
+                                //   var url = Uri.parse(
+                                //       "https://app.aultrapaints.com/privacy-policy");
+                                //   try {
+                                //     if (await canLaunchUrl(url)) {
+                                //       Utils.openUrl(url);
+                                //     } else {
+                                //       _showSnackBar(
+                                //           "Could not open URL in browser.",
+                                //           context,
+                                //           false);
+                                //     }
+                                //   } catch (e) {
+                                //     _showSnackBar(
+                                //         "Failed to open URL in browser.",
+                                //         context,
+                                //         false);
+                                //   }
+                                // },
+                                onTap: () async {
+                                  final Uri url = Uri.parse(
+                                      "https://app.aultrapaints.com/privacy-policy");
+                                  if (await canLaunchUrl(url)) {
+                                    await launchUrl(
+                                      url,
+                                      mode: LaunchMode
+                                          .externalApplication, // Open in an external browser
+                                    );
+                                  } else {
+                                    _showSnackBar(
+                                        "Could not open URL in browser.",
+                                        context,
+                                        false);
+                                  }
+                                },
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'Privacy Policy',
+                                    style: TextStyle(
+                                        decoration: TextDecoration.underline,
+                                        decorationThickness: 1.5,
+                                        fontSize: 14,
+                                        fontFamily: ffGMedium,
+                                        color: appThemeColor),
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),
