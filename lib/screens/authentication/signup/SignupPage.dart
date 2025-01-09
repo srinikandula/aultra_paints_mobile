@@ -115,11 +115,12 @@ class _SignupPageState extends State<SignupPage> {
     else if (_userMobileNumber.text.isEmpty ||
         !phoneNumberRegax.hasMatch(_userMobileNumber.text)) {
       _showSnackBar('Enter a valid Mobile Number', context, false, true);
-    } else if (_userNewPassword.text.isEmpty ) {
-      _showSnackBar('Enter a valid new password', context, false, true);
-    } else if (_userConfirmPassword.text.isEmpty ) {
-      _showSnackBar('Enter a valid confirm password', context, false, true);
     }
+    //  else if (_userNewPassword.text.isEmpty) {
+    //   _showSnackBar('Enter a valid new password', context, false, true);
+    // } else if (_userConfirmPassword.text.isEmpty) {
+    //   _showSnackBar('Enter a valid confirm password', context, false, true);
+    // }
     // else if (_userNewPassword.text.isEmpty ||
     //     !passwordRegex.hasMatch(_userNewPassword.text)) {
     //   _showSnackBar('Enter a valid new password', context, false, true);
@@ -127,9 +128,10 @@ class _SignupPageState extends State<SignupPage> {
     //     !passwordRegex.hasMatch(_userConfirmPassword.text)) {
     //   _showSnackBar('Enter a valid confirm password', context, false, true);
     // }
-    else if (_userNewPassword.text != _userConfirmPassword.text) {
-      _showSnackBar('Passwords are not matching', context, false, true);
-    } else {
+    // else if (_userNewPassword.text != _userConfirmPassword.text) {
+    //   _showSnackBar('Passwords are not matching', context, false, true);
+    // }
+    else {
       postRegisterDetails();
     }
   }
@@ -349,126 +351,126 @@ class _SignupPageState extends State<SignupPage> {
             ],
           ),
           SizedBox(height: 5),
-          //user new password
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Utils.returnInvoiceRedStar('New Password'),
-              Container(
-                margin: const EdgeInsets.only(top: 5),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: textinputBgColor,
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                width: screenWidth * 0.9,
-                child: TextFormField(
-                  onTapOutside: (event) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                  autofocus: false,
-                  keyboardType: TextInputType.text,
-                  controller: _userNewPassword,
-                  obscureText: !newPasswordVisible,
-                  decoration: InputDecoration(
-                      hintText: 'Enter new password',
-                      suffixIcon: Padding(
-                        padding: const EdgeInsets.only(right: 4),
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              newPasswordVisible = !newPasswordVisible;
-                            });
-                          },
-                          child: Icon(
-                            newPasswordVisible
-                                ? Icons.visibility_rounded
-                                : Icons.visibility_off_rounded,
-                            color: appButtonColor,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                      hintStyle: const TextStyle(
-                          fontFamily: ffGMedium,
-                          fontSize: 15.0,
-                          color: Colors.grey),
-                      contentPadding: const EdgeInsets.all(15),
-                      border: InputBorder.none),
-                  onChanged: (value) {
-                    setState(() {
-                      if (_userNewPassword.text != value) {
-                        final cursorPosition = _userNewPassword.selection;
-                        _userNewPassword.text = value;
-                        _userNewPassword.selection = cursorPosition;
-                      }
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
-          //user confirm password
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Utils.returnInvoiceRedStar('Confirm Password'),
-              Container(
-                margin: const EdgeInsets.only(top: 5),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: textinputBgColor,
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                width: screenWidth * 0.9,
-                child: TextFormField(
-                  onTapOutside: (event) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                  autofocus: false,
-                  keyboardType: TextInputType.text,
-                  controller: _userConfirmPassword,
-                  obscureText: !confirmPasswordVisible,
-                  decoration: InputDecoration(
-                      hintText: 'Enter confirm password',
-                      suffixIcon: Padding(
-                        padding: const EdgeInsets.only(right: 4),
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              confirmPasswordVisible = !confirmPasswordVisible;
-                            });
-                          },
-                          child: Icon(
-                            confirmPasswordVisible
-                                ? Icons.visibility_rounded
-                                : Icons.visibility_off_rounded,
-                            color: appButtonColor,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                      hintStyle: const TextStyle(
-                          fontFamily: ffGMedium,
-                          fontSize: 15.0,
-                          color: Colors.grey),
-                      contentPadding: const EdgeInsets.all(15),
-                      border: InputBorder.none),
-                  onChanged: (value) {
-                    setState(() {
-                      if (_userConfirmPassword.text != value) {
-                        final cursorPosition = _userConfirmPassword.selection;
-                        _userConfirmPassword.text = value;
-                        _userConfirmPassword.selection = cursorPosition;
-                      }
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
+          // //user new password
+          // Column(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: [
+          //     Utils.returnInvoiceRedStar('New Password'),
+          //     Container(
+          //       margin: const EdgeInsets.only(top: 5),
+          //       padding: const EdgeInsets.symmetric(vertical: 10),
+          //       decoration: BoxDecoration(
+          //         color: textinputBgColor,
+          //         borderRadius: BorderRadius.circular(5.0),
+          //       ),
+          //       width: screenWidth * 0.9,
+          //       child: TextFormField(
+          //         onTapOutside: (event) {
+          //           FocusManager.instance.primaryFocus?.unfocus();
+          //         },
+          //         autofocus: false,
+          //         keyboardType: TextInputType.text,
+          //         controller: _userNewPassword,
+          //         obscureText: !newPasswordVisible,
+          //         decoration: InputDecoration(
+          //             hintText: 'Enter new password',
+          //             suffixIcon: Padding(
+          //               padding: const EdgeInsets.only(right: 4),
+          //               child: GestureDetector(
+          //                 onTap: () {
+          //                   setState(() {
+          //                     newPasswordVisible = !newPasswordVisible;
+          //                   });
+          //                 },
+          //                 child: Icon(
+          //                   newPasswordVisible
+          //                       ? Icons.visibility_rounded
+          //                       : Icons.visibility_off_rounded,
+          //                   color: appButtonColor,
+          //                   size: 24,
+          //                 ),
+          //               ),
+          //             ),
+          //             hintStyle: const TextStyle(
+          //                 fontFamily: ffGMedium,
+          //                 fontSize: 15.0,
+          //                 color: Colors.grey),
+          //             contentPadding: const EdgeInsets.all(15),
+          //             border: InputBorder.none),
+          //         onChanged: (value) {
+          //           setState(() {
+          //             if (_userNewPassword.text != value) {
+          //               final cursorPosition = _userNewPassword.selection;
+          //               _userNewPassword.text = value;
+          //               _userNewPassword.selection = cursorPosition;
+          //             }
+          //           });
+          //         },
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          // SizedBox(height: 5),
+          // //user confirm password
+          // Column(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: [
+          //     Utils.returnInvoiceRedStar('Confirm Password'),
+          //     Container(
+          //       margin: const EdgeInsets.only(top: 5),
+          //       padding: const EdgeInsets.symmetric(vertical: 10),
+          //       decoration: BoxDecoration(
+          //         color: textinputBgColor,
+          //         borderRadius: BorderRadius.circular(5.0),
+          //       ),
+          //       width: screenWidth * 0.9,
+          //       child: TextFormField(
+          //         onTapOutside: (event) {
+          //           FocusManager.instance.primaryFocus?.unfocus();
+          //         },
+          //         autofocus: false,
+          //         keyboardType: TextInputType.text,
+          //         controller: _userConfirmPassword,
+          //         obscureText: !confirmPasswordVisible,
+          //         decoration: InputDecoration(
+          //             hintText: 'Enter confirm password',
+          //             suffixIcon: Padding(
+          //               padding: const EdgeInsets.only(right: 4),
+          //               child: GestureDetector(
+          //                 onTap: () {
+          //                   setState(() {
+          //                     confirmPasswordVisible = !confirmPasswordVisible;
+          //                   });
+          //                 },
+          //                 child: Icon(
+          //                   confirmPasswordVisible
+          //                       ? Icons.visibility_rounded
+          //                       : Icons.visibility_off_rounded,
+          //                   color: appButtonColor,
+          //                   size: 24,
+          //                 ),
+          //               ),
+          //             ),
+          //             hintStyle: const TextStyle(
+          //                 fontFamily: ffGMedium,
+          //                 fontSize: 15.0,
+          //                 color: Colors.grey),
+          //             contentPadding: const EdgeInsets.all(15),
+          //             border: InputBorder.none),
+          //         onChanged: (value) {
+          //           setState(() {
+          //             if (_userConfirmPassword.text != value) {
+          //               final cursorPosition = _userConfirmPassword.selection;
+          //               _userConfirmPassword.text = value;
+          //               _userConfirmPassword.selection = cursorPosition;
+          //             }
+          //           });
+          //         },
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          // SizedBox(height: 5),
         ],
       ),
     );

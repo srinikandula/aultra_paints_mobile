@@ -4,6 +4,8 @@ const BASE_URL = 'https://api.aultrapaints.com/api/'; //QA
 
 const IOS_APP_VERSION = '1.0.0';
 
+const POST_SEND_LOGIN_OTP = "auth/loginWithOTP"; //send otp
+const POST_VERIFY_LOGIN_OTP = "auth/verifyOTP"; //verify otp
 const POST_LOGIN_DETAILS = "auth/login"; //login
 const REGISTER_USER = "auth/register"; //signup
 

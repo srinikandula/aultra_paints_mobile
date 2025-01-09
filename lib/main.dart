@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import '/screens/authentication/otp/OtpPage.dart';
 import 'screens/orders/createOrder/CreateOrders.dart';
 import 'screens/orders/createProduct/CreateProduct.dart';
 import 'screens/orders/orderDetails/OrderDetails.dart';
@@ -85,6 +86,7 @@ class MyAppState extends State<MyApp> {
         "/createProduct": (context) => const CreateProduct(),
         "/ordersList": (context) => const OrdersList(),
         "/signupPage": (context) => const SignupPage(),
+        "/otpPage": (context) => const OtpPage(),
       },
     );
   }
