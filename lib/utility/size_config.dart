@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 
 class SizeConfig {
@@ -17,23 +15,26 @@ class SizeConfig {
   }
 }
 
-double getProportionateScreenHeight(double inputHeight) { // Height
+double getProportionateScreenHeight(double inputHeight) {
+  // Height
   double screenHeight = SizeConfig.screenHeight;
   return (inputHeight / 812.0) * screenHeight;
 }
 
-double getProportionateScreenWidth(double inputWidth) { // Width, Font
- 
+double getProportionateScreenWidth(double inputWidth) {
+  // Width, Font
   double screenWidth = SizeConfig.screenWidth;
   return (inputWidth / 375.0) * screenWidth;
 }
 
-double getScreenHeight(double inputHeight) { // Height
+double getScreenHeight(double inputHeight) {
+  // Height
   double screenHeight = SizeConfig.screenHeight;
   return (inputHeight / 812.0) * screenHeight;
 }
 
-double getScreenWidth(double inputWidth) { // Width, Font
+double getScreenWidth(double inputWidth) {
+  // Width, Font
   double screenWidth = SizeConfig.screenWidth;
   return (inputWidth / 375.0) * screenWidth;
 }

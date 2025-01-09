@@ -26,7 +26,7 @@ Widget FooterButton(String ButtonTitle, String buttonFrom, BuildContext context,
         child: Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(getScreenWidth(10))),
-            side: BorderSide(width: 1, color: appDarkRed),
+            side: BorderSide(width: 1, color: appThemeColor),
           ),
           child: Container(
             decoration: BoxDecoration(

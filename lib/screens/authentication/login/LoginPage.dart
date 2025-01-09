@@ -79,14 +79,11 @@ class _LoginPageState extends State<LoginPage> {
 
       Loader.showLoader(context);
 
-      final apiURL = '$BASE_URL$POST_LOGIN_DETAILS';
-      Map<String, String> requestBody = {
-        "mobile": tempFirstValue,
-        "password": tempSecondValue,
-      };
+      final apiURL = '$BASE_URL$POST_SEND_LOGIN_OTP';
+      Map<String, String> requestBody = {"mobile": tempFirstValue};
       final body = json.encode(requestBody);
 
-      // print('login body===>${body}=========>${apiURL}');
+      print('login body===>${body}=========>${apiURL}');
 
       final response = await http.post(
         Uri.parse(apiURL),
@@ -94,15 +91,14 @@ class _LoginPageState extends State<LoginPage> {
         body: body,
       );
 
-      // print('API Response checl: ${response.body}');
+      print('API Response checl: ${response.body}');
 
-      // Parse the response
       final apiResp = json.decode(response.body);
       print('API Response: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         Loader.hideLoader(context);
-        onLogin(apiResp);
+        onLogin(tempFirstValue);
       } else {
         Loader.hideLoader(context);
         _showSnackBar(
@@ -123,48 +119,13 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  onLogin(userData) async {
+  onLogin(tempFirstValue) async {
     // print('userdata====>${userData}');
     FocusScope.of(context).unfocus();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var tempToken = "Bearer" + ' ' + userData['token'];
-    await prefs.setString('accessToken', tempToken);
-    await prefs.setString('USER_FULL_NAME', userData['fullName']);
-    await prefs.setString('USER_ID', userData['id']);
-    await prefs.setString('USER_EMAIL', userData['email']);
-    await prefs.setString('USER_MOBILE_NUMBER', userData['mobile']);
+    await prefs.setString('USER_MOBILE_NUMBER', tempFirstValue);
 
-    Navigator.pushNamed(context, '/dashboardPage', arguments: {});
-  }
-
-  Future driverMobileCheck(userData) async {
-    Utils.returnScreenLoader(context);
-    http.Response response;
-    Map map = {
-      "password": "",
-      "username": "",
-      "userType": userData['userType'],
-      "phoneNumber": userData['mobileNumber']
-    };
-    var body = json.encode(map);
-    response = await http.post(Uri.parse(BASE_URL + POST_LOGIN_DETAILS),
-        headers: {"Content-Type": "application/json"}, body: body);
-    stringResponse = response.body;
-    mapResponse = json.decode(response.body);
-    if (response.statusCode == 200) {
-      print('login otp resp ==== $mapResponse');
-
-      Navigator.pop(context);
-      _showSnackBar(
-          mapResponse['message'], context, mapResponse["status"] == "success");
-      if (mapResponse["status"] == "success") {
-        Navigator.pushNamed(context, '/otpPage');
-      }
-    } else {
-      // print('login resp ==== $mapResponse');
-      _showSnackBar(mapResponse['message'], context, false);
-      Navigator.pop(context);
-    }
+    Navigator.pushNamed(context, '/otpPage', arguments: {});
   }
 
   void _showSnackBar(String message, BuildContext context, ColorCheck) {
@@ -214,20 +175,17 @@ class _LoginPageState extends State<LoginPage> {
                                 children: [
                                   Container(
                                     width: screenWidth,
-                                    height: getScreenHeight(100),
+                                    height: getScreenHeight(150),
                                     child: null,
                                   ),
                                 ],
                               )),
                               Container(
                                 width: screenWidth * 0.8,
-                                height: getScreenHeight(40),
+                                height: getScreenWidth(40),
                                 child: Row(
                                   children: [
-                                    Image.asset(
-                                      'assets/images/app_logo.png',
-                                      height: getProportionateScreenHeight(40),
-                                    ),
+                                    Image.asset('assets/images/app_logo.png'),
                                   ],
                                 ),
                               ),
@@ -285,47 +243,50 @@ class _LoginPageState extends State<LoginPage> {
                                   },
                                 ),
                               ),
-                              SizedBox(height: 10),
-                              Container(
-                                margin: EdgeInsets.only(
-                                    top: screenHeight * 0.01,
-                                    left: screenWidth * 0.1,
-                                    right: screenWidth * 0.1),
-                                decoration: BoxDecoration(
-                                  color: white,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    width: 1,
-                                    color: border,
-                                    style: BorderStyle.solid,
-                                  ),
-                                ),
-                                child: TextField(
-                                  keyboardType: TextInputType.text,
-                                  // autofocus: false,
-                                  // focusNode: inputNode,
-                                  onTapOutside: (event) {
-                                    FocusManager.instance.primaryFocus
-                                        ?.unfocus();
-                                  },
-                                  decoration: const InputDecoration(
-                                    labelText: 'Enter Password',
-                                    labelStyle: TextStyle(
-                                      fontFamily: ffGMedium,
-                                      fontSize: 18.0,
-                                      color: textInputPlaceholderColor,
-                                    ),
-                                    contentPadding: EdgeInsets.all(15),
-                                    border: InputBorder.none,
-                                  ),
-                                  onChanged: (value) {
-                                    _loginRequest.password = value.trim();
-                                  },
-                                ),
-                              ),
+                              // SizedBox(height: 10),
+                              // Container(
+                              //   margin: EdgeInsets.only(
+                              //       top: screenHeight * 0.01,
+                              //       left: screenWidth * 0.1,
+                              //       right: screenWidth * 0.1),
+                              //   decoration: BoxDecoration(
+                              //     color: white,
+                              //     borderRadius: BorderRadius.circular(10),
+                              //     border: Border.all(
+                              //       width: 1,
+                              //       color: border,
+                              //       style: BorderStyle.solid,
+                              //     ),
+                              //   ),
+                              //   child: TextField(
+                              //     keyboardType: TextInputType.text,
+                              //     // autofocus: false,
+                              //     // focusNode: inputNode,
+                              //     onTapOutside: (event) {
+                              //       FocusManager.instance.primaryFocus
+                              //           ?.unfocus();
+                              //     },
+                              //     decoration: const InputDecoration(
+                              //       labelText: 'Enter Password',
+                              //       labelStyle: TextStyle(
+                              //         fontFamily: ffGMedium,
+                              //         fontSize: 18.0,
+                              //         color: textInputPlaceholderColor,
+                              //       ),
+                              //       contentPadding: EdgeInsets.all(15),
+                              //       border: InputBorder.none,
+                              //     ),
+                              //     onChanged: (value) {
+                              //       _loginRequest.password = value.trim();
+                              //     },
+                              //   ),
+                              // ),
+
                               SizedBox(height: 30),
                               InkWell(
                                 onTap: () {
+                                  // Navigator.pushNamed(context, '/otpPage',
+                                  //     arguments: {});
                                   // checkUserLogin();
                                   // Navigator.pushNamed(context, '/dashboardPage',
                                   //     arguments: {});
@@ -337,10 +298,12 @@ class _LoginPageState extends State<LoginPage> {
                                   if (tempFirstValue == '') {
                                     _showSnackBar("Please enter Mobile Number",
                                         context, false);
-                                  } else if (tempSecondValue == '') {
-                                    _showSnackBar("Please enter password",
-                                        context, false);
-                                  } else {
+                                  }
+                                  //  else if (tempSecondValue == '') {
+                                  //   _showSnackBar("Please enter password",
+                                  //       context, false);
+                                  // }
+                                  else {
                                     checkUserLogin(
                                         tempFirstValue, tempSecondValue);
                                   }
