@@ -69,7 +69,7 @@ class _QrScannerState extends State<QrScanner> {
     Utils.clearToasts(context);
     Utils.returnScreenLoader(context);
     http.Response response;
-    var QRCodeId = scannedValue.split('qrCodeId=')[1];
+    var QRCodeId = scannedValue.split('tx=')[1];
     var apiUrl = BASE_URL + GET_SCANNED_DATA + QRCodeId;
 
     response = await http.patch(Uri.parse(apiUrl), headers: {

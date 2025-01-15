@@ -11,6 +11,10 @@ const REGISTER_USER = "auth/register"; //signup
 
 const GET_USER_DETAILS = "users/getUser/"; //dashboard
 
+const GET_USER_PARENT_DEALER_CODE_DETAILS = "users/getParentDealerCodeUser";
+
+const VERIFY_OTP_UPDATE_USER = "users/verifyOtpUpdateUser";
+
 const CREATE_ORDER = "order/orders";
 
 const GET_ORDERS = "order/orders";

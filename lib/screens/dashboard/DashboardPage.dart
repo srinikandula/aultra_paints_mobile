@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../services/error_handling.dart';
+import '../../utility/loader.dart';
 import '../../utility/size_config.dart';
 import '/utility/Colors.dart';
 import '/utility/Fonts.dart';
@@ -31,6 +32,11 @@ class _DashboardPageState extends State<DashboardPage> {
   var USER_FULL_NAME;
   var USER_EMAIL;
   var USER_MOBILE_NUMBER;
+  var USER_ACCOUNT_TYPE;
+  var USER_PARENT_DEALER_CODE;
+  var userParentDealerMobile;
+  var userParentDealerName;
+
   String USER_NAME = "";
   String USER_ROLE = "";
   String BACKEND_ROLE = "";
@@ -83,6 +89,8 @@ class _DashboardPageState extends State<DashboardPage> {
     // {"title": "INTRANSIT", "description": "Orders Intransit", "count": "0"},
     // {"title": "DELIVERED", "description": "Orders Delivered", "count": "0"},
   ];
+  var accountType = '';
+  var parentDealerCode = '';
 
   @override
   void initState() {
@@ -124,7 +132,7 @@ class _DashboardPageState extends State<DashboardPage> {
     USER_ID = prefs.getString('USER_ID');
     USER_EMAIL = prefs.getString('USER_EMAIL');
     USER_MOBILE_NUMBER = prefs.getString('USER_MOBILE_NUMBER');
-
+    USER_ACCOUNT_TYPE = prefs.getString('USER_ACCOUNT_TYPE');
     getDashboardCounts();
   }
 
@@ -164,13 +172,93 @@ class _DashboardPageState extends State<DashboardPage> {
       ];
       setState(() {
         dashBoardList = dashBoardList;
+        accountType = USER_ACCOUNT_TYPE;
+        parentDealerCode = apiResp['parentDealerCode'] ?? '';
+        if (parentDealerCode.isEmpty && accountType == 'Painter') {
+          showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
+        }
       });
     } else {
       Navigator.pop(context);
-      error_handling.errorValidation(
-          context, response.body, response.body, false);
+      error_handling.errorValidation(context, response.body, response.body, false);
     }
   }
+
+  Future fetchOtp(String dealerCode) async {
+    Utils.clearToasts(context);
+    Utils.returnScreenLoader(context);
+    http.Response response;
+    var apiUrl = BASE_URL + GET_USER_PARENT_DEALER_CODE_DETAILS;
+    try {
+      response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json", "Authorization": accesstoken},
+        body: json.encode({'dealerCode': dealerCode}),
+      );
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        // Assume the API returns {"success": true/false, "message": "..."}
+        if (['', null, 0, false].contains(responseData["data"]['dealerCode'])) {
+          throw Exception(responseData["message"] ?? "Failed to fetch OTP.");
+        } else {
+          userParentDealerMobile = responseData["data"]['mobile'];
+          userParentDealerName = responseData["data"]['name'];
+          return true;
+        }
+      } else {
+        print(response.statusCode == 400);
+        if (response.statusCode == 400) {
+          // throw Exception("Failed to fetch Dealer Code. Status code");
+          Loader.hideLoader(context);
+          final responseData = json.decode(response.body);
+          print(responseData['message']);
+          _showSnackBar("${responseData['message']}.", context, false,);
+          return false;
+        } else {
+          throw Exception("Failed to fetch OTP. Status code: ${response.statusCode}");
+        }
+      }
+    } catch (error) {
+      print("Error fetching OTP: $error");
+      Navigator.pop(context);
+      throw Exception("An error occurred while requesting OTP.");
+    }
+  }
+
+  Future saveDealerDetails(String dealerCode, String otp) async {
+    Utils.clearToasts(context);
+    Utils.returnScreenLoader(context);
+    http.Response response;
+    var apiUrl = BASE_URL + VERIFY_OTP_UPDATE_USER;
+
+    try {
+      response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json', "Authorization": accesstoken},
+        body: json.encode({
+          'dealerCode': dealerCode,
+          'otp': otp,
+          'mobile': userParentDealerMobile,
+          'painterMobile': USER_MOBILE_NUMBER
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (['', null, 0, false].contains(responseData?["data"]?['parentDealerCode'])) {
+          throw Exception(responseData["message"] ?? "Failed to save details.");
+        } else {
+          return true;
+        }
+      } else {
+        throw Exception("Failed to save details. Status code: ${response.statusCode}");
+      }
+    } catch (error) {
+      print("Error saving dealer details: $error");
+      throw Exception("An error occurred while saving dealer details.");
+    }
+  }
+
 
   void logOut(context) async {
     clearStorage();
@@ -233,6 +321,7 @@ class _DashboardPageState extends State<DashboardPage> {
           backendRole: BACKEND_ROLE,
           accountEmail: USER_EMAIL.toString(),
           accountMobile: USER_MOBILE_NUMBER.toString(),
+          accountType: USER_ACCOUNT_TYPE.toString(),
           onLogout: () => {logOut(context)},
         ),
         body: Form(
@@ -247,80 +336,55 @@ class _DashboardPageState extends State<DashboardPage> {
                           children: [
                             Container(
                                 margin: EdgeInsets.only(
-                                    top: MediaQuery.of(context).size.height *
-                                        0.07,
-                                    left: MediaQuery.of(context).size.width *
-                                        0.05,
-                                    right: MediaQuery.of(context).size.width *
-                                        0.05),
+                                    top: MediaQuery.of(context).size.height * 0.07,
+                                    left: MediaQuery.of(context).size.width * 0.05,
+                                    right: MediaQuery.of(context).size.width * 0.05),
                                 child: Column(
                                   children: [
                                     Container(
                                       child: Row(
                                         children: [
-                                          Image.asset(
-                                            'assets/images/app_logo.png',
-                                            height: getScreenHeight(50),
-                                          ),
+                                          Image.asset('assets/images/app_logo.png', height: getScreenHeight(50),),
                                         ],
                                       ),
                                     ),
                                     Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         InkWell(
                                           onTap: () {
-                                            _scaffoldKey.currentState
-                                                ?.openDrawer();
+                                            _scaffoldKey.currentState?.openDrawer();
                                           },
                                           child: Container(
                                             height: 30,
                                             width: 30,
                                             decoration: BoxDecoration(
                                               color: loginBgColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
+                                              borderRadius: BorderRadius.circular(15),
                                             ),
                                             child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(4.0),
-                                              child: Image.asset(
-                                                'assets/images/menu@3x.png',
-                                                fit: BoxFit.fill,
-                                              ),
+                                              padding: const EdgeInsets.all(4.0),
+                                              child: Image.asset('assets/images/menu@3x.png', fit: BoxFit.fill,),
                                             ),
                                           ),
                                         ),
                                         InkWell(
                                           onTap: () {
-                                            Navigator.pushNamed(
-                                                context, '/qrScanner').then((result) {
+                                            Navigator.pushNamed(context, '/qrScanner').then((result) {
                                               if (result == true) {
                                                 getDashboardCounts();
-                                                setState(() {
-
-                                                });
+                                                setState(() {});
                                               }
                                             });
                                           },
                                           child: Container(
                                             height: 30,
                                             width: 30,
-                                            decoration: BoxDecoration(
-                                              color: loginBgColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                            ),
+                                            decoration: BoxDecoration(color: loginBgColor, borderRadius: BorderRadius.circular(15),),
                                             child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(6.0),
+                                              padding: const EdgeInsets.all(6.0),
                                               child: Center(
-                                                child: Icon(
-                                                  FontAwesomeIcons.qrcode,
-                                                  size: 22,
-                                                  color: Colors.black,
-                                                ),
+                                                child: Icon(FontAwesomeIcons.qrcode, size: 22, color: Colors.black,),
                                               ),
                                             ),
                                           ),
@@ -330,195 +394,76 @@ class _DashboardPageState extends State<DashboardPage> {
                                   ],
                                 )),
                             Container(
-                              child: searchListData.length >= 2
-                                  ? Container(
-                                      child: ListView.builder(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 5, vertical: 5),
-                                        shrinkWrap: true,
-                                        itemCount: searchListData.length,
-                                        itemBuilder: (context, index) {
-                                          return Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              _buildProductRow(
-                                                  searchListData[index]
-                                                          ['lrNumber']
-                                                      .toString(),
-                                                  loggedUserRole == 'DEALER'
-                                                      ? searchValue
-                                                      // searchListData[index]
-                                                      //         ['vin']
-                                                      //     .toString()
-                                                      : searchListData[index]
-                                                              ['lrStatus']
-                                                          .toString(),
-                                                  searchListData[index]),
-                                              Container(
-                                                  margin: EdgeInsets.symmetric(
-                                                      horizontal: 15),
-                                                  child:
-                                                      searchListData.length == 1
-                                                          ? null
-                                                          : Divider()),
-                                            ],
-                                          );
-                                        },
+                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                              child: Column(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+                                  Text(' Dashboard', style: TextStyle(color: HeadingTextColor, fontSize: 14, fontFamily: ffGSemiBold,),),
+                                  SizedBox(height: 10),
+                                  Container(
+                                    // onRefresh: getDashboardCounts,
+                                    color: whiteBgColor,
+                                    child: dashBoardList.isEmpty ? Container(
+                                      height: MediaQuery.of(context).size.height * 0.6,
+                                      child: ListView(
+                                        physics: AlwaysScrollableScrollPhysics(), // Ensures scroll behavior
+                                        children: [],
                                       ),
-                                    )
-                                  : Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 16, horizontal: 16),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          // Container(
-                                          //   padding: EdgeInsets.only(left: 5),
-                                          //   child: Text(
-                                          //     loggedUserRole == 'DEALER'
-                                          //         ? 'Search by LR Number, Invoice/DO Number and VIN Number.'
-                                          //         : loggedUserRole == 'CUSTOMER'
-                                          //             ? 'Search by LR Number, Trip Number and Indent Number.'
-                                          //             : loggedUserRole ==
-                                          //                         'DRIVER' ||
-                                          //                     loggedUserRole ==
-                                          //                         'BA'
-                                          //                 ? 'Search by LR Number and Trip Number.'
-                                          //                 : 'Search by LR Number, Invoice Number and DO Number.',
-                                          //     style: TextStyle(
-                                          //         fontSize: 13,
-                                          //         fontFamily: ffGMediumItalic,
-                                          //         color: hintTextColor),
-                                          //   ),
-                                          // ),
-                                          // SizedBox(height: 16),
-                                          Text(
-                                            ' Dashboard',
-                                            style: TextStyle(
-                                              color: HeadingTextColor,
-                                              fontSize: 14,
-                                              fontFamily: ffGSemiBold,
+                                    ) : ListView.builder(
+                                      shrinkWrap: true,
+                                      physics:
+                                      NeverScrollableScrollPhysics(), // Ensures scrollability
+                                      padding: EdgeInsets.zero,
+                                      itemCount: dashBoardList.length,
+                                      itemBuilder: (context, index) {
+                                        var dashboardCard = dashBoardList[index];
+                                        return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            InkWell(
+                                              onTap: () {},
+                                              child: _buildDashboardCard(
+                                                dashboardCard['title'].toString(),
+                                                dashboardCard['description'].toString(),
+                                                dashboardCard['count'].toString(),
+                                                buttonTextBgColor,
+                                                buttonTextBgColor,
+                                                '',
+                                              ),
                                             ),
-                                          ),
-                                          SizedBox(height: 10),
-                                          Container(
-                                            // onRefresh: getDashboardCounts,
-                                            color: whiteBgColor,
-                                            child: dashBoardList.isEmpty
-                                                ? Container(
-                                                    height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            0.6,
-                                                    child: ListView(
-                                                      physics:
-                                                          AlwaysScrollableScrollPhysics(), // Ensures scroll behavior
-                                                      children: [],
-                                                    ),
-                                                  )
-                                                : ListView.builder(
-                                                    shrinkWrap: true,
-                                                    physics:
-                                                        NeverScrollableScrollPhysics(), // Ensures scrollability
-                                                    padding: EdgeInsets.zero,
-                                                    itemCount:
-                                                        dashBoardList.length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      var dashboardCard =
-                                                          dashBoardList[index];
-                                                      return Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          InkWell(
-                                                            onTap: () {
-                                                              // if (dashboardCard[
-                                                              //         'count'] !=
-                                                              //     '0') {
-                                                              // Utils.clearToasts(
-                                                              //     context);
-                                                              // Navigator
-                                                              //     .pushNamed(
-                                                              //   context,
-                                                              //   // '/orderDetails',
-                                                              //   '/ordersList',
-                                                              //   arguments: {
-                                                              //     'argumentStatus':
-                                                              //         dashboardCard[
-                                                              //             'status'],
-                                                              //   },
-                                                              // ).then((result) {
-                                                              //   if (result ==
-                                                              //       true) {
-                                                              //     // getDashboardCounts();
-                                                              //     setState(() {
-                                                              //       searchValue =
-                                                              //           '';
-                                                              //       searchListData =
-                                                              //           [];
-                                                              //       _searchController
-                                                              //           .clear();
-                                                              //     });
-                                                              //   }
-                                                              // });
-                                                              // }
-                                                            },
-                                                            child: _buildDashboardCard(
-                                                              dashboardCard['title'].toString(),
-                                                              dashboardCard['description'].toString(),
-                                                              dashboardCard['count'].toString(),
-                                                              buttonTextBgColor,
-                                                              buttonTextBgColor,
-                                                              '',
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 5),
-                                                        ],
-                                                      );
-                                                    },
-                                                  ),
-                                          ),
-
-                                          // Divider(),
-
-                                          // InkWell(
-                                          //   onTap: () async {
-                                          //     SharedPreferences prefs =
-                                          //         await SharedPreferences
-                                          //             .getInstance();
-                                          //     await prefs.setInt(
-                                          //         'Selected_indentId', 00);
-                                          //     await prefs.setBool(
-                                          //         'Indent_Editing', true);
-                                          //     await prefs.setBool(
-                                          //         'fromDashboardScreen', true);
-
-                                          //     Navigator.pushNamed(
-                                          //             context, '/createOrders')
-                                          //         .then((result) {
-                                          //       setState(() {
-                                          //         searchValue = '';
-                                          //         searchListData = [];
-                                          //         _searchController.clear();
-                                          //       });
-                                          //     });
-                                          //   },
-                                          //   child: _buildDashboardCard(
-                                          //       'CREATE ORDER ',
-                                          //       'A new order can be created in next screen',
-                                          //       "#123",
-                                          //       buttonTextBgColor,
-                                          //       buttonTextBgColor,
-                                          //       'indent_create'),
-                                          // )
-                                        ],
-                                      ),
+                                            SizedBox(height: 5),
+                                          ],
+                                        );
+                                        },
                                     ),
+                                  ),
+
+                                  Container(
+                                    child: accountType == 'Painter' ? Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(height: 20), // Add some space between sections
+                                        Text(' Dealer details', style: TextStyle(color: HeadingTextColor, fontSize: 14, fontFamily: ffGSemiBold)),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          color: whiteBgColor,
+                                          child: Column(
+                                            children: [
+                                              _buildDealerDetailCard(
+                                                "Dealer Code ",
+                                                parentDealerCode != '' ? parentDealerCode : 'NA',
+                                                buttonTextBgColor,
+                                                buttonTextBgColor,
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ) :  Column()
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ))),
@@ -527,6 +472,55 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
     );
   }
+
+
+  Widget _buildDealerDetailCard(String title, String value, Color bgColor, Color borderColor) {
+    return Card(
+      elevation: 0,
+      color: bgColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(getProportionateScreenWidth(10)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: getProportionateScreenHeight(15),
+          horizontal: getProportionateScreenWidth(14),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(fontSize: getProportionateScreenWidth(16), fontFamily: ffGSemiBold, color: buttonBorderColor,),
+                ),
+                Text(
+                  value,
+                  style: TextStyle(fontSize: getProportionateScreenWidth(16), fontWeight: FontWeight.bold, fontFamily: ffGMedium, color: appButtonColor,),
+                ),
+              ]
+            ),
+
+            Container(
+              child: value.isNotEmpty ? InkWell(
+                onTap: () {
+                  showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
+                },
+                child: Container(
+                  child: Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Icon(Icons.edit, size: 25, weight: 600, color: appButtonColor)
+                  ),
+                ),
+              ) : Container(),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
 
   Widget _buildProductRow(String productName, String units, totalData) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -582,8 +576,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildDashboardCard(String title, String subtitle, String count,
-      Color bgColor, Color borderColor, String fromButton) {
+  Widget _buildDashboardCard(String title, String subtitle, String count, Color bgColor, Color borderColor, String fromButton) {
     return Card(
       elevation: 0,
       color: bgColor,
@@ -621,12 +614,14 @@ class _DashboardPageState extends State<DashboardPage> {
                     width: fromButton == 'indent_create'
                         ? getProportionateScreenWidth(200)
                         : getProportionateScreenWidth(190),
-                    child: Text(subtitle,
+                    child: Text(
+                        subtitle,
                         style: TextStyle(
-                            fontSize: getProportionateScreenWidth(14),
-                            height: 1,
+                            fontSize: getProportionateScreenWidth(14), height: 1,
                             fontFamily: ffGMediumItalic,
-                            color: subHeadingTextColor)),
+                            color: subHeadingTextColor
+                        )
+                    ),
                   ),
                 ],
               ),
@@ -635,27 +630,225 @@ class _DashboardPageState extends State<DashboardPage> {
                 ? Container(
                     width: getProportionateScreenWidth(60),
                     alignment: Alignment.center,
-                    child: Icon(
-                      Icons.arrow_forward_rounded,
-                      color: appThemeColor,
-                      size: 50,
-                    ),
+                    child: Icon(Icons.arrow_forward_rounded, color: appThemeColor, size: 50,),
                   )
                 : Container(
                     width: getProportionateScreenWidth(120),
                     alignment: Alignment.center,
                     child: Text(
                       count,
-                      style: TextStyle(
-                          fontSize: 37,
-                          fontWeight: FontWeight.bold,
-                          color: appButtonColor,
-                          fontFamily: ffGBold),
+                      style: TextStyle(fontSize: 37, fontWeight: FontWeight.bold, color: appButtonColor, fontFamily: ffGBold),
                     ),
                   )
           ],
         ),
       ),
+    );
+  }
+
+  void showPopupForDealerCode(BuildContext context, Map<String, dynamic> response) {
+    print('${!response['dealerCode'].isEmpty}=========>');
+    final
+    // showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
+
+    // Controller for the input fields
+    TextEditingController dealerCodeController = TextEditingController();
+    List<TextEditingController> otpControllers =
+    List.generate(6, (index) => TextEditingController());
+
+    bool isOtpVisible = false;
+    bool isLoading = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent closing the dialog by clicking outside
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return WillPopScope(
+              onWillPop: () async => false, // Disable the back button
+              child: Dialog(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 10,
+                child: Container(
+                  width: 400,
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Dealer Details",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 10),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            width: 1,
+                            color: Colors.grey,
+                            style: BorderStyle.solid,
+                          ),
+                        ),
+                        child: TextField(
+                          controller: dealerCodeController,
+                          keyboardType: TextInputType.text,
+                          onTapOutside: (event) {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'Enter Dealer Code',
+                            labelStyle: TextStyle(
+                              fontFamily: 'Medium',
+                              fontSize: 18.0,
+                              color: Colors.grey,
+                            ),
+                            contentPadding: EdgeInsets.all(15),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      if (isOtpVisible) ...[
+                        SizedBox(height: 20),
+                        Text("Enter OTP", style: TextStyle(fontSize: 16)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: List.generate(6, (index) {
+                            return SizedBox(
+                              width: 40,
+                              child: TextField(
+                                controller: otpControllers[index],
+                                maxLength: 1,
+                                keyboardType: TextInputType.number,
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  counterText: "",
+                                  border: OutlineInputBorder(),
+                                ),
+                                onChanged: (value) {
+                                  if (value.isNotEmpty && index < 5) {
+                                    FocusScope.of(context).nextFocus();
+                                  } else if (value.isEmpty && index > 0) {
+                                    FocusScope.of(context).previousFocus();
+                                  }
+                                },
+                              ),
+                            );
+                          }),
+                        ),
+                        SizedBox(height: 10),
+                        Text('The 6-digit OTP was sent to the ${userParentDealerName}. OTP expiry time is 10 minutes.', style: TextStyle(fontSize: 15)),
+
+                        StreamBuilder<int>(
+                          stream: Stream.periodic(Duration(seconds: 1), (i) => 600 - i - 1).take(600),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              final remainingSeconds = snapshot.data!;
+                              final minutes = remainingSeconds ~/ 60;
+                              final seconds = remainingSeconds % 60;
+                              return Text(
+                                'Time remaining: ${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                              );
+                            }
+                            return SizedBox.shrink();
+                          },
+                        ),
+
+                      ],
+                      SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if (!response['dealerCode'].isEmpty)
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("Cancel"),
+                            ),
+                          if (!isOtpVisible)
+                            TextButton(
+                              onPressed: () async {
+                                if (dealerCodeController.text.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("Please enter Dealer Code."),),
+                                  );
+                                  return;
+                                }
+
+                                setState(() => isLoading = true);
+
+                                try {
+                                  bool success = await fetchOtp(dealerCodeController.text);
+                                  if (success) {
+                                    setState(() {
+                                      isOtpVisible = true;isLoading = false;
+                                      Navigator.pop(context);
+                                    });
+                                  } else {
+                                    setState(() {
+                                      isOtpVisible = false;isLoading = false;
+                                      Navigator.pop(context);
+                                    });
+                                  }
+                                } catch (error) {
+                                  setState(() => isLoading = false);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(error.toString())),
+                                  );
+                                }
+                              },
+                              child: isLoading ? CircularProgressIndicator() : Text("Get OTP"),
+                            ),
+                          if (isOtpVisible)
+                            TextButton(
+                              onPressed: () async {
+                                String otp = otpControllers.map((e) => e.text).join();
+                                if (otp.length < 6) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("Please enter a valid 6-digit OTP.")),
+                                  );
+                                  return;
+                                }
+
+                                setState(() => isLoading = true);
+
+                                try {
+                                  bool saveSuccess = await saveDealerDetails(dealerCodeController.text, otp,);
+                                  if (saveSuccess) {
+                                    setState(() => isLoading = false);
+                                    getDashboardCounts();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("Details saved successfully.")),
+                                    );
+                                    Navigator.pop(context, true);
+                                    Navigator.pop(context, true);
+                                  }
+                                } catch (error) {
+                                  setState(() => isLoading = false);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(error.toString())),
+                                  );
+                                }
+                              },
+                              child: isLoading ? CircularProgressIndicator() : Text("Save"),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -678,6 +871,7 @@ class MyDrawer extends StatelessWidget {
   final String backendRole;
   final String accountEmail;
   final String accountMobile;
+  final String accountType;
   final VoidCallback onLogout;
 
   MyDrawer({
@@ -686,6 +880,7 @@ class MyDrawer extends StatelessWidget {
     required this.backendRole,
     required this.accountEmail,
     required this.accountMobile,
+    required this.accountType,
     required this.onLogout,
   });
   @override
@@ -697,32 +892,13 @@ class MyDrawer extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topRight: Radius.circular(30),
-            bottomRight: Radius.circular(30),
-          ),
+          borderRadius: BorderRadius.only(topRight: Radius.circular(0), bottomRight: Radius.circular(0),),
         ),
         child: ListView(
           padding: EdgeInsets.symmetric(vertical: screenHeight * 0.1, horizontal: 20),
           children: <Widget>[
-            Text(
-              accountName,
-              style: TextStyle(
-                color: drawerTitleColor,
-                fontFamily: ffGBold,
-                fontSize: 16,
-              ),
-            ),
-            Text(
-              // accountEmail,
-              // accountRole,
-              accountMobile,
-              style: TextStyle(
-                color: drawerTitleColor,
-                fontFamily: ffGMedium,
-                fontSize: 14,
-              ),
-            ),
+            Text(accountName, style: TextStyle(color: drawerTitleColor, fontFamily: ffGBold, fontSize: 24,),),
+            Text(accountMobile, style: TextStyle(color: drawerTitleColor, fontFamily: ffGMedium, fontSize: 14,),),
             Divider(thickness: 1),
             SizedBox(height: 15), // Consistent spacing before the ListTile items
             Container(
@@ -730,37 +906,18 @@ class MyDrawer extends StatelessWidget {
               child: Column(
                 children: [
                   ListTile(
-                    title: Text(
-                      'Home',
-                      style: TextStyle(
-                        color: appThemeColor,
-                        fontFamily: ffGSemiBold,
-                        fontSize: 14,
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
+                    title: Text('Home', style: TextStyle(color: appThemeColor, fontFamily: ffGSemiBold, fontSize: 22,),),
+                    onTap: () { Navigator.pop(context); },
                   ),
-                  accountRole == 'CUSTOMER'
-                      ? ListTile(
-                          title: Text(
-                            'My Indents',
-                            style: drawerItemStyle,
-                          ),
-                          onTap: () {
-                            _navigateTo(context, '/tripsList');
-                          },
-                        )
-                      : SizedBox.shrink(),
                 ],
               ),
             ),
             // SizedBox(height: 10),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.2),
-              child: Divider(thickness: 2),
-            ),
+            Divider(thickness: 1),
+            // Container(
+            //   margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.2),
+            //   child: Divider(thickness: 2),
+            // ),
             InkWell(
               onTap: () {
                 // Navigator.pop(context);
@@ -770,13 +927,7 @@ class MyDrawer extends StatelessWidget {
                 title: Center(
                   child: Text(
                     'Logout',
-                    style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      decorationThickness: 1.5,
-                      color: drawerSubListColor,
-                      fontFamily: ffGMedium,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(decorationThickness: 1.5, color: drawerSubListColor, fontFamily: ffGMedium, fontSize: 22,),
                   ),
                 ),
               ),
