@@ -162,12 +162,12 @@ class _DashboardPageState extends State<DashboardPage> {
         {
           "title": "Redeemed Points",
           "description": "Redeemed Points Confirmation",
-          "count": apiResp['redeemablePoints']
+          "count": apiResp['redeemablePoints'] ?? '0'
         },
         {
           "title": "Earned Cash Reward",
           "description": "Earned Cash Reward Confirmation",
-          "count": apiResp['cash']
+          "count": apiResp['cash'] ?? '0'
         },
       ];
       setState(() {
@@ -314,7 +314,7 @@ class _DashboardPageState extends State<DashboardPage> {
     http.Response response;
     var apiUrl = BASE_URL + DELETE_USER_ACCOUNT + USER_ID;
 
-    print('delete apiturl====>${apiUrl}');
+    // print('delete apiturl====>${apiUrl}');
 
     response = await http.put(
       Uri.parse(apiUrl),
@@ -325,7 +325,7 @@ class _DashboardPageState extends State<DashboardPage> {
       body: jsonEncode({}),
     );
 
-    print('error====>${response.body}======>${response.statusCode}');
+    // print('error====>${response.body}======>${response.statusCode}');
 
     if (response.statusCode == 200) {
       Navigator.pop(context);
