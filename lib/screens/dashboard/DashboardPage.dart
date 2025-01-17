@@ -162,12 +162,12 @@ class _DashboardPageState extends State<DashboardPage> {
         {
           "title": "Redeemed Points",
           "description": "Redeemed Points Confirmation",
-          "count": apiResp['redeemablePoints']
+          "count": apiResp['redeemablePoints'] ?? '0'
         },
         {
           "title": "Earned Cash Reward",
           "description": "Earned Cash Reward Confirmation",
-          "count": apiResp['cash']
+          "count": apiResp['cash'] ?? '0'
         },
       ];
       setState(() {
@@ -175,12 +175,16 @@ class _DashboardPageState extends State<DashboardPage> {
         accountType = USER_ACCOUNT_TYPE;
         parentDealerCode = apiResp['parentDealerCode'] ?? '';
         if (parentDealerCode.isEmpty && accountType == 'Painter') {
-          showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
+          showPopupForDealerCode(context, {
+            'dealerCode': parentDealerCode,
+            'dealerName': userParentDealerName
+          });
         }
       });
     } else {
       Navigator.pop(context);
-      error_handling.errorValidation(context, response.body, response.body, false);
+      error_handling.errorValidation(
+          context, response.body, response.body, false);
     }
   }
 
@@ -192,7 +196,10 @@ class _DashboardPageState extends State<DashboardPage> {
     try {
       response = await http.post(
         Uri.parse(apiUrl),
-        headers: {"Content-Type": "application/json", "Authorization": accesstoken},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": accesstoken
+        },
         body: json.encode({'dealerCode': dealerCode}),
       );
       if (response.statusCode == 200) {
@@ -212,10 +219,15 @@ class _DashboardPageState extends State<DashboardPage> {
           Loader.hideLoader(context);
           final responseData = json.decode(response.body);
           print(responseData['message']);
-          _showSnackBar("${responseData['message']}.", context, false,);
+          _showSnackBar(
+            "${responseData['message']}.",
+            context,
+            false,
+          );
           return false;
         } else {
-          throw Exception("Failed to fetch OTP. Status code: ${response.statusCode}");
+          throw Exception(
+              "Failed to fetch OTP. Status code: ${response.statusCode}");
         }
       }
     } catch (error) {
@@ -234,7 +246,10 @@ class _DashboardPageState extends State<DashboardPage> {
     try {
       response = await http.post(
         Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json', "Authorization": accesstoken},
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": accesstoken
+        },
         body: json.encode({
           'dealerCode': dealerCode,
           'otp': otp,
@@ -245,20 +260,21 @@ class _DashboardPageState extends State<DashboardPage> {
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        if (['', null, 0, false].contains(responseData?["data"]?['parentDealerCode'])) {
+        if (['', null, 0, false]
+            .contains(responseData?["data"]?['parentDealerCode'])) {
           throw Exception(responseData["message"] ?? "Failed to save details.");
         } else {
           return true;
         }
       } else {
-        throw Exception("Failed to save details. Status code: ${response.statusCode}");
+        throw Exception(
+            "Failed to save details. Status code: ${response.statusCode}");
       }
     } catch (error) {
       print("Error saving dealer details: $error");
       throw Exception("An error occurred while saving dealer details.");
     }
   }
-
 
   void logOut(context) async {
     clearStorage();
@@ -292,6 +308,78 @@ class _DashboardPageState extends State<DashboardPage> {
     // }
   }
 
+  Future deleteUserAccount() async {
+    Utils.clearToasts(context);
+    Utils.returnScreenLoader(context);
+    http.Response response;
+    var apiUrl = BASE_URL + DELETE_USER_ACCOUNT + USER_ID;
+
+    // print('delete apiturl====>${apiUrl}');
+
+    response = await http.put(
+      Uri.parse(apiUrl),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": accesstoken
+      },
+      body: jsonEncode({}),
+    );
+
+    // print('error====>${response.body}======>${response.statusCode}');
+
+    if (response.statusCode == 200) {
+      Navigator.pop(context);
+      Navigator.pop(context);
+      _showSnackBar('Account deleted successfully.', context, true);
+      clearStorage();
+    } else {
+      Navigator.pop(context);
+      error_handling.errorValidation(
+          context, response.body, response.body, false);
+    }
+  }
+
+  void showAccountDeletionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Delete Account',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'Are you sure you want to delete your account? This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  // backgroundColor: Colors.red,
+                  ),
+              onPressed: () {
+                // Add your account deletion logic here
+                // Navigator.of(context).pop();
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   SnackBar(
+                //     content: Text('Account deleted successfully.'),
+                //   ),
+                // );
+                deleteUserAccount();
+              },
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<bool> _onWillPop() async {
     // print('back button hitted');
     Utils.clearToasts(context);
@@ -323,6 +411,7 @@ class _DashboardPageState extends State<DashboardPage> {
           accountMobile: USER_MOBILE_NUMBER.toString(),
           accountType: USER_ACCOUNT_TYPE.toString(),
           onLogout: () => {logOut(context)},
+          onAccountDelete: () => {showAccountDeletionDialog(context)},
         ),
         body: Form(
             key: _formKey,
@@ -336,41 +425,56 @@ class _DashboardPageState extends State<DashboardPage> {
                           children: [
                             Container(
                                 margin: EdgeInsets.only(
-                                    top: MediaQuery.of(context).size.height * 0.07,
-                                    left: MediaQuery.of(context).size.width * 0.05,
-                                    right: MediaQuery.of(context).size.width * 0.05),
+                                    top: MediaQuery.of(context).size.height *
+                                        0.07,
+                                    left: MediaQuery.of(context).size.width *
+                                        0.05,
+                                    right: MediaQuery.of(context).size.width *
+                                        0.05),
                                 child: Column(
                                   children: [
                                     Container(
                                       child: Row(
                                         children: [
-                                          Image.asset('assets/images/app_logo.png', height: getScreenHeight(50),),
+                                          Image.asset(
+                                            'assets/images/app_logo.png',
+                                            height: getScreenHeight(50),
+                                          ),
                                         ],
                                       ),
                                     ),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         InkWell(
                                           onTap: () {
-                                            _scaffoldKey.currentState?.openDrawer();
+                                            _scaffoldKey.currentState
+                                                ?.openDrawer();
                                           },
                                           child: Container(
                                             height: 30,
                                             width: 30,
                                             decoration: BoxDecoration(
                                               color: loginBgColor,
-                                              borderRadius: BorderRadius.circular(15),
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets.all(4.0),
-                                              child: Image.asset('assets/images/menu@3x.png', fit: BoxFit.fill,),
+                                              padding:
+                                                  const EdgeInsets.all(4.0),
+                                              child: Image.asset(
+                                                'assets/images/menu@3x.png',
+                                                fit: BoxFit.fill,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         InkWell(
                                           onTap: () {
-                                            Navigator.pushNamed(context, '/qrScanner').then((result) {
+                                            Navigator.pushNamed(
+                                                    context, '/qrScanner')
+                                                .then((result) {
                                               if (result == true) {
                                                 getDashboardCounts();
                                                 setState(() {});
@@ -380,11 +484,20 @@ class _DashboardPageState extends State<DashboardPage> {
                                           child: Container(
                                             height: 30,
                                             width: 30,
-                                            decoration: BoxDecoration(color: loginBgColor, borderRadius: BorderRadius.circular(15),),
+                                            decoration: BoxDecoration(
+                                              color: loginBgColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                            ),
                                             child: Padding(
-                                              padding: const EdgeInsets.all(6.0),
+                                              padding:
+                                                  const EdgeInsets.all(6.0),
                                               child: Center(
-                                                child: Icon(FontAwesomeIcons.qrcode, size: 22, color: Colors.black,),
+                                                child: Icon(
+                                                  FontAwesomeIcons.qrcode,
+                                                  size: 22,
+                                                  color: Colors.black,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -394,74 +507,103 @@ class _DashboardPageState extends State<DashboardPage> {
                                   ],
                                 )),
                             Container(
-                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 16, horizontal: 16),
                               child: Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(' Dashboard', style: TextStyle(color: HeadingTextColor, fontSize: 14, fontFamily: ffGSemiBold,),),
+                                  Text(
+                                    ' Dashboard',
+                                    style: TextStyle(
+                                      color: HeadingTextColor,
+                                      fontSize: 14,
+                                      fontFamily: ffGSemiBold,
+                                    ),
+                                  ),
                                   SizedBox(height: 10),
                                   Container(
                                     // onRefresh: getDashboardCounts,
                                     color: whiteBgColor,
-                                    child: dashBoardList.isEmpty ? Container(
-                                      height: MediaQuery.of(context).size.height * 0.6,
-                                      child: ListView(
-                                        physics: AlwaysScrollableScrollPhysics(), // Ensures scroll behavior
-                                        children: [],
-                                      ),
-                                    ) : ListView.builder(
-                                      shrinkWrap: true,
-                                      physics:
-                                      NeverScrollableScrollPhysics(), // Ensures scrollability
-                                      padding: EdgeInsets.zero,
-                                      itemCount: dashBoardList.length,
-                                      itemBuilder: (context, index) {
-                                        var dashboardCard = dashBoardList[index];
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            InkWell(
-                                              onTap: () {},
-                                              child: _buildDashboardCard(
-                                                dashboardCard['title'].toString(),
-                                                dashboardCard['description'].toString(),
-                                                dashboardCard['count'].toString(),
-                                                buttonTextBgColor,
-                                                buttonTextBgColor,
-                                                '',
-                                              ),
+                                    child: dashBoardList.isEmpty
+                                        ? Container(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.6,
+                                            child: ListView(
+                                              physics:
+                                                  AlwaysScrollableScrollPhysics(), // Ensures scroll behavior
+                                              children: [],
                                             ),
-                                            SizedBox(height: 5),
-                                          ],
-                                        );
-                                        },
-                                    ),
-                                  ),
-
-                                  Container(
-                                    child: accountType == 'Painter' ? Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(height: 20), // Add some space between sections
-                                        Text(' Dealer details', style: TextStyle(color: HeadingTextColor, fontSize: 14, fontFamily: ffGSemiBold)),
-                                        SizedBox(height: 10),
-                                        Container(
-                                          color: whiteBgColor,
-                                          child: Column(
-                                            children: [
-                                              _buildDealerDetailCard(
-                                                "Dealer Code ",
-                                                parentDealerCode != '' ? parentDealerCode : 'NA',
-                                                buttonTextBgColor,
-                                                buttonTextBgColor,
-                                              )
-                                            ],
+                                          )
+                                        : ListView.builder(
+                                            shrinkWrap: true,
+                                            physics:
+                                                NeverScrollableScrollPhysics(), // Ensures scrollability
+                                            padding: EdgeInsets.zero,
+                                            itemCount: dashBoardList.length,
+                                            itemBuilder: (context, index) {
+                                              var dashboardCard =
+                                                  dashBoardList[index];
+                                              return Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () {},
+                                                    child: _buildDashboardCard(
+                                                      dashboardCard['title']
+                                                          .toString(),
+                                                      dashboardCard[
+                                                              'description']
+                                                          .toString(),
+                                                      dashboardCard['count']
+                                                          .toString(),
+                                                      buttonTextBgColor,
+                                                      buttonTextBgColor,
+                                                      '',
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 5),
+                                                ],
+                                              );
+                                            },
                                           ),
-                                        ),
-                                      ],
-                                    ) :  Column()
                                   ),
+                                  Container(
+                                      child: accountType == 'Painter'
+                                          ? Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                SizedBox(
+                                                    height:
+                                                        20), // Add some space between sections
+                                                Text(' Dealer details',
+                                                    style: TextStyle(
+                                                        color: HeadingTextColor,
+                                                        fontSize: 14,
+                                                        fontFamily:
+                                                            ffGSemiBold)),
+                                                SizedBox(height: 10),
+                                                Container(
+                                                  color: whiteBgColor,
+                                                  child: Column(
+                                                    children: [
+                                                      _buildDealerDetailCard(
+                                                        "Dealer Code ",
+                                                        parentDealerCode != ''
+                                                            ? parentDealerCode
+                                                            : 'NA',
+                                                        buttonTextBgColor,
+                                                        buttonTextBgColor,
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : Column()),
                                 ],
                               ),
                             ),
@@ -473,8 +615,8 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-
-  Widget _buildDealerDetailCard(String title, String value, Color bgColor, Color borderColor) {
+  Widget _buildDealerDetailCard(
+      String title, String value, Color bgColor, Color borderColor) {
     return Card(
       elevation: 0,
       color: bgColor,
@@ -489,38 +631,48 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(fontSize: getProportionateScreenWidth(16), fontFamily: ffGSemiBold, color: buttonBorderColor,),
+            Row(children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: getProportionateScreenWidth(16),
+                  fontFamily: ffGSemiBold,
+                  color: buttonBorderColor,
                 ),
-                Text(
-                  value,
-                  style: TextStyle(fontSize: getProportionateScreenWidth(16), fontWeight: FontWeight.bold, fontFamily: ffGMedium, color: appButtonColor,),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: getProportionateScreenWidth(16),
+                  fontWeight: FontWeight.bold,
+                  fontFamily: ffGMedium,
+                  color: appButtonColor,
                 ),
-              ]
-            ),
-
+              ),
+            ]),
             Container(
-              child: value.isNotEmpty ? InkWell(
-                onTap: () {
-                  showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
-                },
-                child: Container(
-                  child: Padding(
-                    padding: const EdgeInsets.all(6.0),
-                    child: Icon(Icons.edit, size: 25, weight: 600, color: appButtonColor)
-                  ),
-                ),
-              ) : Container(),
+              child: value.isNotEmpty
+                  ? InkWell(
+                      onTap: () {
+                        showPopupForDealerCode(context, {
+                          'dealerCode': parentDealerCode,
+                          'dealerName': userParentDealerName
+                        });
+                      },
+                      child: Container(
+                        child: Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child: Icon(Icons.edit,
+                                size: 25, weight: 600, color: appButtonColor)),
+                      ),
+                    )
+                  : Container(),
             )
           ],
         ),
       ),
     );
   }
-
 
   Widget _buildProductRow(String productName, String units, totalData) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -576,7 +728,8 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildDashboardCard(String title, String subtitle, String count, Color bgColor, Color borderColor, String fromButton) {
+  Widget _buildDashboardCard(String title, String subtitle, String count,
+      Color bgColor, Color borderColor, String fromButton) {
     return Card(
       elevation: 0,
       color: bgColor,
@@ -614,14 +767,12 @@ class _DashboardPageState extends State<DashboardPage> {
                     width: fromButton == 'indent_create'
                         ? getProportionateScreenWidth(200)
                         : getProportionateScreenWidth(190),
-                    child: Text(
-                        subtitle,
+                    child: Text(subtitle,
                         style: TextStyle(
-                            fontSize: getProportionateScreenWidth(14), height: 1,
+                            fontSize: getProportionateScreenWidth(14),
+                            height: 1,
                             fontFamily: ffGMediumItalic,
-                            color: subHeadingTextColor
-                        )
-                    ),
+                            color: subHeadingTextColor)),
                   ),
                 ],
               ),
@@ -630,14 +781,22 @@ class _DashboardPageState extends State<DashboardPage> {
                 ? Container(
                     width: getProportionateScreenWidth(60),
                     alignment: Alignment.center,
-                    child: Icon(Icons.arrow_forward_rounded, color: appThemeColor, size: 50,),
+                    child: Icon(
+                      Icons.arrow_forward_rounded,
+                      color: appThemeColor,
+                      size: 50,
+                    ),
                   )
                 : Container(
                     width: getProportionateScreenWidth(120),
                     alignment: Alignment.center,
                     child: Text(
                       count,
-                      style: TextStyle(fontSize: 37, fontWeight: FontWeight.bold, color: appButtonColor, fontFamily: ffGBold),
+                      style: TextStyle(
+                          fontSize: 37,
+                          fontWeight: FontWeight.bold,
+                          color: appButtonColor,
+                          fontFamily: ffGBold),
                     ),
                   )
           ],
@@ -646,22 +805,24 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  void showPopupForDealerCode(BuildContext context, Map<String, dynamic> response) {
+  void showPopupForDealerCode(
+      BuildContext context, Map<String, dynamic> response) {
     print('${!response['dealerCode'].isEmpty}=========>');
     final
-    // showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
+        // showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
 
-    // Controller for the input fields
-    TextEditingController dealerCodeController = TextEditingController();
+        // Controller for the input fields
+        TextEditingController dealerCodeController = TextEditingController();
     List<TextEditingController> otpControllers =
-    List.generate(6, (index) => TextEditingController());
+        List.generate(6, (index) => TextEditingController());
 
     bool isOtpVisible = false;
     bool isLoading = false;
 
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevent closing the dialog by clicking outside
+      barrierDismissible:
+          false, // Prevent closing the dialog by clicking outside
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -682,7 +843,8 @@ class _DashboardPageState extends State<DashboardPage> {
                     children: [
                       Text(
                         "Dealer Details",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 10),
                       Container(
@@ -742,10 +904,13 @@ class _DashboardPageState extends State<DashboardPage> {
                           }),
                         ),
                         SizedBox(height: 10),
-                        Text('The 6-digit OTP was sent to the ${userParentDealerName}. OTP expiry time is 10 minutes.', style: TextStyle(fontSize: 15)),
-
+                        Text(
+                            'The 6-digit OTP was sent to the ${userParentDealerName}. OTP expiry time is 10 minutes.',
+                            style: TextStyle(fontSize: 15)),
                         StreamBuilder<int>(
-                          stream: Stream.periodic(Duration(seconds: 1), (i) => 600 - i - 1).take(600),
+                          stream: Stream.periodic(
+                                  Duration(seconds: 1), (i) => 600 - i - 1)
+                              .take(600),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               final remainingSeconds = snapshot.data!;
@@ -753,13 +918,13 @@ class _DashboardPageState extends State<DashboardPage> {
                               final seconds = remainingSeconds % 60;
                               return Text(
                                 'Time remaining: ${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
-                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.bold),
                               );
                             }
                             return SizedBox.shrink();
                           },
                         ),
-
                       ],
                       SizedBox(height: 20),
                       Row(
@@ -777,7 +942,10 @@ class _DashboardPageState extends State<DashboardPage> {
                               onPressed: () async {
                                 if (dealerCodeController.text.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("Please enter Dealer Code."),),
+                                    SnackBar(
+                                      content:
+                                          Text("Please enter Dealer Code."),
+                                    ),
                                   );
                                   return;
                                 }
@@ -785,15 +953,18 @@ class _DashboardPageState extends State<DashboardPage> {
                                 setState(() => isLoading = true);
 
                                 try {
-                                  bool success = await fetchOtp(dealerCodeController.text);
+                                  bool success =
+                                      await fetchOtp(dealerCodeController.text);
                                   if (success) {
                                     setState(() {
-                                      isOtpVisible = true;isLoading = false;
+                                      isOtpVisible = true;
+                                      isLoading = false;
                                       Navigator.pop(context);
                                     });
                                   } else {
                                     setState(() {
-                                      isOtpVisible = false;isLoading = false;
+                                      isOtpVisible = false;
+                                      isLoading = false;
                                       Navigator.pop(context);
                                     });
                                   }
@@ -804,15 +975,20 @@ class _DashboardPageState extends State<DashboardPage> {
                                   );
                                 }
                               },
-                              child: isLoading ? CircularProgressIndicator() : Text("Get OTP"),
+                              child: isLoading
+                                  ? CircularProgressIndicator()
+                                  : Text("Get OTP"),
                             ),
                           if (isOtpVisible)
                             TextButton(
                               onPressed: () async {
-                                String otp = otpControllers.map((e) => e.text).join();
+                                String otp =
+                                    otpControllers.map((e) => e.text).join();
                                 if (otp.length < 6) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("Please enter a valid 6-digit OTP.")),
+                                    SnackBar(
+                                        content: Text(
+                                            "Please enter a valid 6-digit OTP.")),
                                   );
                                   return;
                                 }
@@ -820,12 +996,17 @@ class _DashboardPageState extends State<DashboardPage> {
                                 setState(() => isLoading = true);
 
                                 try {
-                                  bool saveSuccess = await saveDealerDetails(dealerCodeController.text, otp,);
+                                  bool saveSuccess = await saveDealerDetails(
+                                    dealerCodeController.text,
+                                    otp,
+                                  );
                                   if (saveSuccess) {
                                     setState(() => isLoading = false);
                                     getDashboardCounts();
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("Details saved successfully.")),
+                                      SnackBar(
+                                          content: Text(
+                                              "Details saved successfully.")),
                                     );
                                     Navigator.pop(context, true);
                                     Navigator.pop(context, true);
@@ -837,7 +1018,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                   );
                                 }
                               },
-                              child: isLoading ? CircularProgressIndicator() : Text("Save"),
+                              child: isLoading
+                                  ? CircularProgressIndicator()
+                                  : Text("Save"),
                             ),
                         ],
                       ),
@@ -873,6 +1056,7 @@ class MyDrawer extends StatelessWidget {
   final String accountMobile;
   final String accountType;
   final VoidCallback onLogout;
+  final VoidCallback onAccountDelete;
 
   MyDrawer({
     required this.accountName,
@@ -882,6 +1066,7 @@ class MyDrawer extends StatelessWidget {
     required this.accountMobile,
     required this.accountType,
     required this.onLogout,
+    required this.onAccountDelete,
   });
   @override
   Widget build(BuildContext context) {
@@ -892,24 +1077,70 @@ class MyDrawer extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.only(topRight: Radius.circular(0), bottomRight: Radius.circular(0),),
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(0),
+            bottomRight: Radius.circular(0),
+          ),
         ),
         child: ListView(
-          padding: EdgeInsets.symmetric(vertical: screenHeight * 0.1, horizontal: 20),
+          padding: EdgeInsets.symmetric(
+              vertical: screenHeight * 0.1, horizontal: 20),
           children: <Widget>[
-            Text(accountName, style: TextStyle(color: drawerTitleColor, fontFamily: ffGBold, fontSize: 24,),),
-            Text(accountMobile, style: TextStyle(color: drawerTitleColor, fontFamily: ffGMedium, fontSize: 14,),),
+            Text(
+              accountName,
+              style: TextStyle(
+                color: drawerTitleColor,
+                fontFamily: ffGBold,
+                fontSize: 24,
+              ),
+            ),
+            Text(
+              accountMobile,
+              style: TextStyle(
+                color: drawerTitleColor,
+                fontFamily: ffGMedium,
+                fontSize: 14,
+              ),
+            ),
             Divider(thickness: 1),
-            SizedBox(height: 15), // Consistent spacing before the ListTile items
+            SizedBox(
+                height: 15), // Consistent spacing before the ListTile items
             Container(
-              height: screenHeight * 0.7,
+              height: screenHeight * 0.6,
               child: Column(
                 children: [
                   ListTile(
-                    title: Text('Home', style: TextStyle(color: appThemeColor, fontFamily: ffGSemiBold, fontSize: 22,),),
-                    onTap: () { Navigator.pop(context); },
+                    title: Text(
+                      'Home',
+                      style: TextStyle(
+                        color: appThemeColor,
+                        fontFamily: ffGSemiBold,
+                        fontSize: 22,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
                   ),
                 ],
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                onAccountDelete();
+              },
+              child: ListTile(
+                title: Center(
+                  child: Text(
+                    'Delete Account',
+                    style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        decorationThickness: 1.5,
+                        fontSize: 14,
+                        fontFamily: ffGMedium,
+                        color: appThemeColor),
+                  ),
+                ),
               ),
             ),
             // SizedBox(height: 10),
@@ -927,7 +1158,12 @@ class MyDrawer extends StatelessWidget {
                 title: Center(
                   child: Text(
                     'Logout',
-                    style: TextStyle(decorationThickness: 1.5, color: drawerSubListColor, fontFamily: ffGMedium, fontSize: 22,),
+                    style: TextStyle(
+                      decorationThickness: 1.5,
+                      color: drawerSubListColor,
+                      fontFamily: ffGMedium,
+                      fontSize: 22,
+                    ),
                   ),
                 ),
               ),

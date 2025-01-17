@@ -24,3 +24,6 @@ const GET_ORDER_BY_ID = "order/orders/";
 const GET_SCANNED_DATA = "transaction/mark-processed/"; //scanned data
 
 const API_LOGOUT = "login/logout";
+
+// const DELETE_USER_ACCOUNT = "api/users/userAccountSuspended/";
+const DELETE_USER_ACCOUNT = "users/toggle-status/";
