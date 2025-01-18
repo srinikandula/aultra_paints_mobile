@@ -453,16 +453,19 @@ class _DashboardPageState extends State<DashboardPage> {
                                                 ?.openDrawer();
                                           },
                                           child: Container(
-                                            height: 30,
-                                            width: 30,
+                                            height: getScreenWidth(30),
+                                            width: getScreenWidth(30),
                                             decoration: BoxDecoration(
                                               color: loginBgColor,
                                               borderRadius:
-                                                  BorderRadius.circular(15),
+                                                  BorderRadius.circular(
+                                                      getScreenWidth(15)),
                                             ),
                                             child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(4.0),
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: getScreenHeight(4),
+                                                  horizontal:
+                                                      getScreenWidth(4)),
                                               child: Image.asset(
                                                 'assets/images/menu@3x.png',
                                                 fit: BoxFit.fill,
@@ -482,20 +485,21 @@ class _DashboardPageState extends State<DashboardPage> {
                                             });
                                           },
                                           child: Container(
-                                            height: 30,
-                                            width: 30,
+                                            height: getScreenWidth(30),
+                                            width: getScreenWidth(30),
                                             decoration: BoxDecoration(
                                               color: loginBgColor,
                                               borderRadius:
-                                                  BorderRadius.circular(15),
+                                                  BorderRadius.circular(
+                                                      getScreenWidth(15)),
                                             ),
                                             child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(6.0),
+                                              padding: EdgeInsets.all(
+                                                  getScreenWidth(6)),
                                               child: Center(
                                                 child: Icon(
                                                   FontAwesomeIcons.qrcode,
-                                                  size: 22,
+                                                  size: getScreenWidth(22),
                                                   color: Colors.black,
                                                 ),
                                               ),
@@ -507,8 +511,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                   ],
                                 )),
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 16, horizontal: 16),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: getScreenHeight(16),
+                                  horizontal: getScreenWidth(16)),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -516,11 +521,11 @@ class _DashboardPageState extends State<DashboardPage> {
                                     ' Dashboard',
                                     style: TextStyle(
                                       color: HeadingTextColor,
-                                      fontSize: 14,
+                                      fontSize: getScreenWidth(14),
                                       fontFamily: ffGSemiBold,
                                     ),
                                   ),
-                                  SizedBox(height: 10),
+                                  SizedBox(height: getScreenHeight(10)),
                                   Container(
                                     // onRefresh: getDashboardCounts,
                                     color: whiteBgColor,
@@ -564,7 +569,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                                       '',
                                                     ),
                                                   ),
-                                                  SizedBox(height: 5),
+                                                  SizedBox(
+                                                      height:
+                                                          getScreenHeight(5)),
                                                 ],
                                               );
                                             },
@@ -577,15 +584,18 @@ class _DashboardPageState extends State<DashboardPage> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 SizedBox(
-                                                    height:
-                                                        20), // Add some space between sections
+                                                    height: getScreenHeight(
+                                                        20)), // Add some space between sections
                                                 Text(' Dealer details',
                                                     style: TextStyle(
                                                         color: HeadingTextColor,
-                                                        fontSize: 14,
+                                                        fontSize:
+                                                            getScreenWidth(14),
                                                         fontFamily:
                                                             ffGSemiBold)),
-                                                SizedBox(height: 10),
+                                                SizedBox(
+                                                    height:
+                                                        getScreenHeight(10)),
                                                 Container(
                                                   color: whiteBgColor,
                                                   child: Column(
@@ -734,42 +744,41 @@ class _DashboardPageState extends State<DashboardPage> {
       elevation: 0,
       color: bgColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(getProportionateScreenWidth(10)),
+        borderRadius: BorderRadius.circular(getScreenWidth(10)),
       ),
       child: Padding(
         padding: EdgeInsets.only(
-            top: getProportionateScreenHeight(getProportionateScreenWidth(20)),
-            bottom:
-                getProportionateScreenHeight(getProportionateScreenWidth(20)),
-            left: getProportionateScreenWidth(getProportionateScreenWidth(14)),
+            top: getScreenHeight(20),
+            bottom: getScreenHeight(20),
+            left: getScreenWidth(14),
             right: (fromButton == 'indent_create'
-                ? getProportionateScreenWidth(30)
-                : getProportionateScreenWidth(0))),
+                ? getScreenWidth(30)
+                : getScreenWidth(0))),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
               width: fromButton == 'indent_create'
-                  ? getProportionateScreenWidth(200)
-                  : getProportionateScreenWidth(200),
+                  ? getScreenWidth(200)
+                  : getScreenWidth(200),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
                     style: TextStyle(
-                        fontSize: getProportionateScreenWidth(16),
+                        fontSize: getScreenWidth(16),
                         fontFamily: ffGSemiBold,
                         color: buttonBorderColor),
                   ),
-                  SizedBox(height: getProportionateScreenWidth(8)),
+                  SizedBox(height: getScreenHeight(8)),
                   Container(
                     width: fromButton == 'indent_create'
-                        ? getProportionateScreenWidth(200)
-                        : getProportionateScreenWidth(190),
+                        ? getScreenWidth(200)
+                        : getScreenWidth(190),
                     child: Text(subtitle,
                         style: TextStyle(
-                            fontSize: getProportionateScreenWidth(14),
+                            fontSize: getScreenWidth(14),
                             height: 1,
                             fontFamily: ffGMediumItalic,
                             color: subHeadingTextColor)),
@@ -779,21 +788,21 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             count == "#123"
                 ? Container(
-                    width: getProportionateScreenWidth(60),
+                    width: getScreenWidth(60),
                     alignment: Alignment.center,
                     child: Icon(
                       Icons.arrow_forward_rounded,
                       color: appThemeColor,
-                      size: 50,
+                      size: getScreenWidth(50),
                     ),
                   )
                 : Container(
-                    width: getProportionateScreenWidth(120),
+                    width: getScreenWidth(120),
                     alignment: Alignment.center,
                     child: Text(
                       count,
                       style: TextStyle(
-                          fontSize: 37,
+                          fontSize: getScreenWidth(37),
                           fontWeight: FontWeight.bold,
                           color: appButtonColor,
                           fontFamily: ffGBold),
@@ -831,12 +840,12 @@ class _DashboardPageState extends State<DashboardPage> {
               child: Dialog(
                 backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(getScreenWidth(10)),
                 ),
                 elevation: 10,
                 child: Container(
                   width: 400,
-                  padding: EdgeInsets.all(16),
+                  padding: EdgeInsets.all(getScreenWidth(16)),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -844,15 +853,17 @@ class _DashboardPageState extends State<DashboardPage> {
                       Text(
                         "Dealer Details",
                         style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                            fontSize: getScreenWidth(20),
+                            fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: getScreenHeight(10)),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius:
+                              BorderRadius.circular(getScreenWidth(10)),
                           border: Border.all(
-                            width: 1,
+                            width: getScreenWidth(1),
                             color: Colors.grey,
                             style: BorderStyle.solid,
                           ),
@@ -867,22 +878,25 @@ class _DashboardPageState extends State<DashboardPage> {
                             labelText: 'Enter Dealer Code',
                             labelStyle: TextStyle(
                               fontFamily: 'Medium',
-                              fontSize: 18.0,
+                              fontSize: getScreenWidth(18),
                               color: Colors.grey,
                             ),
-                            contentPadding: EdgeInsets.all(15),
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: getScreenHeight(15),
+                                horizontal: getScreenWidth(15)),
                             border: InputBorder.none,
                           ),
                         ),
                       ),
                       if (isOtpVisible) ...[
-                        SizedBox(height: 20),
-                        Text("Enter OTP", style: TextStyle(fontSize: 16)),
+                        SizedBox(height: getScreenHeight(20)),
+                        Text("Enter OTP",
+                            style: TextStyle(fontSize: getScreenWidth(16))),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: List.generate(6, (index) {
                             return SizedBox(
-                              width: 40,
+                              width: getScreenWidth(40),
                               child: TextField(
                                 controller: otpControllers[index],
                                 maxLength: 1,
@@ -903,10 +917,10 @@ class _DashboardPageState extends State<DashboardPage> {
                             );
                           }),
                         ),
-                        SizedBox(height: 10),
+                        SizedBox(height: getScreenHeight(10)),
                         Text(
                             'The 6-digit OTP was sent to the ${userParentDealerName}. OTP expiry time is 10 minutes.',
-                            style: TextStyle(fontSize: 15)),
+                            style: TextStyle(fontSize: getScreenWidth(15))),
                         StreamBuilder<int>(
                           stream: Stream.periodic(
                                   Duration(seconds: 1), (i) => 600 - i - 1)
@@ -919,14 +933,15 @@ class _DashboardPageState extends State<DashboardPage> {
                               return Text(
                                 'Time remaining: ${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
                                 style: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.bold),
+                                    fontSize: getScreenWidth(15),
+                                    fontWeight: FontWeight.bold),
                               );
                             }
                             return SizedBox.shrink();
                           },
                         ),
                       ],
-                      SizedBox(height: 20),
+                      SizedBox(height: getScreenHeight(20)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -1042,10 +1057,10 @@ void _navigateTo(BuildContext context, String routeName) {
   Navigator.pushNamed(context, routeName);
 }
 
-const TextStyle drawerItemStyle = TextStyle(
+TextStyle drawerItemStyle = TextStyle(
   color: drawerSubListColor,
   fontFamily: ffGMedium,
-  fontSize: 16,
+  fontSize: getScreenWidth(16),
 );
 
 class MyDrawer extends StatelessWidget {
@@ -1073,6 +1088,7 @@ class MyDrawer extends StatelessWidget {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
     return Drawer(
+      width: getScreenWidth(200),
       backgroundColor: Colors.transparent,
       child: Container(
         decoration: BoxDecoration(
@@ -1084,14 +1100,14 @@ class MyDrawer extends StatelessWidget {
         ),
         child: ListView(
           padding: EdgeInsets.symmetric(
-              vertical: screenHeight * 0.1, horizontal: 20),
+              vertical: screenHeight * 0.1, horizontal: getScreenWidth(20)),
           children: <Widget>[
             Text(
               accountName,
               style: TextStyle(
                 color: drawerTitleColor,
                 fontFamily: ffGBold,
-                fontSize: 24,
+                fontSize: getScreenWidth(24),
               ),
             ),
             Text(
@@ -1099,12 +1115,13 @@ class MyDrawer extends StatelessWidget {
               style: TextStyle(
                 color: drawerTitleColor,
                 fontFamily: ffGMedium,
-                fontSize: 14,
+                fontSize: getScreenWidth(14),
               ),
             ),
-            Divider(thickness: 1),
+            Divider(thickness: getScreenHeight(1)),
             SizedBox(
-                height: 15), // Consistent spacing before the ListTile items
+                height: getScreenHeight(
+                    15)), // Consistent spacing before the ListTile items
             Container(
               height: screenHeight * 0.6,
               child: Column(
@@ -1115,7 +1132,7 @@ class MyDrawer extends StatelessWidget {
                       style: TextStyle(
                         color: appThemeColor,
                         fontFamily: ffGSemiBold,
-                        fontSize: 22,
+                        fontSize: getScreenWidth(22),
                       ),
                     ),
                     onTap: () {
@@ -1136,7 +1153,7 @@ class MyDrawer extends StatelessWidget {
                     style: TextStyle(
                         decoration: TextDecoration.underline,
                         decorationThickness: 1.5,
-                        fontSize: 14,
+                        fontSize: getScreenWidth(14),
                         fontFamily: ffGMedium,
                         color: appThemeColor),
                   ),
@@ -1144,7 +1161,7 @@ class MyDrawer extends StatelessWidget {
               ),
             ),
             // SizedBox(height: 10),
-            Divider(thickness: 1),
+            Divider(thickness: getScreenHeight(1)),
             // Container(
             //   margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.2),
             //   child: Divider(thickness: 2),
@@ -1162,7 +1179,7 @@ class MyDrawer extends StatelessWidget {
                       decorationThickness: 1.5,
                       color: drawerSubListColor,
                       fontFamily: ffGMedium,
-                      fontSize: 22,
+                      fontSize: getScreenWidth(22),
                     ),
                   ),
                 ),

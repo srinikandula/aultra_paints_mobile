@@ -198,12 +198,12 @@ class _LoginPageState extends State<LoginPage> {
                                     right: 100),
                                 child: Align(
                                   alignment: Alignment.centerLeft,
-                                  child: const Text(
+                                  child: Text(
                                     'Login with your provided credentials',
                                     style: TextStyle(
                                       fontFamily: ffGRegular,
                                       color: loginSubHeadingColor,
-                                      fontSize: 16.0,
+                                      fontSize: getScreenWidth(16),
                                     ),
                                   ),
                                 ),
@@ -230,11 +230,16 @@ class _LoginPageState extends State<LoginPage> {
                                     FocusManager.instance.primaryFocus
                                         ?.unfocus();
                                   },
-                                  decoration: const InputDecoration(
+                                  style: TextStyle(
+                                    fontSize: getScreenWidth(18),
+                                    color: Colors.black,
+                                    fontFamily: ffGMedium,
+                                  ),
+                                  decoration: InputDecoration(
                                     labelText: 'Enter Mobile Number',
                                     labelStyle: TextStyle(
                                       fontFamily: ffGMedium,
-                                      fontSize: 18.0,
+                                      fontSize: getScreenWidth(18),
                                       color: textInputPlaceholderColor,
                                     ),
                                     contentPadding: EdgeInsets.all(15),
@@ -336,8 +341,7 @@ class _LoginPageState extends State<LoginPage> {
                                         "LOGIN",
                                         style: TextStyle(
                                           fontFamily: ffGSemiBold,
-                                          fontSize:
-                                              getProportionateScreenWidth(18),
+                                          fontSize: getScreenWidth(18),
                                           color: buttonTextWhiteColor,
                                         ),
                                       ),
@@ -359,7 +363,7 @@ class _LoginPageState extends State<LoginPage> {
                                     style: TextStyle(
                                         decoration: TextDecoration.underline,
                                         decorationThickness: 1.5,
-                                        fontSize: 16,
+                                        fontSize: getScreenWidth(16),
                                         fontFamily: ffGMedium,
                                         color: appThemeColor),
                                   ),
@@ -409,7 +413,7 @@ class _LoginPageState extends State<LoginPage> {
                                     style: TextStyle(
                                         decoration: TextDecoration.underline,
                                         decorationThickness: 1.5,
-                                        fontSize: 14,
+                                        fontSize: getScreenWidth(14),
                                         fontFamily: ffGMedium,
                                         color: appThemeColor),
                                   ),

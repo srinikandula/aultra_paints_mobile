@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:aultra_paints_mobile/utility/FooterButton.dart';
+import 'package:aultra_paints_mobile/utility/size_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -164,12 +165,13 @@ class _SignupPageState extends State<SignupPage> {
             Expanded(
               child: Scrollbar(
                 thumbVisibility: true,
-                thickness: 2,
+                thickness: getScreenWidth(2),
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
+                    margin: EdgeInsets.symmetric(
+                        horizontal: getScreenWidth(20),
+                        vertical: getScreenHeight(10)),
                     child: Column(
                       children: [
                         returnFormFeilds(),
@@ -221,7 +223,7 @@ class _SignupPageState extends State<SignupPage> {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      height: screenHeight * 0.73,
+      height: screenHeight * 0.7,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -231,11 +233,11 @@ class _SignupPageState extends State<SignupPage> {
             children: [
               Utils.returnInvoiceRedStar('Name'),
               Container(
-                margin: const EdgeInsets.only(top: 5),
-                padding: const EdgeInsets.symmetric(vertical: 10),
+                margin: EdgeInsets.only(top: getScreenHeight(5)),
+                padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
                 decoration: BoxDecoration(
                   color: textinputBgColor,
-                  borderRadius: BorderRadius.circular(5.0),
+                  borderRadius: BorderRadius.circular(getScreenWidth(5)),
                 ),
                 width: screenWidth * 0.9,
                 child: TextFormField(
@@ -245,11 +247,16 @@ class _SignupPageState extends State<SignupPage> {
                   autofocus: false,
                   keyboardType: TextInputType.text,
                   controller: _userName,
-                  decoration: const InputDecoration(
+                  style: TextStyle(
+                    fontSize: getScreenWidth(15),
+                    color: Colors.black,
+                    fontFamily: ffGMedium,
+                  ),
+                  decoration: InputDecoration(
                       hintText: 'Enter Name',
                       hintStyle: TextStyle(
                           fontFamily: ffGMedium,
-                          fontSize: 15.0,
+                          fontSize: getScreenWidth(15),
                           color: Colors.grey),
                       contentPadding: EdgeInsets.all(15),
                       border: InputBorder.none),
@@ -266,7 +273,7 @@ class _SignupPageState extends State<SignupPage> {
               ),
             ],
           ),
-          SizedBox(height: 5),
+          SizedBox(height: getScreenHeight(5)),
           //user email
           // Column(
           //   crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,11 +322,11 @@ class _SignupPageState extends State<SignupPage> {
             children: [
               Utils.returnInvoiceRedStar('Mobile Number'),
               Container(
-                margin: const EdgeInsets.only(top: 5),
-                padding: const EdgeInsets.symmetric(vertical: 10),
+                margin: EdgeInsets.only(top: getScreenHeight(5)),
+                padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
                 decoration: BoxDecoration(
                   color: textinputBgColor,
-                  borderRadius: BorderRadius.circular(5.0),
+                  borderRadius: BorderRadius.circular(getScreenWidth(5)),
                 ),
                 width: screenWidth * 0.9,
                 child: TextFormField(
@@ -329,11 +336,16 @@ class _SignupPageState extends State<SignupPage> {
                   autofocus: false,
                   keyboardType: TextInputType.phone,
                   controller: _userMobileNumber,
-                  decoration: const InputDecoration(
+                  style: TextStyle(
+                    fontSize: getScreenWidth(15),
+                    color: Colors.black,
+                    fontFamily: ffGMedium,
+                  ),
+                  decoration: InputDecoration(
                       hintText: 'Enter Mobile Number',
                       hintStyle: TextStyle(
                           fontFamily: ffGMedium,
-                          fontSize: 15.0,
+                          fontSize: getScreenWidth(15),
                           color: Colors.grey),
                       contentPadding: EdgeInsets.all(15),
                       border: InputBorder.none),
@@ -350,7 +362,7 @@ class _SignupPageState extends State<SignupPage> {
               ),
             ],
           ),
-          SizedBox(height: 5),
+          SizedBox(height: getScreenHeight(5)),
           // //user new password
           // Column(
           //   crossAxisAlignment: CrossAxisAlignment.start,
