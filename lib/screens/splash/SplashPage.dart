@@ -8,8 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utility/Utils.dart';
+import '../LayOut/LayOutPage.dart';
 import '../authentication/login/LoginPage.dart';
-import '../dashboard/DashboardPage.dart';
+import '../dashboard/DashboardNewPage.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);
@@ -47,7 +48,7 @@ class _SplashPageState extends State<SplashPage> {
 
     if (authtoken != null) {
       Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const DashboardPage()));
+          MaterialPageRoute(builder: (context) => const LayoutPage(child: DashboardNewPage())));
     } else {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => const LoginPage()));

@@ -97,6 +97,7 @@ class _QrScannerState extends State<QrScanner> {
   onBackPressed() {
     Utils.clearToasts(context);
     Navigator.pop(context, true);
+    Navigator.pop(context, true);
   }
 
   Future<bool> _onWillPop() async {
@@ -154,46 +155,75 @@ class _QrScannerState extends State<QrScanner> {
     );
   }
 
-  void showApiResponsePopup(
-      BuildContext context, Map<String, dynamic> response) {
+  void showApiResponsePopup(BuildContext context, Map<String, dynamic> response) {
     final message = response["message"] ?? "No message";
     final data = response["data"] ?? {};
 
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Scanned Details"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(message, style: TextStyle(fontWeight: FontWeight.bold)),
-              SizedBox(height: 10),
-              Text("Batch Name: ${data['batchName'] ?? 0}"),
-              SizedBox(height: 2),
-              Text("Batch Number: ${data['batchNumber'] ?? 0}"),
-              SizedBox(height: 2),
-              Text("Processed: ${data['isProcessed'] ?? false ? 'Yes' : 'No'}"),
-              SizedBox(height: 2),
-              Text("Redeemable Points: ${data['redeemablePoints'] ?? 0}"),
-              SizedBox(height: 2),
-              Text("Coupon: ${data['couponCode'] ?? 0}"),
-              SizedBox(height: 2),
-              Text("Cash: ${data['cash'] ?? 0}"),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                // Navigator.of(context).pop(); // Close the dialog
-                // Navigator.pop(context);
-                Navigator.pop(context, true);
-                Navigator.pop(context, true);
-              },
-              child: Text("OK"),
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return WillPopScope(
+              // onWillPop: () async => true,
+              onWillPop: _onWillPop,
+              // onWillPop: () async => {
+              //   Navigator.pop(context, true);
+              //   return true;
+              // },
+              child: Dialog(
+                backgroundColor: Colors.green,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 10,
+                child: Container(
+                  width: 100,
+                  // height: 300,
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 30),
+                      Container(
+                        child: Center(
+                          child: Text("${data['cash'] ?? 0} ₹", style: TextStyle(fontSize: 80, color: Colors.white, fontFamily: ffGSemiBold,),),
+                        ),
+                      ),
+                      // Text(message, style: TextStyle(fontSize: 14, color: Colors.white, fontFamily: ffGSemiBold,)),
+                      SizedBox(height: 40),
+                      Container(
+                        child: Center(
+                          child: Text("Coupon Redeemed from Aultra Paints.", style: TextStyle(fontSize: 20, color: Colors.white, fontFamily: ffGSemiBold,), textAlign: TextAlign.center,),
+                        )
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+                        child: Center(
+                          child: Text("With Coupon : ${data['couponCode'] ?? 0}", style: TextStyle(fontSize: 16, color: Colors.white, fontFamily: ffGSemiBold,),),
+                        )
+                      ),
+                      // SizedBox(height: 2),
+                      // Text("Reward Points: ${data['rewardPoints'] ?? 0}", style: TextStyle(fontSize: 14, color: Colors.white, fontFamily: ffGSemiBold,),),
+                      // SizedBox(height: 40),
+                      Align(
+                        alignment: Alignment.center,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pop(context, true);
+                            Navigator.pop(context, true);
+                          },
+                          child: Text("OK", style: TextStyle(fontSize: 14, color: Colors.white, fontFamily: ffGSemiBold,)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         );
       },
     );
