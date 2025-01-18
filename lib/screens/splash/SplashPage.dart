@@ -21,46 +21,66 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  late Timer _navigationTimer;
 
   @override
   void initState() {
     super.initState();
-    callTimer();
-    certificateCheck();
+    _initializeSplash();
   }
 
-  void _showSnackBar(String message, BuildContext context, ColorCheck) {
+  @override
+  void dispose() {
+    _navigationTimer.cancel(); // Ensure timer is cleared to avoid memory leaks
+    super.dispose();
+  }
+
+  void _initializeSplash() async {
+    _startNavigationTimer();
+    // await certificateCheck();
+  }
+
+  void _showSnackBar(String message, BuildContext context, bool isSuccess) {
     final snackBar = SnackBar(
-        content: Text(message),
-        backgroundColor: ColorCheck ? Colors.green : Colors.red,
-        duration: Utils.returnStatusToastDuration(ColorCheck));
+      content: Text(message),
+      backgroundColor: isSuccess ? Colors.green : Colors.red,
+      duration: Utils.returnStatusToastDuration(isSuccess),
+    );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  callTimer() {
-    Timer(const Duration(seconds: 1), () => onNavigate());
+  void _startNavigationTimer() {
+    _navigationTimer = Timer(const Duration(seconds: 2), () => onNavigate());
   }
 
-  onNavigate() async {
+  Future<void> onNavigate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var authtoken = prefs.getString('accessToken');
+    var authToken = prefs.getString('accessToken');
 
-    if (authtoken != null) {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const LayoutPage(child: DashboardNewPage())));
+    if (!mounted) return;
+
+    if (authToken != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DashboardNewPage(),
+        ),
+      );
     } else {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const LoginPage()));
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginPage(),
+        ),
+      );
     }
   }
 
   Future<HttpClient> createHttpClientWithCertificate() async {
     SecurityContext context = SecurityContext.defaultContext;
     try {
-      // final certData =
-      //     await rootBundle.load('assets/certificate/STAR_mlldev_com.crt'); //dev
-      final certData = await rootBundle
-          .load('assets/certificate/AultraPaints_b20bd50c61d9d911.crt'); //QA
+      final certData = await rootBundle.load(
+          'assets/certificate/AultraPaints_b20bd50c61d9d911.crt'); // QA Certificate
       context.setTrustedCertificatesBytes(certData.buffer.asUint8List());
     } catch (e) {
       print("Error loading certificate: $e");
@@ -73,55 +93,60 @@ class _SplashPageState extends State<SplashPage> {
   Future<void> certificateCheck() async {
     try {
       HttpClient client = await createHttpClientWithCertificate();
-
       final request =
           await client.getUrl(Uri.parse('https://api.aultrapaints.com'));
-
       final response = await request.close();
 
       if (response.statusCode == 200) {
-        callTimer();
+        _startNavigationTimer();
       } else {
-        if (!mounted) return; // Ensure the widget is still mounted
+        if (!mounted) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginPage()),
         );
-
-        // _showSnackBar('Certification verification failed', context, false);
       }
     } catch (e) {
-      if (!mounted) return; // Ensure the widget is still mounted
+      if (!mounted) return;
       _showSnackBar('An error occurred: $e', context, false);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: Colors.white,
-        body: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * 1,
-                child: Center(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      height: MediaQuery.of(context).size.width * 0.6,
-                      decoration: const BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage('assets/images/app_logo.png'),
-                              fit: BoxFit.fitWidth)),
+      key: _scaffoldKey,
+      backgroundColor: Colors.white,
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    height: MediaQuery.of(context).size.width * 0.6,
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/images/app_logo.png'),
+                        fit: BoxFit.fitWidth,
+                      ),
                     ),
-                  ],
-                )),
+                  ),
+                ],
               ),
-            )));
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -15,11 +15,10 @@ import '../../utility/size_config.dart';
 
 import 'package:http/http.dart' as http;
 
-
-class LayoutPage extends StatelessWidget {
+class LayoutPage extends StatefulWidget {
   final DashboardNewPage child; // Page content
 
-  const LayoutPage({Key? key, required DashboardNewPage child}) : super(key: key);
+  const LayoutPage({Key? key, required this.child}) : super(key: key);
 
   @override
   State<LayoutPage> createState() => _LayoutPageState();
@@ -81,10 +80,7 @@ class _LayoutPageState extends State<LayoutPage> {
       var tempResp = json.decode(response.body);
       var apiResp = tempResp['data'];
       dashBoardList = [
-        {
-          "title": "Rewards ",
-          "count": apiResp['cash']
-        },
+        {"title": "Rewards ", "count": apiResp['cash']},
       ];
       setState(() {
         dashBoardList = dashBoardList;
@@ -104,18 +100,22 @@ class _LayoutPageState extends State<LayoutPage> {
       });
     } else {
       Navigator.pop(context);
-      error_handling.errorValidation(context, response.body, response.body, false);
+      error_handling.errorValidation(
+          context, response.body, response.body, false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     // final Widget child; // Page content
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       key: _scaffoldKey,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13), // Custom height
+        preferredSize: Size.fromHeight(
+            MediaQuery.of(context).size.height * 0.13), // Custom height
         child: Container(
           // decoration: BoxDecoration(
           //   borderRadius: BorderRadius.circular(30),

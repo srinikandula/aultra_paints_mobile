@@ -162,11 +162,8 @@ class _DashboardPageState extends State<DashboardPage> {
         {
           "title": "Redeemed Points",
           "description": "Redeemed Points Confirmation",
-<<<<<<< HEAD
           "count": apiResp['redeemablePoints'] ?? '0'
-=======
-          "count": apiResp['rewardPoints']
->>>>>>> b8bd28c (Dashboard Changes)
+          // "count": apiResp['rewardPoints']
         },
         {
           "title": "Earned Cash Reward",

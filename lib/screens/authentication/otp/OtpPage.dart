@@ -11,6 +11,8 @@ import '../../../services/config.dart';
 import '../../../utility/SingleParamHeader.dart';
 import '../../../utility/Utils.dart';
 import '../../../utility/validations.dart';
+import '../../LayOut/LayOutPage.dart';
+import '../../dashboard/DashboardNewPage.dart';
 import '/utility/Colors.dart';
 import '/utility/Fonts.dart';
 
@@ -135,7 +137,15 @@ class _OtpPageState extends State<OtpPage> {
     await prefs.setString('USER_ACCOUNT_TYPE', userData['accountType']);
     // await prefs.setString('USER_PARENT_DEALER_CODE', userData['parentDealerCode'] ?? '');
 
-    Navigator.pushNamed(context, '/dashboardPage', arguments: {});
+    // Navigator.pushNamed(context, '/dashboardPage', arguments: {});
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const LayoutPage(
+          child: DashboardNewPage(),
+        ),
+      ),
+    );
   }
 
   Widget returnOTPfields() {

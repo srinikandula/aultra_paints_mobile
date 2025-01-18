@@ -82,7 +82,10 @@ class MyAppState extends State<MyApp> {
       routes: {
         "/otpPage": (context) => const OtpPage(),
         // "/dashboardPage": (context) => const DashboardPage(),
-        "/dashboardPage": (context) => LayoutPage(child: DashboardNewPage())
+        "/dashboardPage": (context) => LayoutPage(child: DashboardNewPage()),
+        // "/dashboardNewPage": (context) =>
+        //     LayoutPage(child: DashboardNewPage(child: SomeWidget())),
+
         // '/': (context) => LayoutPage(child: DashboardNewPage(), title: 'Home'),
         // '/profile': (context) => LayoutPage(child: ProfilePage(), title: 'Profile'),
         // '/settings': (context) => LayoutPage(child: SettingsPage(), title: 'Settings'),

@@ -19,20 +19,20 @@ import 'package:http/http.dart' as http;
 import '../../../services/config.dart';
 import '../../utility/loader.dart';
 import '../../utility/size_config.dart';
+import '../orders/qrScanner/QrScanner.dart';
 
 class DashboardNewPage extends StatefulWidget {
-  final DashboardNewPage child; // Page content
+  final Widget? child; // Make child optional
 
-  const DashboardNewPage({Key? key, required this.child}) : super(key: key);
+  const DashboardNewPage({Key? key, this.child}) : super(key: key);
 
-  // @override
-  // State<DashboardNewPage> createState() => _DashboardNewPageState();
+  @override
   _DashboardNewPageState createState() => _DashboardNewPageState();
 }
 
 class _DashboardNewPageState extends State<DashboardNewPage> {
   final _formKey = GlobalKey<FormState>();
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  // final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   var accesstoken;
   var USER_ID;
@@ -58,11 +58,35 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
   var accountType = '';
   var parentDealerCode = '';
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  late PageController _pageController;
+  late Timer _timer;
 
   @override
   void initState() {
     fetchLocalStorageData();
     super.initState();
+    _pageController = PageController(viewportFraction: 0.6);
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
+      if (_pageController.hasClients && rewardSchemes.isNotEmpty) {
+        int nextPage = (_pageController.page?.toInt() ?? 0) + 1;
+        if (nextPage >= rewardSchemes.length) {
+          nextPage = 0;
+        }
+        _pageController.animateToPage(
+          nextPage,
+          duration: Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    _pageController.dispose();
+    super.dispose();
   }
 
   void _showSnackBar(String message, BuildContext context, ColorCheck) {
@@ -110,30 +134,34 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       var tempResp = json.decode(response.body);
       var apiResp = tempResp['data'];
       dashBoardList = [
-        {
-          "title": "Rewards ",
-          "count": apiResp['cash']
-        },
+        {"title": "Rewards ", "count": apiResp['cash']},
       ];
       setState(() {
         dashBoardList = dashBoardList;
         accountType = USER_ACCOUNT_TYPE;
         parentDealerCode = apiResp['parentDealerCode'] ?? '';
         if (parentDealerCode.isEmpty && accountType == 'Painter') {
-          showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
+          showPopupForDealerCode(context, {
+            'dealerCode': parentDealerCode,
+            'dealerName': userParentDealerName
+          });
         }
         getRewardSchemes();
         getProductOffers();
 
         _scrollController.addListener(() {
-          if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && !isLoading && hasMore) {
+          if (_scrollController.position.pixels ==
+                  _scrollController.position.maxScrollExtent &&
+              !isLoading &&
+              hasMore) {
             getProductOffers(); // Load more data when scrolled to bottom
           }
         });
       });
     } else {
       Navigator.pop(context);
-      error_handling.errorValidation(context, response.body, response.body, false);
+      error_handling.errorValidation(
+          context, response.body, response.body, false);
     }
   }
 
@@ -145,7 +173,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     try {
       response = await http.post(
         Uri.parse(apiUrl),
-        headers: {"Content-Type": "application/json", "Authorization": accesstoken},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": accesstoken
+        },
         body: json.encode({'dealerCode': dealerCode}),
       );
       if (response.statusCode == 200) {
@@ -165,10 +196,15 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
           Loader.hideLoader(context);
           final responseData = json.decode(response.body);
           print(responseData['message']);
-          _showSnackBar("${responseData['message']}.", context, false,);
+          _showSnackBar(
+            "${responseData['message']}.",
+            context,
+            false,
+          );
           return false;
         } else {
-          throw Exception("Failed to fetch OTP. Status code: ${response.statusCode}");
+          throw Exception(
+              "Failed to fetch OTP. Status code: ${response.statusCode}");
         }
       }
     } catch (error) {
@@ -187,7 +223,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     try {
       response = await http.post(
         Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json', "Authorization": accesstoken},
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": accesstoken
+        },
         body: json.encode({
           'dealerCode': dealerCode,
           'otp': otp,
@@ -198,13 +237,15 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        if (['', null, 0, false].contains(responseData?["data"]?['parentDealerCode'])) {
+        if (['', null, 0, false]
+            .contains(responseData?["data"]?['parentDealerCode'])) {
           throw Exception(responseData["message"] ?? "Failed to save details.");
         } else {
           return true;
         }
       } else {
-        throw Exception("Failed to save details. Status code: ${response.statusCode}");
+        throw Exception(
+            "Failed to save details. Status code: ${response.statusCode}");
       }
     } catch (error) {
       print("Error saving dealer details: $error");
@@ -223,7 +264,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       print(apiUrl);
       response = await http.post(
         Uri.parse(apiUrl),
-        headers: {"Content-Type": "application/json", "Authorization": accesstoken},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": accesstoken
+        },
         body: json.encode({'page': currentPage, 'limit': 4}),
       );
       final responseData = json.decode(response.body);
@@ -243,7 +287,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
         return false;
       } else {
         Navigator.pop(context);
-        error_handling.errorValidation(context, response.body, response.body, false);
+        error_handling.errorValidation(
+            context, response.body, response.body, false);
       }
     } catch (error) {
       // final errorData = json.decode(error);
@@ -260,7 +305,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     print(apiUrl);
     response = await http.get(
       Uri.parse(apiUrl),
-      headers: {"Content-Type": "application/json", "Authorization": accesstoken},
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": accesstoken
+      },
       // body: json.encode({'dealerCode': dealerCode}),
     );
     if (response.statusCode == 200) {
@@ -271,12 +319,12 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       return true;
     } else {
       Navigator.pop(context);
-      error_handling.errorValidation(context, response.body, response.body, false);
+      error_handling.errorValidation(
+          context, response.body, response.body, false);
     }
     Navigator.pop(context);
     error_handling.errorValidation(context, response, response, false);
   }
-
 
   void logOut(context) async {
     clearStorage();
@@ -295,391 +343,274 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
 
   @override
   Widget build(BuildContext context) {
-    PageController _pageController = PageController(viewportFraction: 0.6); // Adjust viewportFraction for partial visibility
-
-    // Timer to auto-scroll the PageView
-    Timer.periodic(Duration(seconds: 1), (Timer timer) {
-      if (_pageController.hasClients && rewardSchemes.isNotEmpty) {
-        int nextPage = (_pageController.page?.toInt() ?? 0) + 1;
-        if (nextPage >= rewardSchemes.length) {
-          nextPage = 0; // Loop back to the first item
-        }
-        _pageController.animateToPage(
-          nextPage,
-          duration: Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
-
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    double cardWidth = screenWidth * 0.9; // 80% of the screen width
-    double cardHeight = 270; // Fixed height for the cards
-    // double cardHeight = screenHeight * 0.9;
-    double rewardCardHeight = screenHeight * 0.9; // 80% of theFixed height for the cards
-
     return WillPopScope(
-        onWillPop: _onWillPop,
+      onWillPop: _onWillPop,
       child: Scaffold(
         key: _scaffoldKey,
-        drawer: MyDrawer(
-          accountName: USER_FULL_NAME.toString(),
-          accountId: USER_ID.toString(),
-          accountMobile: USER_MOBILE_NUMBER.toString(),
-          accountType: USER_ACCOUNT_TYPE.toString(),
-          onLogout: () => {logOut(context)},
-        ),
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13), // Custom height
-          child: Container(
-            // decoration: BoxDecoration(
-            //   borderRadius: BorderRadius.circular(30),
-            //   color: Colors.white,
-            //   boxShadow: [
-            //     BoxShadow(
-            //       color: Colors.grey.withOpacity(0.2),
-            //       spreadRadius: 2,
-            //       blurRadius: 5,
-            //       offset: Offset(0, 3),
-            //     ),
-            //   ],
-            // ),
-            // color: Colors.white, // Background color
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).size.height * 0.05,
-              left: MediaQuery.of(context).size.width * 0.05,
-              right: MediaQuery.of(context).size.width * 0.05,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Row(
-                  // mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/images/app_logo.png',
-                      height: getScreenHeight(50),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        _scaffoldKey.currentState?.openDrawer();
-                      },
-                      child: Container(
-                        height: 30,
-                        width: 30,
-                        decoration: BoxDecoration(
-                          color: loginBgColor,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Image.asset(
-                            'assets/images/menu@3x.png',
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Image.asset(
-                    //   'assets/images/app_logo.png',
-                    //   height: getScreenHeight(50),
-                    // ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/qrScanner').then((result) {
-                          if (result == true) {
-                            getDashboardCounts();
-                            setState(() {});
-                          }
-                        });
-                      },
-                      child: Container(
-                        height: 30,
-                        width: 30,
-                        decoration: BoxDecoration(
-                          color: loginBgColor,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(6.0),
-                          child: Center(
-                            child: Icon(
-                              FontAwesomeIcons.qrcode,
-                              size: 22,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-        body: SingleChildScrollView( // Add SingleChildScrollView
+        drawer: _buildDrawer(),
+        appBar: _buildAppBar(context),
+        body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                padding: const EdgeInsets.only(bottom: 5, top: 10),
-                child: Text(
-                  'Welcome back, ${USER_FULL_NAME}',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold,),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                padding: const EdgeInsets.only(bottom: 10, top: 10),
-                child: Text(
-                  'Product Offers',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: appThemeColor),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              // Horizontal Reward Schemes List
-              SizedBox(
-                height: 260, // Set the height for the horizontal list
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: productOffers.length + (hasMore ? 1 : 0), // Show loading indicator if more data is available
-                    itemBuilder: (context, index) {
-                      if (index < productOffers.length) {
-                        final offer = productOffers[index];
-                        return Container(
-                          width: 150, // Width of each item
-                          margin: EdgeInsets.only(top: 0, left: 8, right: 8, bottom: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                spreadRadius: 2,
-                                blurRadius: 5,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              // Reward Image
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                                  child: FadeInImage.assetNetwork(
-                                    placeholder: 'assets/images/app_logo_load.png', // Placeholder image
-                                    image: offer['productOfferImageUrl'] ?? '', // Network image URL
-                                    fit: BoxFit.cover,
-                                    imageErrorBuilder: (context, error, stackTrace) {
-                                      return Image.asset(
-                                        'assets/images/app_logo_load.png', // Fallback image
-                                        fit: BoxFit.cover,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      offer['productOfferTitle'], // Title of the reward
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    SizedBox(height: 2),
-                                    Text(
-                                      offer['productOfferDescription'], // Description of the reward
-                                      maxLines: 2,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey[700],
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      } else {
-                        // Show a loading spinner at the bottom
-                        return Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                child: dashBoardList.isEmpty
-                    ? Container(
-                  height: MediaQuery.of(context).size.height * 0.6,
-                  child: ListView(
-                    physics: AlwaysScrollableScrollPhysics(), // Ensures scroll behavior
-                    children: [],
-                  ),
-                )
-                    : ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(), // Ensures scrollability
-                  padding: EdgeInsets.zero,
-                  itemCount: dashBoardList.length,
-                  itemBuilder: (context, index) {
-                    var dashboardCard = dashBoardList[index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        InkWell(
-                          onTap: () {},
-                          child: _buildDashboardCard(
-                            dashboardCard['title'].toString(),
-                            dashboardCard['count'].toString(),
-                            white,
-                            buttonTextBgColor,
-                            '',
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                      ],
-                    );
-                  },
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                // padding: const EdgeInsets.only(bottom: 10),
-                child: Text(
-                  'Current Schemes',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: appThemeColor),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              SizedBox(
-                height: cardHeight,
-                child: rewardSchemes.isEmpty
-                    ? Center(child: CircularProgressIndicator())
-                    : PageView.builder(
-                  controller: _pageController,
-                  itemCount: rewardSchemes.length,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    final item = rewardSchemes[index];
-                    return Transform.scale(
-                      scale: index == _pageController.page?.round()
-                          ? 1.0 // Scale center card fully
-                          : 0.9, // Slightly shrink side cards
-                      child: Align(
-                        alignment: Alignment.topCenter, // Align cards to the top
-                        child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                spreadRadius: 2,
-                                blurRadius: 5,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 250,
-                                height: 250,
-                                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: FadeInImage.assetNetwork(
-                                    placeholder: 'assets/images/app_logo_load.png', // Placeholder image
-                                    image: item['rewardSchemeImageUrl'] ?? '', // Network image URL
-                                    fit: BoxFit.cover,
-                                    imageErrorBuilder: (context, error, stackTrace) {
-                                      return Image.asset(
-                                        'assets/images/app_logo_load.png', // Fallback image
-                                        fit: BoxFit.cover,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
+              _buildWelcomeMessage(),
+              _buildSectionTitle('Product Offers'),
+              _buildProductOffers(),
+              _buildSectionTitle('Current Schemes'),
+              _buildCurrentSchemes(),
             ],
           ),
         ),
-
-      )
+      ),
     );
   }
 
-  Widget _buildDashboardCard(String title, String count, Color bgColor, Color borderColor, String fromButton) {
-    return Container(
-        margin: EdgeInsets.symmetric(horizontal: 0.0, vertical: 16.0),
-      child: InkWell(
-        onTap: () {},
+  Widget _buildDrawer() {
+    return MyDrawer(
+      accountName: USER_FULL_NAME.toString(),
+      accountId: USER_ID.toString(),
+      accountMobile: USER_MOBILE_NUMBER.toString(),
+      accountType: USER_ACCOUNT_TYPE.toString(),
+      onLogout: () => logOut(context),
+    );
+  }
+
+  void _openQRScanner() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            QrScanner(), // The screen where QR scanner is implemented
+      ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    return PreferredSize(
+      preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13),
+      child: Container(
+        padding: EdgeInsets.only(
+          top: MediaQuery.of(context).size.height * 0.05,
+          left: MediaQuery.of(context).size.width * 0.05,
+          right: MediaQuery.of(context).size.width * 0.05,
+        ),
         child: Row(
-          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('${title} ', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: appThemeColor), textAlign: TextAlign.center,),
-            Text(count, style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: Colors.blueAccent), textAlign: TextAlign.center,),
+            InkWell(
+              onTap: () => _scaffoldKey.currentState?.openDrawer(),
+              child: _buildIconContainer('assets/images/menu@3x.png'),
+            ),
+            InkWell(
+              onTap: () => _openQRScanner(),
+              child: _buildIconContainer(
+                null,
+                icon: FontAwesomeIcons.qrcode,
+              ),
+            ),
           ],
         ),
-      )
+      ),
     );
   }
 
-  void showPopupForDealerCode(BuildContext context, Map<String, dynamic> response) {
+  Widget _buildIconContainer(String? imagePath, {IconData? icon}) {
+    return Container(
+      height: 30,
+      width: 30,
+      decoration: BoxDecoration(
+        color: loginBgColor,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(6.0),
+        child: Center(
+          child: icon != null
+              ? Icon(icon, size: 22, color: Colors.black)
+              : Image.asset(imagePath!, fit: BoxFit.fill),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWelcomeMessage() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Text(
+        'Welcome back, ${USER_FULL_NAME}',
+        style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Text(
+        title,
+        style: TextStyle(
+            fontSize: 18, fontWeight: FontWeight.bold, color: appThemeColor),
+      ),
+    );
+  }
+
+  Widget _buildProductOffers() {
+    return SizedBox(
+      height: 260,
+      child: ListView.builder(
+        controller: _scrollController,
+        scrollDirection: Axis.horizontal,
+        itemCount: productOffers.length + (hasMore ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index < productOffers.length) {
+            final offer = productOffers[index];
+            return _buildOfferCard(offer);
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildOfferCard(Map<String, dynamic> offer) {
+    return Container(
+      width: 150,
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Offer Image
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+            child: FadeInImage.assetNetwork(
+              placeholder: 'assets/images/app_logo_load.png',
+              image: offer['productOfferImageUrl'] ?? '',
+              fit: BoxFit.cover,
+              imageErrorBuilder: (context, error, stackTrace) {
+                return Image.asset('assets/images/app_logo_load.png',
+                    fit: BoxFit.cover);
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              offer['productOfferTitle'],
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCurrentSchemes() {
+    return SizedBox(
+      height: 270,
+      child: rewardSchemes.isEmpty
+          ? Center(child: CircularProgressIndicator())
+          : PageView.builder(
+              controller: _pageController,
+              itemCount: rewardSchemes.length,
+              itemBuilder: (context, index) {
+                final scheme = rewardSchemes[index];
+                return _buildRewardCard(scheme);
+              },
+            ),
+    );
+  }
+
+  Widget _buildRewardCard(Map<String, dynamic> scheme) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: FadeInImage.assetNetwork(
+          placeholder: 'assets/images/app_logo_load.png',
+          image: scheme['rewardSchemeImageUrl'] ?? '',
+          fit: BoxFit.cover,
+          imageErrorBuilder: (context, error, stackTrace) {
+            return Image.asset('assets/images/app_logo_load.png',
+                fit: BoxFit.cover);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDashboardCard(String title, String count, Color bgColor,
+      Color borderColor, String fromButton) {
+    return Container(
+        margin: EdgeInsets.symmetric(horizontal: 0.0, vertical: 16.0),
+        child: InkWell(
+          onTap: () {},
+          child: Row(
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${title} ',
+                style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: appThemeColor),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                count,
+                style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.blueAccent),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ));
+  }
+
+  void showPopupForDealerCode(
+      BuildContext context, Map<String, dynamic> response) {
     print('${!response['dealerCode'].isEmpty}=========>');
     final
-    // showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
+        // showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
 
-    // Controller for the input fields
-    TextEditingController dealerCodeController = TextEditingController();
+        // Controller for the input fields
+        TextEditingController dealerCodeController = TextEditingController();
     List<TextEditingController> otpControllers =
-    List.generate(6, (index) => TextEditingController());
+        List.generate(6, (index) => TextEditingController());
 
     bool isOtpVisible = false;
     bool isLoading = false;
 
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevent closing the dialog by clicking outside
+      barrierDismissible:
+          false, // Prevent closing the dialog by clicking outside
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -700,7 +631,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                     children: [
                       Text(
                         "Dealer Details",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 10),
                       Container(
@@ -760,10 +692,13 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                           }),
                         ),
                         SizedBox(height: 10),
-                        Text('The 6-digit OTP was sent to the ${userParentDealerName}. OTP expiry time is 10 minutes.', style: TextStyle(fontSize: 15)),
-
+                        Text(
+                            'The 6-digit OTP was sent to the ${userParentDealerName}. OTP expiry time is 10 minutes.',
+                            style: TextStyle(fontSize: 15)),
                         StreamBuilder<int>(
-                          stream: Stream.periodic(Duration(seconds: 1), (i) => 600 - i - 1).take(600),
+                          stream: Stream.periodic(
+                                  Duration(seconds: 1), (i) => 600 - i - 1)
+                              .take(600),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               final remainingSeconds = snapshot.data!;
@@ -771,13 +706,13 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                               final seconds = remainingSeconds % 60;
                               return Text(
                                 'Time remaining: ${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
-                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.bold),
                               );
                             }
                             return SizedBox.shrink();
                           },
                         ),
-
                       ],
                       SizedBox(height: 20),
                       Row(
@@ -795,7 +730,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                               onPressed: () async {
                                 if (dealerCodeController.text.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("Please enter Dealer Code."),),
+                                    SnackBar(
+                                      content:
+                                          Text("Please enter Dealer Code."),
+                                    ),
                                   );
                                   return;
                                 }
@@ -803,15 +741,18 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                 setState(() => isLoading = true);
 
                                 try {
-                                  bool success = await fetchOtp(dealerCodeController.text);
+                                  bool success =
+                                      await fetchOtp(dealerCodeController.text);
                                   if (success) {
                                     setState(() {
-                                      isOtpVisible = true;isLoading = false;
+                                      isOtpVisible = true;
+                                      isLoading = false;
                                       Navigator.pop(context);
                                     });
                                   } else {
                                     setState(() {
-                                      isOtpVisible = false;isLoading = false;
+                                      isOtpVisible = false;
+                                      isLoading = false;
                                       Navigator.pop(context);
                                     });
                                   }
@@ -822,15 +763,20 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                   );
                                 }
                               },
-                              child: isLoading ? CircularProgressIndicator() : Text("Get OTP"),
+                              child: isLoading
+                                  ? CircularProgressIndicator()
+                                  : Text("Get OTP"),
                             ),
                           if (isOtpVisible)
                             TextButton(
                               onPressed: () async {
-                                String otp = otpControllers.map((e) => e.text).join();
+                                String otp =
+                                    otpControllers.map((e) => e.text).join();
                                 if (otp.length < 6) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("Please enter a valid 6-digit OTP.")),
+                                    SnackBar(
+                                        content: Text(
+                                            "Please enter a valid 6-digit OTP.")),
                                   );
                                   return;
                                 }
@@ -838,12 +784,17 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                 setState(() => isLoading = true);
 
                                 try {
-                                  bool saveSuccess = await saveDealerDetails(dealerCodeController.text, otp,);
+                                  bool saveSuccess = await saveDealerDetails(
+                                    dealerCodeController.text,
+                                    otp,
+                                  );
                                   if (saveSuccess) {
                                     setState(() => isLoading = false);
                                     getDashboardCounts();
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("Details saved successfully.")),
+                                      SnackBar(
+                                          content: Text(
+                                              "Details saved successfully.")),
                                     );
                                     Navigator.pop(context, true);
                                     Navigator.pop(context, true);
@@ -855,7 +806,9 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                   );
                                 }
                               },
-                              child: isLoading ? CircularProgressIndicator() : Text("Save"),
+                              child: isLoading
+                                  ? CircularProgressIndicator()
+                                  : Text("Save"),
                             ),
                         ],
                       ),
@@ -895,27 +848,65 @@ class MyDrawer extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.only(topRight: Radius.circular(0), bottomRight: Radius.circular(0),),
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(0),
+            bottomRight: Radius.circular(0),
+          ),
         ),
         child: ListView(
-          padding: EdgeInsets.symmetric(vertical: screenHeight * 0.1, horizontal: 20),
+          padding: EdgeInsets.symmetric(
+              vertical: screenHeight * 0.1, horizontal: 20),
           children: <Widget>[
-            Text(accountName, style: TextStyle(color: drawerTitleColor, fontFamily: ffGBold, fontSize: 24,),),
-            Text(accountMobile, style: TextStyle(color: drawerTitleColor, fontFamily: ffGMedium, fontSize: 14,),),
+            Text(
+              accountName,
+              style: TextStyle(
+                color: drawerTitleColor,
+                fontFamily: ffGBold,
+                fontSize: 24,
+              ),
+            ),
+            Text(
+              accountMobile,
+              style: TextStyle(
+                color: drawerTitleColor,
+                fontFamily: ffGMedium,
+                fontSize: 14,
+              ),
+            ),
             Divider(thickness: 1),
-            SizedBox(height: 15), // Consistent spacing before the ListTile items
+            SizedBox(
+                height: 15), // Consistent spacing before the ListTile items
             Container(
               height: screenHeight * 0.7,
               child: Column(
                 children: [
                   ListTile(
-                    title: Text('Home', style: TextStyle(color: appThemeColor, fontFamily: ffGSemiBold, fontSize: 22,),),
-                    onTap: () { Navigator.pop(context); },
+                    title: Text(
+                      'Home',
+                      style: TextStyle(
+                        color: appThemeColor,
+                        fontFamily: ffGSemiBold,
+                        fontSize: 22,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
                   ),
-                  if(accountType == 'Dealer') ListTile(
-                    title: Text('Painters', style: TextStyle(color: appThemeColor, fontFamily: ffGSemiBold, fontSize: 22,),),
-                    onTap: () { Navigator.pushNamed(context, '/painters'); },
-                  ),
+                  if (accountType == 'Dealer')
+                    ListTile(
+                      title: Text(
+                        'Painters',
+                        style: TextStyle(
+                          color: appThemeColor,
+                          fontFamily: ffGSemiBold,
+                          fontSize: 22,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/painters');
+                      },
+                    ),
                 ],
               ),
             ),
@@ -929,7 +920,12 @@ class MyDrawer extends StatelessWidget {
                 title: Center(
                   child: Text(
                     'Logout',
-                    style: TextStyle(decorationThickness: 1.5, color: drawerSubListColor, fontFamily: ffGMedium, fontSize: 22,),
+                    style: TextStyle(
+                      decorationThickness: 1.5,
+                      color: drawerSubListColor,
+                      fontFamily: ffGMedium,
+                      fontSize: 22,
+                    ),
                   ),
                 ),
               ),
