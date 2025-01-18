@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:aultra_paints_mobile/screens/LayOut/LayOutPage.dart';
+import 'package:aultra_paints_mobile/screens/dashboard/DashboardNewPage.dart';
+
 import '/screens/authentication/otp/OtpPage.dart';
 import 'screens/orders/createOrder/CreateOrders.dart';
 import 'screens/orders/createProduct/CreateProduct.dart';
@@ -68,7 +71,7 @@ class MyAppState extends State<MyApp> {
       systemNavigationBarIconBrightness: Brightness.dark,
     ));
     return MaterialApp(
-      title: '',
+      // title: '',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         platform: TargetPlatform.iOS,
@@ -77,17 +80,26 @@ class MyAppState extends State<MyApp> {
       // home: const DashboardPage(),
       builder: EasyLoading.init(),
       routes: {
-        "/splashPage": (context) => const SplashPage(),
-        "/loginPage": (context) => const LoginPage(),
-        "/dashboardPage": (context) => const DashboardPage(),
-        "/createOrders": (context) => const CreateOrders(),
-        "/qrScanner": (context) => const QrScanner(),
-        "/orderDetails": (context) => const OrderDetails(),
-        "/createProduct": (context) => const CreateProduct(),
-        "/ordersList": (context) => const OrdersList(),
-        "/signupPage": (context) => const SignupPage(),
         "/otpPage": (context) => const OtpPage(),
+        // "/dashboardPage": (context) => const DashboardPage(),
+        "/dashboardPage": (context) => LayoutPage(child: DashboardNewPage())
+        // '/': (context) => LayoutPage(child: DashboardNewPage(), title: 'Home'),
+        // '/profile': (context) => LayoutPage(child: ProfilePage(), title: 'Profile'),
+        // '/settings': (context) => LayoutPage(child: SettingsPage(), title: 'Settings'),
       },
+      // routes: {
+      //   "/splashPage": (context) => const SplashPage(),
+      //   "/loginPage": (context) => const LoginPage(),
+      //   // "/dashboardPage": (context) => const DashboardPage(),
+      //   "/dashboardPage": (context) => const DashboardNewPage(),
+      //   "/createOrders": (context) => const CreateOrders(),
+      //   "/qrScanner": (context) => const QrScanner(),
+      //   "/orderDetails": (context) => const OrderDetails(),
+      //   "/createProduct": (context) => const CreateProduct(),
+      //   "/ordersList": (context) => const OrdersList(),
+      //   "/signupPage": (context) => const SignupPage(),
+      //   "/otpPage": (context) => const OtpPage(),
+      // },
     );
   }
 }
