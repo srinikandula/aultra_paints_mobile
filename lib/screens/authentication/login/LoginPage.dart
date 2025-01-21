@@ -85,18 +85,13 @@ class _LoginPageState extends State<LoginPage> {
       Map<String, String> requestBody = {"mobile": tempFirstValue};
       final body = json.encode(requestBody);
 
-      print('login body===>${body}=========>${apiURL}');
-
       final response = await http.post(
         Uri.parse(apiURL),
         headers: {"Content-Type": "application/json"},
         body: body,
       );
 
-      print('API Response checl: ${response.body}');
-
       final apiResp = json.decode(response.body);
-      print('API Response: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         Loader.hideLoader(context);
@@ -158,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Scaffold(
         resizeToAvoidBottomInset: true,
         key: _scaffoldKey,
-        backgroundColor: loginBgColor,
+        backgroundColor: whiteBgColor,
         body: SafeArea(
           child: Stack(
             children: [
@@ -169,7 +164,7 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       Center(
                         child: Container(
-                          color: loginBgColor,
+                          color: whiteBgColor,
                           child: Column(
                             children: [
                               Container(
@@ -182,12 +177,19 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ],
                               )),
-                              Container(
-                                width: screenWidth * 0.8,
-                                height: getScreenWidth(40),
+                              SizedBox(
+                                width: getScreenWidth(300),
+                                // height: getScreenWidth(40),
                                 child: Row(
                                   children: [
-                                    Image.asset('assets/images/app_logo.png'),
+                                    Container(
+                                        height: getScreenWidth(40),
+                                        child: Image.asset(
+                                            'assets/images/app_icon.png')),
+                                    Container(
+                                        height: getScreenWidth(25),
+                                        child: Image.asset(
+                                            'assets/images/app_name.png')),
                                   ],
                                 ),
                               ),

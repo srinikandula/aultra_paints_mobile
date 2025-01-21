@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:aultra_paints_mobile/utility/size_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,7 +38,7 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   callTimer() {
-    Timer(const Duration(seconds: 1), () => onNavigate());
+    Timer(const Duration(seconds: 2), () => onNavigate());
   }
 
   onNavigate() async {
@@ -110,13 +111,27 @@ class _SplashPageState extends State<SplashPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // Container(
+                    //   width: MediaQuery.of(context).size.width * 0.8,
+                    //   height: MediaQuery.of(context).size.width * 0.6,
+                    //   decoration: const BoxDecoration(
+                    //       image: DecorationImage(
+                    //           image: AssetImage('assets/images/app_logo.png'),
+                    //           fit: BoxFit.fitWidth)),
+                    // ),
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      height: MediaQuery.of(context).size.width * 0.6,
-                      decoration: const BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage('assets/images/app_logo.png'),
-                              fit: BoxFit.fitWidth)),
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      // height: getScreenWidth(40),
+                      child: Row(
+                        children: [
+                          Container(
+                              height: MediaQuery.of(context).size.width * 0.3,
+                              child: Image.asset('assets/images/app_icon.png')),
+                          Container(
+                              height: MediaQuery.of(context).size.width * 0.1,
+                              child: Image.asset('assets/images/app_name.png')),
+                        ],
+                      ),
                     ),
                   ],
                 )),

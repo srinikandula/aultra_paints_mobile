@@ -203,6 +203,7 @@ class _DashboardPageState extends State<DashboardPage> {
         body: json.encode({'dealerCode': dealerCode}),
       );
       if (response.statusCode == 200) {
+        Navigator.pop(context);
         final responseData = json.decode(response.body);
         // Assume the API returns {"success": true/false, "message": "..."}
         if (['', null, 0, false].contains(responseData["data"]['dealerCode'])) {
@@ -213,10 +214,9 @@ class _DashboardPageState extends State<DashboardPage> {
           return true;
         }
       } else {
-        print(response.statusCode == 400);
+        Navigator.pop(context);
         if (response.statusCode == 400) {
           // throw Exception("Failed to fetch Dealer Code. Status code");
-          Loader.hideLoader(context);
           final responseData = json.decode(response.body);
           print(responseData['message']);
           _showSnackBar(
@@ -433,13 +433,19 @@ class _DashboardPageState extends State<DashboardPage> {
                                         0.05),
                                 child: Column(
                                   children: [
-                                    Container(
+                                    SizedBox(
+                                      // width: getScreenWidth(300),
+                                      // height: getScreenWidth(40),
                                       child: Row(
                                         children: [
-                                          Image.asset(
-                                            'assets/images/app_logo.png',
-                                            height: getScreenHeight(50),
-                                          ),
+                                          Container(
+                                              height: getScreenWidth(40),
+                                              child: Image.asset(
+                                                  'assets/images/app_icon.png')),
+                                          Container(
+                                              height: getScreenWidth(25),
+                                              child: Image.asset(
+                                                  'assets/images/app_name.png')),
                                         ],
                                       ),
                                     ),

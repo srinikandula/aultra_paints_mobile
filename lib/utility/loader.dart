@@ -1,10 +1,8 @@
-
 import '/utility/size_config.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 import 'Colors.dart';
 import 'Fonts.dart';
-
 
 class Loader {
   static bool _isLoaderVisible = false;
@@ -28,12 +26,15 @@ class Loader {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    margin: EdgeInsets.only(left: getProportionateScreenHeight(80), right: getProportionateScreenHeight(10)),
+                    margin: EdgeInsets.only(
+                        left: getProportionateScreenHeight(80),
+                        right: getProportionateScreenHeight(10)),
                     child: SizedBox(
                       // width: getProportionateScreenWidth(500),
                       // height: getProportionateScreenWidth(250),
+                      height: getScreenWidth(60),
                       child: Image.asset(
-                        'assets/images/app_logo_load.png',
+                        'assets/images/app_file_icon.png',
                         fit: BoxFit.fill,
                       ),
                     ),
@@ -99,7 +100,7 @@ class Loader {
   }
 
   static void hideLoader(BuildContext context) {
-    if(_isLoaderVisible) {
+    if (_isLoaderVisible) {
       _isLoaderVisible = false;
       Navigator.of(context, rootNavigator: true).pop();
     }
