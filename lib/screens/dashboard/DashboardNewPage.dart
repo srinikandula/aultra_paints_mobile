@@ -58,11 +58,26 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
   var accountType = '';
   var parentDealerCode = '';
 
+  final PageController _pageController = PageController();
+  double? _currentPage;
 
   @override
   void initState() {
     fetchLocalStorageData();
     super.initState();
+    _pageController.addListener(() {
+      if (_pageController.page != null) {
+        setState(() {
+          _currentPage = _pageController.page;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   void _showSnackBar(String message, BuildContext context, ColorCheck) {
@@ -110,17 +125,17 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       var tempResp = json.decode(response.body);
       var apiResp = tempResp['data'];
       dashBoardList = [
-        {
-          "title": "Reward Points ",
-          "count": apiResp['cash']
-        },
+        {"title": "Reward Points ", "count": apiResp['cash']},
       ];
       setState(() {
         dashBoardList = dashBoardList;
         accountType = USER_ACCOUNT_TYPE;
         parentDealerCode = apiResp['parentDealerCode'] ?? '';
         if (parentDealerCode.isEmpty && accountType == 'Painter') {
-          showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
+          showPopupForDealerCode(context, {
+            'dealerCode': parentDealerCode,
+            'dealerName': userParentDealerName
+          });
         } else if (parentDealerCode.isNotEmpty && accountType == 'Painter') {
           getRewardSchemes();
           getProductOffers();
@@ -130,14 +145,18 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
         }
 
         _scrollController.addListener(() {
-          if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && !isLoading && hasMore) {
+          if (_scrollController.position.pixels ==
+                  _scrollController.position.maxScrollExtent &&
+              !isLoading &&
+              hasMore) {
             getProductOffers(); // Load more data when scrolled to bottom
           }
         });
       });
     } else {
       Navigator.pop(context);
-      error_handling.errorValidation(context, response.body, response.body, false);
+      error_handling.errorValidation(
+          context, response.body, response.body, false);
     }
   }
 
@@ -149,7 +168,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     try {
       response = await http.post(
         Uri.parse(apiUrl),
-        headers: {"Content-Type": "application/json", "Authorization": accesstoken},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": accesstoken
+        },
         body: json.encode({'dealerCode': dealerCode.trim()}),
       );
       if (response.statusCode == 200) {
@@ -169,10 +191,15 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
           Loader.hideLoader(context);
           final responseData = json.decode(response.body);
           print(responseData['message']);
-          _showSnackBar("${responseData['message']}.", context, false,);
+          _showSnackBar(
+            "${responseData['message']}.",
+            context,
+            false,
+          );
           return false;
         } else {
-          throw Exception("Failed to fetch OTP. Status code: ${response.statusCode}");
+          throw Exception(
+              "Failed to fetch OTP. Status code: ${response.statusCode}");
         }
       }
     } catch (error) {
@@ -192,7 +219,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     try {
       response = await http.post(
         Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json', "Authorization": accesstoken},
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": accesstoken
+        },
         body: json.encode({
           'dealerCode': dealerCode,
           'otp': otp,
@@ -203,20 +233,25 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        if (['', null, 0, false].contains(responseData?["data"]?['parentDealerCode'])) {
+        if (['', null, 0, false]
+            .contains(responseData?["data"]?['parentDealerCode'])) {
           throw Exception(responseData["message"] ?? "Failed to save details.");
         } else {
-          print('${responseData['data']?['parentDealerCode']}=================??????????????????????/');
+          print(
+              '${responseData['data']?['parentDealerCode']}=================??????????????????????/');
           SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('USER_PARENT_DEALER_CODE', responseData['data']?['parentDealerCode'] ?? '');
-          userViewModel.setParentDealerCode(responseData['data']?['parentDealerCode']);
+          await prefs.setString('USER_PARENT_DEALER_CODE',
+              responseData['data']?['parentDealerCode'] ?? '');
+          userViewModel
+              .setParentDealerCode(responseData['data']?['parentDealerCode']);
           getRewardSchemes();
           getProductOffers();
           setState(() {});
           return true;
         }
       } else {
-        throw Exception("Failed to save details. Status code: ${response.statusCode}");
+        throw Exception(
+            "Failed to save details. Status code: ${response.statusCode}");
       }
     } catch (error) {
       print("Error saving dealer details: $error");
@@ -235,7 +270,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       print(apiUrl);
       response = await http.post(
         Uri.parse(apiUrl),
-        headers: {"Content-Type": "application/json", "Authorization": accesstoken},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": accesstoken
+        },
         body: json.encode({'page': currentPage, 'limit': 4}),
       );
       final responseData = json.decode(response.body);
@@ -255,7 +293,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
         return false;
       } else {
         Navigator.pop(context);
-        error_handling.errorValidation(context, response.body, response.body, false);
+        error_handling.errorValidation(
+            context, response.body, response.body, false);
       }
     } catch (error) {
       // final errorData = json.decode(error);
@@ -272,7 +311,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     print(apiUrl);
     response = await http.get(
       Uri.parse(apiUrl),
-      headers: {"Content-Type": "application/json", "Authorization": accesstoken},
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": accesstoken
+      },
       // body: json.encode({'dealerCode': dealerCode}),
     );
     if (response.statusCode == 200) {
@@ -283,12 +325,12 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       return true;
     } else {
       Navigator.pop(context);
-      error_handling.errorValidation(context, response.body, response.body, false);
+      error_handling.errorValidation(
+          context, response.body, response.body, false);
     }
     Navigator.pop(context);
     error_handling.errorValidation(context, response, response, false);
   }
-
 
   void logOut(context) async {
     clearStorage();
@@ -329,266 +371,304 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     double cardWidth = screenWidth * 0.9; // 80% of the screen width
     double cardHeight = 270; // Fixed height for the cards
     // double cardHeight = screenHeight * 0.9;
-    double rewardCardHeight = screenHeight * 0.9; // 80% of theFixed height for the cards
+    double rewardCardHeight =
+        screenHeight * 0.9; // 80% of theFixed height for the cards
 
     return WillPopScope(
         onWillPop: _onWillPop,
-      child: Scaffold(
-        backgroundColor: Colors.white54,
-        key: _scaffoldKey,
-        body: SingleChildScrollView( // Add SingleChildScrollView
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                // decoration: BoxDecoration(
-                //   // color: appBarColor, // Background color
-                //   color: Colors.white, // Background color
-                //   borderRadius: BorderRadius.circular(20), // Rounded corners
-                //   boxShadow: [
-                //     BoxShadow(
-                //       color: Colors.grey.withOpacity(0.1),
-                //       spreadRadius: 3,
-                //       blurRadius: 5,
-                //       offset: const Offset(0, 3), // Shadow position
-                //     ),
-                //   ],
-                //   // border: Border.all(color: Colors.black, width: 1),
-                // ),
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                padding: const EdgeInsets.only(bottom: 5, top: 10),
-                child: Text(
-                  'Welcome back, ${USER_FULL_NAME}',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold,),
-                  textAlign: TextAlign.center,
+        child: Scaffold(
+          backgroundColor: Colors.white54,
+          key: _scaffoldKey,
+          body: SingleChildScrollView(
+            // Add SingleChildScrollView
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  // decoration: BoxDecoration(
+                  //   // color: appBarColor, // Background color
+                  //   color: Colors.white, // Background color
+                  //   borderRadius: BorderRadius.circular(20), // Rounded corners
+                  //   boxShadow: [
+                  //     BoxShadow(
+                  //       color: Colors.grey.withOpacity(0.1),
+                  //       spreadRadius: 3,
+                  //       blurRadius: 5,
+                  //       offset: const Offset(0, 3), // Shadow position
+                  //     ),
+                  //   ],
+                  //   // border: Border.all(color: Colors.black, width: 1),
+                  // ),
+                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                  padding: const EdgeInsets.only(bottom: 5, top: 10),
+                  child: Text(
+                    'Welcome back, ${USER_FULL_NAME}',
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                // padding: const EdgeInsets.only(bottom: 10),
-                child: Text(
-                  'Reward Schemes',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: appThemeColor),
-                  textAlign: TextAlign.center,
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                  // padding: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    'Reward Schemes',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: appThemeColor),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: cardHeight,
-                child: rewardSchemes.isEmpty
-                    ? Center(child: CircularProgressIndicator())
-                    : PageView.builder(
-                  controller: _pageController,
-                  itemCount: rewardSchemes.length,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    final item = rewardSchemes[index];
-                    return Transform.scale(
-                      scale: index == _pageController.page?.round()
-                          ? 1.0 // Scale center card fully
-                          : 0.9, // Slightly shrink side cards
-                      child: Align(
-                        alignment: Alignment.topCenter, // Align cards to the top
-                        child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                spreadRadius: 2,
-                                blurRadius: 5,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 250,
-                                height: 250,
-                                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: FadeInImage.assetNetwork(
-                                    placeholder: 'assets/images/app_logo_load.png', // Placeholder image
-                                    image: item['rewardSchemeImageUrl'] ?? '', // Network image URL
-                                    fit: BoxFit.cover,
-                                    imageErrorBuilder: (context, error, stackTrace) {
-                                      return Image.asset(
-                                        'assets/images/app_logo_load.png', // Fallback image
-                                        fit: BoxFit.cover,
-                                      );
-                                    },
+                SizedBox(
+                  height: cardHeight,
+                  child: rewardSchemes.isEmpty
+                      ? Center(child: CircularProgressIndicator())
+                      : PageView.builder(
+                          controller: _pageController,
+                          itemCount: rewardSchemes.length,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            final item = rewardSchemes[index];
+                            // Make sure _currentPage is initialized before using it
+                            double scale = 0.9; // Default scale for side cards
+                            if (_currentPage != null) {
+                              scale =
+                                  index == _currentPage!.round() ? 1.0 : 0.9;
+                            }
+                            return Transform.scale(
+                              scale: scale, // Slightly shrink side cards
+                              child: Align(
+                                alignment: Alignment
+                                    .topCenter, // Align cards to the top
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: 0, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.1),
+                                        spreadRadius: 2,
+                                        blurRadius: 5,
+                                        offset: Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        width: 250,
+                                        height: 250,
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10.0, vertical: 10.0),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: FadeInImage.assetNetwork(
+                                            placeholder:
+                                                'assets/images/app_logo_load.png', // Placeholder image
+                                            image:
+                                                item['rewardSchemeImageUrl'] ??
+                                                    '', // Network image URL
+                                            fit: BoxFit.cover,
+                                            imageErrorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Image.asset(
+                                                'assets/images/app_logo_load.png', // Fallback image
+                                                fit: BoxFit.cover,
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
-                      ),
-                    );
-                  },
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                child: dashBoardList.isEmpty
-                    ? Container(
-                  height: MediaQuery.of(context).size.height * 0.6,
-                  child: ListView(
-                    physics: AlwaysScrollableScrollPhysics(), // Ensures scroll behavior
-                    children: [],
-                  ),
-                )
-                    : ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(), // Ensures scrollability
-                  padding: EdgeInsets.zero,
-                  itemCount: dashBoardList.length,
-                  itemBuilder: (context, index) {
-                    var dashboardCard = dashBoardList[index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        InkWell(
-                          onTap: () {},
-                          child: _buildDashboardCard(
-                            dashboardCard['title'].toString(),
-                            dashboardCard['count'].toString(),
-                            white,
-                            buttonTextBgColor,
-                            '',
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                  child: dashBoardList.isEmpty
+                      ? Container(
+                          height: MediaQuery.of(context).size.height * 0.6,
+                          child: ListView(
+                            physics:
+                                AlwaysScrollableScrollPhysics(), // Ensures scroll behavior
+                            children: [],
                           ),
-                        ),
-                        SizedBox(height: 5),
-                      ],
-                    );
-                  },
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                padding: const EdgeInsets.only(bottom: 10, top: 10),
-                child: Text(
-                  'Product Offers',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: appThemeColor),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              // Horizontal Reward Schemes List
-              SizedBox(
-                height: 260, // Set the height for the horizontal list
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: productOffers.length + (hasMore ? 1 : 0), // Show loading indicator if more data is available
-                    itemBuilder: (context, index) {
-                      if (index < productOffers.length) {
-                        final offer = productOffers[index];
-                        return Container(
-                          width: 150, // Width of each item
-                          margin: EdgeInsets.only(top: 0, left: 8, right: 8, bottom: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                spreadRadius: 2,
-                                blurRadius: 5,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              // Reward Image
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                                  child: FadeInImage.assetNetwork(
-                                    placeholder: 'assets/images/app_logo_load.png', // Placeholder image
-                                    image: offer['productOfferImageUrl'] ?? '', // Network image URL
-                                    fit: BoxFit.cover,
-                                    imageErrorBuilder: (context, error, stackTrace) {
-                                      return Image.asset(
-                                        'assets/images/app_logo_load.png', // Fallback image
-                                        fit: BoxFit.cover,
-                                      );
-                                    },
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics:
+                              NeverScrollableScrollPhysics(), // Ensures scrollability
+                          padding: EdgeInsets.zero,
+                          itemCount: dashBoardList.length,
+                          itemBuilder: (context, index) {
+                            var dashboardCard = dashBoardList[index];
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                InkWell(
+                                  onTap: () {},
+                                  child: _buildDashboardCard(
+                                    dashboardCard['title'].toString(),
+                                    dashboardCard['count'].toString(),
+                                    white,
+                                    buttonTextBgColor,
+                                    '',
                                   ),
                                 ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      offer['productOfferTitle'], // Title of the reward
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    SizedBox(height: 2),
-                                    Text(
-                                      offer['productOfferDescription'], // Description of the reward
-                                      maxLines: 2,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey[700],
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      } else {
-                        // Show a loading spinner at the bottom
-                        return Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      }
-                    },
+                                SizedBox(height: 5),
+                              ],
+                            );
+                          },
+                        ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                  padding: const EdgeInsets.only(bottom: 10, top: 10),
+                  child: Text(
+                    'Product Offers',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: appThemeColor),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-              ),
-            ],
+                // Horizontal Reward Schemes List
+                SizedBox(
+                  height: 260, // Set the height for the horizontal list
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: productOffers.length +
+                          (hasMore
+                              ? 1
+                              : 0), // Show loading indicator if more data is available
+                      itemBuilder: (context, index) {
+                        if (index < productOffers.length) {
+                          final offer = productOffers[index];
+                          return Container(
+                            width: 150, // Width of each item
+                            margin: EdgeInsets.only(
+                                top: 0, left: 8, right: 8, bottom: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                // Reward Image
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 8),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(10)),
+                                    child: FadeInImage.assetNetwork(
+                                      placeholder:
+                                          'assets/images/app_logo_load.png', // Placeholder image
+                                      image: offer['productOfferImageUrl'] ??
+                                          '', // Network image URL
+                                      fit: BoxFit.cover,
+                                      imageErrorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Image.asset(
+                                          'assets/images/app_logo_load.png', // Fallback image
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 8),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        offer[
+                                            'productOfferTitle'], // Title of the reward
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      SizedBox(height: 2),
+                                      Text(
+                                        offer[
+                                            'productOfferDescription'], // Description of the reward
+                                        maxLines: 2,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[700],
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          // Show a loading spinner at the bottom
+                          return Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-
-      )
-    );
+        ));
   }
 
-  void showPopupForDealerCode(BuildContext context, Map<String, dynamic> response) {
+  void showPopupForDealerCode(
+      BuildContext context, Map<String, dynamic> response) {
     print('${!response['dealerCode'].isEmpty}=========>');
     final
-    // showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
+        // showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
 
-    // Controller for the input fields
-    TextEditingController dealerCodeController = TextEditingController();
+        // Controller for the input fields
+        TextEditingController dealerCodeController = TextEditingController();
     List<TextEditingController> otpControllers =
-    List.generate(6, (index) => TextEditingController());
+        List.generate(6, (index) => TextEditingController());
 
     bool isOtpVisible = false;
     bool isLoading = false;
 
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevent closing the dialog by clicking outside
+      barrierDismissible:
+          false, // Prevent closing the dialog by clicking outside
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -609,7 +689,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                     children: [
                       Text(
                         "Dealer Details",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 10),
                       Container(
@@ -669,10 +750,13 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                           }),
                         ),
                         SizedBox(height: 10),
-                        Text('The 6-digit OTP was sent to the ${userParentDealerName}. OTP expiry time is 10 minutes.', style: TextStyle(fontSize: 15)),
-
+                        Text(
+                            'The 6-digit OTP was sent to the ${userParentDealerName}. OTP expiry time is 10 minutes.',
+                            style: TextStyle(fontSize: 15)),
                         StreamBuilder<int>(
-                          stream: Stream.periodic(Duration(seconds: 1), (i) => 600 - i - 1).take(600),
+                          stream: Stream.periodic(
+                                  Duration(seconds: 1), (i) => 600 - i - 1)
+                              .take(600),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               final remainingSeconds = snapshot.data!;
@@ -680,13 +764,13 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                               final seconds = remainingSeconds % 60;
                               return Text(
                                 'Time remaining: ${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
-                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.bold),
                               );
                             }
                             return SizedBox.shrink();
                           },
                         ),
-
                       ],
                       SizedBox(height: 20),
                       Row(
@@ -706,22 +790,26 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                   // ScaffoldMessenger.of(context).showSnackBar(
                                   //   SnackBar(content: Text("Please enter Dealer Code."),),
                                   // );
-                                  error_handling.errorValidation(context, '', 'Please enter Dealer Code.', false);
+                                  error_handling.errorValidation(context, '',
+                                      'Please enter Dealer Code.', false);
                                   return;
                                 }
 
                                 setState(() => isLoading = true);
 
                                 try {
-                                  bool success = await fetchOtp(dealerCodeController.text);
+                                  bool success =
+                                      await fetchOtp(dealerCodeController.text);
                                   if (success) {
                                     setState(() {
-                                      isOtpVisible = true;isLoading = false;
+                                      isOtpVisible = true;
+                                      isLoading = false;
                                       Navigator.pop(context);
                                     });
                                   } else {
                                     setState(() {
-                                      isOtpVisible = false;isLoading = false;
+                                      isOtpVisible = false;
+                                      isLoading = false;
                                       Navigator.pop(context);
                                     });
                                   }
@@ -732,15 +820,20 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                   );
                                 }
                               },
-                              child: isLoading ? CircularProgressIndicator() : Text("Get OTP"),
+                              child: isLoading
+                                  ? CircularProgressIndicator()
+                                  : Text("Get OTP"),
                             ),
                           if (isOtpVisible)
                             TextButton(
                               onPressed: () async {
-                                String otp = otpControllers.map((e) => e.text).join();
+                                String otp =
+                                    otpControllers.map((e) => e.text).join();
                                 if (otp.length < 6) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("Please enter a valid 6-digit OTP.")),
+                                    SnackBar(
+                                        content: Text(
+                                            "Please enter a valid 6-digit OTP.")),
                                   );
                                   return;
                                 }
@@ -748,12 +841,17 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                 setState(() => isLoading = true);
 
                                 try {
-                                  bool saveSuccess = await saveDealerDetails(dealerCodeController.text, otp,);
+                                  bool saveSuccess = await saveDealerDetails(
+                                    dealerCodeController.text,
+                                    otp,
+                                  );
                                   if (saveSuccess) {
                                     setState(() => isLoading = false);
                                     getDashboardCounts();
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("Details saved successfully.")),
+                                      SnackBar(
+                                          content: Text(
+                                              "Details saved successfully.")),
                                     );
                                     Navigator.pop(context, true);
                                     Navigator.pop(context, true);
@@ -766,7 +864,9 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                   );
                                 }
                               },
-                              child: isLoading ? CircularProgressIndicator() : Text("Save"),
+                              child: isLoading
+                                  ? CircularProgressIndicator()
+                                  : Text("Save"),
                             ),
                         ],
                       ),
@@ -781,19 +881,33 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     );
   }
 
-  Widget _buildDashboardCard(String title, String count, Color bgColor, Color borderColor, String fromButton) {
+  Widget _buildDashboardCard(String title, String count, Color bgColor,
+      Color borderColor, String fromButton) {
     return Container(
         margin: EdgeInsets.symmetric(horizontal: 0.0, vertical: 16.0),
-      child: InkWell(
-        onTap: () {},
-        child: Row(
-          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('${title} ', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: appThemeColor), textAlign: TextAlign.center,),
-            Text(count, style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: Colors.blueAccent), textAlign: TextAlign.center,),
-          ],
-        ),
-      )
-    );
+        child: InkWell(
+          onTap: () {},
+          child: Row(
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${title} ',
+                style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: appThemeColor),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                count,
+                style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.blueAccent),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ));
   }
 }
