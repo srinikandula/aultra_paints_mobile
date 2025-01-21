@@ -1,5 +1,10 @@
 import 'dart:io';
 
+import 'package:aultra_paints_mobile/screens/LayOut/LayOutPage.dart';
+import 'package:aultra_paints_mobile/screens/dashboard/DashboardNewPage.dart';
+import 'package:aultra_paints_mobile/screens/painter/PainterPage.dart';
+import 'package:aultra_paints_mobile/services/UserViewModel.dart';
+
 import '/screens/authentication/otp/OtpPage.dart';
 import 'screens/orders/createOrder/CreateOrders.dart';
 import 'screens/orders/createProduct/CreateProduct.dart';
@@ -23,6 +28,9 @@ Future<void> main() async {
     providers: [
       ChangeNotifierProvider<LoginViewModel>(
         create: (context) => LoginViewModel(),
+      ),
+      ChangeNotifierProvider<UserViewModel>(
+        create: (context) => UserViewModel(),
       ),
     ],
     child: MyApp(),
@@ -68,7 +76,7 @@ class MyAppState extends State<MyApp> {
       systemNavigationBarIconBrightness: Brightness.dark,
     ));
     return MaterialApp(
-      title: '',
+      // title: '',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         platform: TargetPlatform.iOS,
@@ -79,14 +87,14 @@ class MyAppState extends State<MyApp> {
       routes: {
         "/splashPage": (context) => const SplashPage(),
         "/loginPage": (context) => const LoginPage(),
-        "/dashboardPage": (context) => const DashboardPage(),
-        "/createOrders": (context) => const CreateOrders(),
-        "/qrScanner": (context) => const QrScanner(),
-        "/orderDetails": (context) => const OrderDetails(),
-        "/createProduct": (context) => const CreateProduct(),
-        "/ordersList": (context) => const OrdersList(),
         "/signupPage": (context) => const SignupPage(),
         "/otpPage": (context) => const OtpPage(),
+        "/dashboardPage": (context) => LayoutPage(child: DashboardNewPage()),
+        "/painters": (context) => LayoutPage(child: PainterPage()),
+        "/qrScanner": (context) => const QrScanner(),
+        // '/': (context) => LayoutPage(child: DashboardNewPage(), title: 'Home'),
+        // '/profile': (context) => LayoutPage(child: ProfilePage(), title: 'Profile'),
+        // '/settings': (context) => LayoutPage(child: SettingsPage(), title: 'Settings'),
       },
     );
   }

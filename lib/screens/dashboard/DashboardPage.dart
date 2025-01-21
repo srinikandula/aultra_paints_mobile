@@ -162,7 +162,7 @@ class _DashboardPageState extends State<DashboardPage> {
         {
           "title": "Redeemed Points",
           "description": "Redeemed Points Confirmation",
-          "count": apiResp['redeemablePoints'] ?? '0'
+          "count": apiResp['rewardPoints']
         },
         {
           "title": "Earned Cash Reward",
@@ -515,7 +515,13 @@ class _DashboardPageState extends State<DashboardPage> {
                                       ],
                                     ),
                                   ],
-                                )),
+                                )
+                            ),
+
+
+                            
+
+
                             Container(
                               padding: EdgeInsets.symmetric(
                                   vertical: getScreenHeight(16),
