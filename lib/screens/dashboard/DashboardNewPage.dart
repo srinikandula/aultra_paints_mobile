@@ -334,6 +334,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     return WillPopScope(
         onWillPop: _onWillPop,
       child: Scaffold(
+        backgroundColor: Colors.white54,
         key: _scaffoldKey,
         body: SingleChildScrollView( // Add SingleChildScrollView
           child: Column(
