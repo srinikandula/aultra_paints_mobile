@@ -53,6 +53,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
   bool hasMore = true; // Check if more data is available
   ScrollController _scrollController = ScrollController();
 
+  bool saveOtpButtonLoader = false;
+
   var rewardSchemes = [];
 
   var accountType = '';
@@ -136,20 +138,18 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
             'dealerCode': parentDealerCode,
             'dealerName': userParentDealerName
           });
-        } else if (parentDealerCode.isNotEmpty && accountType == 'Painter') {
-          getRewardSchemes();
-          getProductOffers();
-        } else if (accountType != 'Painter') {
-          getRewardSchemes();
-          getProductOffers();
         }
+
+        getProductOffers('first');
+
+        //  getRewardSchemes();
 
         _scrollController.addListener(() {
           if (_scrollController.position.pixels ==
                   _scrollController.position.maxScrollExtent &&
               !isLoading &&
               hasMore) {
-            getProductOffers(); // Load more data when scrolled to bottom
+            getProductOffers(''); // Load more data when scrolled to bottom
           }
         });
       });
@@ -165,106 +165,88 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     Utils.returnScreenLoader(context);
     http.Response response;
     var apiUrl = BASE_URL + GET_USER_PARENT_DEALER_CODE_DETAILS;
-    try {
-      response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": accesstoken
-        },
-        body: json.encode({'dealerCode': dealerCode.trim()}),
-      );
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        // Assume the API returns {"success": true/false, "message": "..."}
-        if (['', null, 0, false].contains(responseData["data"]['dealerCode'])) {
-          throw Exception(responseData["message"] ?? "Failed to fetch OTP.");
-        } else {
-          userParentDealerMobile = responseData["data"]['mobile'];
-          userParentDealerName = responseData["data"]['name'];
-          return true;
-        }
+    var tempBody = json.encode({'dealerCode': dealerCode.trim()});
+
+    response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": accesstoken
+      },
+      body: tempBody,
+    );
+    print(
+        'tempBody====>${tempBody}====>${response.statusCode}====>${response.body}');
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      // Assume the API returns {"success": true/false, "message": "..."}
+      if (['', null, 0, false].contains(responseData["data"]['dealerCode'])) {
+        throw Exception(responseData["message"] ?? "Failed to fetch OTP.");
       } else {
-        print(response.statusCode == 400);
-        if (response.statusCode == 400) {
-          // throw Exception("Failed to fetch Dealer Code. Status code");
-          Loader.hideLoader(context);
-          final responseData = json.decode(response.body);
-          print(responseData['message']);
-          _showSnackBar(
-            "${responseData['message']}.",
-            context,
-            false,
-          );
-          return false;
-        } else {
-          throw Exception(
-              "Failed to fetch OTP. Status code: ${response.statusCode}");
-        }
+        userParentDealerMobile = responseData["data"]['mobile'];
+        userParentDealerName = responseData["data"]['name'];
+        return true;
       }
-    } catch (error) {
-      print("Error fetching OTP: $error");
-      Navigator.pop(context);
-      throw Exception("An error occurred while requesting OTP.");
+    } else {
+      error_handling.errorValidation(
+          context, response.body, response.body, false);
     }
   }
 
   Future saveDealerDetails(String dealerCode, String otp) async {
-    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
     Utils.clearToasts(context);
-    Utils.returnScreenLoader(context);
+    // Utils.returnScreenLoader(context);
     http.Response response;
     var apiUrl = BASE_URL + VERIFY_OTP_UPDATE_USER;
+    var tempBody = json.encode({
+      'dealerCode': dealerCode,
+      'otp': otp,
+      'mobile': userParentDealerMobile,
+      'painterMobile': USER_MOBILE_NUMBER
+    });
 
-    try {
-      response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          "Authorization": accesstoken
-        },
-        body: json.encode({
-          'dealerCode': dealerCode,
-          'otp': otp,
-          'mobile': userParentDealerMobile,
-          'painterMobile': USER_MOBILE_NUMBER
-        }),
-      );
+    response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        "Authorization": accesstoken
+      },
+      body: tempBody,
+    );
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        if (['', null, 0, false]
-            .contains(responseData?["data"]?['parentDealerCode'])) {
-          throw Exception(responseData["message"] ?? "Failed to save details.");
-        } else {
-          print(
-              '${responseData['data']?['parentDealerCode']}=================??????????????????????/');
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('USER_PARENT_DEALER_CODE',
-              responseData['data']?['parentDealerCode'] ?? '');
-          userViewModel
-              .setParentDealerCode(responseData['data']?['parentDealerCode']);
-          getRewardSchemes();
-          getProductOffers();
-          setState(() {});
-          return true;
-        }
-      } else {
-        throw Exception(
-            "Failed to save details. Status code: ${response.statusCode}");
-      }
-    } catch (error) {
-      print("Error saving dealer details: $error");
-      throw Exception("An error occurred while saving dealer details.");
+    if (response.statusCode == 200) {
+      // Navigator.pop(context);
+      var tempResp = json.decode(response.body);
+
+      setState(() => saveOtpButtonLoader = false);
+      getDashboardCounts();
+      Navigator.pop(context, true);
+      _showSnackBar("Details saved successfully.", context, true);
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('USER_PARENT_DEALER_CODE',
+          tempResp['data']?['parentDealerCode'] ?? '');
+      // userViewModel
+      //     .setParentDealerCode(responseData['data']?['parentDealerCode']);
+      // getRewardSchemes();
+      // getProductOffers('first');
+    } else {
+      setState(() => saveOtpButtonLoader = false);
+      // Navigator.pop(context);
+      error_handling.errorValidation(
+          context, response.body, response.body, false);
     }
   }
 
-  Future getProductOffers() async {
+  Future getProductOffers(String hitType) async {
+    if (hitType == 'first') {
+      getRewardSchemes();
+    }
     if (isLoading) return;
     setState(() => isLoading = true);
     try {
       Utils.clearToasts(context);
-      Utils.returnScreenLoader(context);
+      // Utils.returnScreenLoader(context);
       http.Response response;
       var apiUrl = BASE_URL + GET_PRODUCT_OFFERS;
       print(apiUrl);
@@ -278,7 +260,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       );
       final responseData = json.decode(response.body);
       if (response.statusCode == 200) {
-        Navigator.pop(context);
+        // Navigator.pop(context);
         List<dynamic> newOffers = responseData;
         setState(() {
           currentPage++;
@@ -292,7 +274,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       } else if (response.statusCode == 404) {
         return false;
       } else {
-        Navigator.pop(context);
+        // Navigator.pop(context);
         error_handling.errorValidation(
             context, response.body, response.body, false);
       }
@@ -305,10 +287,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
 
   Future getRewardSchemes() async {
     Utils.clearToasts(context);
-    Utils.returnScreenLoader(context);
+    // Utils.returnScreenLoader(context);
     http.Response response;
     var apiUrl = BASE_URL + GET_REWARDS_SCHEMES;
-    print(apiUrl);
+
     response = await http.get(
       Uri.parse(apiUrl),
       headers: {
@@ -318,18 +300,18 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       // body: json.encode({'dealerCode': dealerCode}),
     );
     if (response.statusCode == 200) {
-      Navigator.pop(context);
+      // Navigator.pop(context);
       final responseData = json.decode(response.body);
       // print('======> ${responseData}');
       rewardSchemes = responseData;
       return true;
     } else {
-      Navigator.pop(context);
+      // Navigator.pop(context);
       error_handling.errorValidation(
           context, response.body, response.body, false);
     }
-    Navigator.pop(context);
-    error_handling.errorValidation(context, response, response, false);
+    // Navigator.pop(context);
+    // error_handling.errorValidation(context, response, response, false);
   }
 
   void logOut(context) async {
@@ -402,101 +384,144 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                   margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                   padding: const EdgeInsets.only(bottom: 5, top: 10),
                   child: Text(
-                    'Welcome back, ${USER_FULL_NAME}',
+                    'Welcome, ${USER_FULL_NAME}',
                     style: TextStyle(
-                      fontSize: 30,
+                      fontSize: getScreenWidth(26),
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ),
+                //Product offer scroll
                 Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                  // padding: const EdgeInsets.only(bottom: 10),
+                  margin: EdgeInsets.symmetric(horizontal: getScreenWidth(16)),
+                  padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
                   child: Text(
-                    'Reward Schemes',
+                    'Product Offers',
                     style: TextStyle(
-                        fontSize: 18,
+                        decoration: TextDecoration.underline,
+                        decorationThickness: 1.5,
+                        fontSize: getScreenWidth(16),
                         fontWeight: FontWeight.bold,
                         color: appThemeColor),
                     textAlign: TextAlign.center,
                   ),
                 ),
+                // Horizontal Reward Schemes List
                 SizedBox(
-                  height: cardHeight,
-                  child: rewardSchemes.isEmpty
-                      ? Center(child: CircularProgressIndicator())
-                      : PageView.builder(
-                          controller: _pageController,
-                          itemCount: rewardSchemes.length,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) {
-                            final item = rewardSchemes[index];
-                            // Make sure _currentPage is initialized before using it
-                            double scale = 0.9; // Default scale for side cards
-                            if (_currentPage != null) {
-                              scale =
-                                  index == _currentPage!.round() ? 1.0 : 0.9;
-                            }
-                            return Transform.scale(
-                              scale: scale, // Slightly shrink side cards
-                              child: Align(
-                                alignment: Alignment
-                                    .topCenter, // Align cards to the top
-                                child: Container(
-                                  margin: EdgeInsets.symmetric(
-                                      horizontal: 0, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.white,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.1),
-                                        spreadRadius: 2,
-                                        blurRadius: 5,
-                                        offset: Offset(0, 3),
-                                      ),
-                                    ],
+                  height: getScreenHeight(
+                      270), // Set the height for the horizontal list
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: getScreenWidth(8)),
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: productOffers.length +
+                          (hasMore
+                              ? 1
+                              : 0), // Show loading indicator if more data is available
+                      itemBuilder: (context, index) {
+                        if (index < productOffers.length) {
+                          final offer = productOffers[index];
+                          return Container(
+                            width: getScreenWidth(150), // Width of each item
+                            margin: EdgeInsets.only(
+                                left: getScreenWidth(4),
+                                right: getScreenWidth(4),
+                                bottom: getScreenHeight(10)),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.circular(getScreenWidth(10)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  spreadRadius: 2,
+                                  blurRadius: getScreenWidth(5),
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                // Reward Image
+                                Container(
+                                  height: getScreenWidth(160),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: getScreenWidth(8),
+                                      vertical: getScreenHeight(6)),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(
+                                            getScreenWidth(10))),
+                                    child: FadeInImage.assetNetwork(
+                                      placeholder:
+                                          'assets/images/app_file_icon.png', // Placeholder image
+                                      image: offer['productOfferImageUrl'] ??
+                                          '', // Network image URL
+                                      fit: BoxFit.cover,
+                                      imageErrorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Image.asset(
+                                          'assets/images/app_file_icon.png', // Fallback image
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    ),
                                   ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: getScreenWidth(2),
+                                      vertical: getScreenHeight(2)),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
                                     children: [
-                                      Container(
-                                        width: 250,
-                                        height: 250,
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 10.0, vertical: 10.0),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: FadeInImage.assetNetwork(
-                                            placeholder:
-                                                'assets/images/app_logo_load.png', // Placeholder image
-                                            image:
-                                                item['rewardSchemeImageUrl'] ??
-                                                    '', // Network image URL
-                                            fit: BoxFit.cover,
-                                            imageErrorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Image.asset(
-                                                'assets/images/app_logo_load.png', // Fallback image
-                                                fit: BoxFit.cover,
-                                              );
-                                            },
-                                          ),
+                                      Text(
+                                        offer['productOfferTitle'],
+                                        maxLines: 2,
+                                        overflow: TextOverflow
+                                            .ellipsis, // Title of the reward
+                                        style: TextStyle(
+                                          fontSize: getScreenWidth(14),
+                                          fontWeight: FontWeight.bold,
                                         ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      SizedBox(height: getScreenHeight(1)),
+                                      Text(
+                                        offer[
+                                            'productOfferDescription'], // Description of the reward
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: getScreenWidth(12),
+                                          color: Colors.grey[700],
+                                        ),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ],
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          // Show a loading spinner at the bottom
+                          return Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(getScreenWidth(8)),
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
                 ),
+
+                //reward points count
                 Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                  margin: EdgeInsets.symmetric(horizontal: getScreenWidth(10)),
                   child: dashBoardList.isEmpty
                       ? Container(
                           height: MediaQuery.of(context).size.height * 0.6,
@@ -527,123 +552,100 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                     '',
                                   ),
                                 ),
-                                SizedBox(height: 5),
+                                SizedBox(height: getScreenHeight(5)),
                               ],
                             );
                           },
                         ),
                 ),
+                //rewards scroll
                 Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                  padding: const EdgeInsets.only(bottom: 10, top: 10),
+                  margin: EdgeInsets.symmetric(horizontal: getScreenWidth(16)),
                   child: Text(
-                    'Product Offers',
+                    'Reward Schemes',
                     style: TextStyle(
-                        fontSize: 18,
+                        decoration: TextDecoration.underline,
+                        decorationThickness: 1.5,
+                        fontSize: getScreenWidth(18),
                         fontWeight: FontWeight.bold,
                         color: appThemeColor),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                // Horizontal Reward Schemes List
                 SizedBox(
-                  height: 260, // Set the height for the horizontal list
-                  child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: productOffers.length +
-                          (hasMore
-                              ? 1
-                              : 0), // Show loading indicator if more data is available
-                      itemBuilder: (context, index) {
-                        if (index < productOffers.length) {
-                          final offer = productOffers[index];
-                          return Container(
-                            width: 150, // Width of each item
-                            margin: EdgeInsets.only(
-                                top: 0, left: 8, right: 8, bottom: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.1),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              children: [
-                                // Reward Image
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 8),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(10)),
-                                    child: FadeInImage.assetNetwork(
-                                      placeholder:
-                                          'assets/images/app_logo_load.png', // Placeholder image
-                                      image: offer['productOfferImageUrl'] ??
-                                          '', // Network image URL
-                                      fit: BoxFit.cover,
-                                      imageErrorBuilder:
-                                          (context, error, stackTrace) {
-                                        return Image.asset(
-                                          'assets/images/app_logo_load.png', // Fallback image
-                                          fit: BoxFit.cover,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 8),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        offer[
-                                            'productOfferTitle'], // Title of the reward
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.center,
+                  height: cardHeight,
+                  child: rewardSchemes.isEmpty
+                      ? Center(child: CircularProgressIndicator())
+                      : PageView.builder(
+                          controller: _pageController,
+                          itemCount: rewardSchemes.length,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            final item = rewardSchemes[index];
+                            // Make sure _currentPage is initialized before using it
+                            double scale = 0.9; // Default scale for side cards
+                            if (_currentPage != null) {
+                              scale =
+                                  index == _currentPage!.round() ? 1.0 : 0.9;
+                            }
+                            return Transform.scale(
+                              scale: scale, // Slightly shrink side cards
+                              child: Align(
+                                alignment: Alignment
+                                    .topCenter, // Align cards to the top
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: getScreenHeight(8)),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                        getScreenWidth(10)),
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.1),
+                                        spreadRadius: 2,
+                                        blurRadius: 5,
+                                        offset: Offset(0, 3),
                                       ),
-                                      SizedBox(height: 2),
-                                      Text(
-                                        offer[
-                                            'productOfferDescription'], // Description of the reward
-                                        maxLines: 2,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey[700],
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        width: getScreenWidth(250),
+                                        height: getScreenWidth(220),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: getScreenWidth(10),
+                                            vertical: getScreenHeight(10)),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: FadeInImage.assetNetwork(
+                                            placeholder:
+                                                'assets/images/app_file_icon.png', // Placeholder image
+                                            image:
+                                                item['rewardSchemeImageUrl'] ??
+                                                    '', // Network image URL
+                                            fit: BoxFit.cover,
+                                            imageErrorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Image.asset(
+                                                'assets/images/app_file_icon.png', // Fallback image
+                                                fit: BoxFit.cover,
+                                              );
+                                            },
+                                          ),
                                         ),
-                                        textAlign: TextAlign.center,
                                       ),
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          );
-                        } else {
-                          // Show a loading spinner at the bottom
-                          return Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  ),
+                              ),
+                            );
+                          },
+                        ),
                 ),
               ],
             ),
@@ -653,7 +655,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
 
   void showPopupForDealerCode(
       BuildContext context, Map<String, dynamic> response) {
-    print('${!response['dealerCode'].isEmpty}=========>');
+    print('======dealer code===>${!response['dealerCode'].isEmpty}');
     final
         // showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
 
@@ -721,57 +723,65 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                           ),
                         ),
                       ),
-                      if (isOtpVisible) ...[
-                        SizedBox(height: 20),
-                        Text("Enter OTP", style: TextStyle(fontSize: 16)),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: List.generate(6, (index) {
-                            return SizedBox(
-                              width: 40,
-                              child: TextField(
-                                controller: otpControllers[index],
-                                maxLength: 1,
-                                keyboardType: TextInputType.number,
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  counterText: "",
-                                  border: OutlineInputBorder(),
+                      !isOtpVisible
+                          ? SizedBox.shrink()
+                          : Column(
+                              children: [
+                                SizedBox(height: 20),
+                                Text("Enter OTP",
+                                    style: TextStyle(fontSize: 16)),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: List.generate(6, (index) {
+                                    return SizedBox(
+                                      width: 40,
+                                      child: TextField(
+                                        controller: otpControllers[index],
+                                        maxLength: 1,
+                                        keyboardType: TextInputType.number,
+                                        textAlign: TextAlign.center,
+                                        decoration: InputDecoration(
+                                          counterText: "",
+                                          border: OutlineInputBorder(),
+                                        ),
+                                        onChanged: (value) {
+                                          if (value.isNotEmpty && index < 5) {
+                                            FocusScope.of(context).nextFocus();
+                                          } else if (value.isEmpty &&
+                                              index > 0) {
+                                            FocusScope.of(context)
+                                                .previousFocus();
+                                          }
+                                        },
+                                      ),
+                                    );
+                                  }),
                                 ),
-                                onChanged: (value) {
-                                  if (value.isNotEmpty && index < 5) {
-                                    FocusScope.of(context).nextFocus();
-                                  } else if (value.isEmpty && index > 0) {
-                                    FocusScope.of(context).previousFocus();
-                                  }
-                                },
-                              ),
-                            );
-                          }),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                            'The 6-digit OTP was sent to the ${userParentDealerName}. OTP expiry time is 10 minutes.',
-                            style: TextStyle(fontSize: 15)),
-                        StreamBuilder<int>(
-                          stream: Stream.periodic(
-                                  Duration(seconds: 1), (i) => 600 - i - 1)
-                              .take(600),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              final remainingSeconds = snapshot.data!;
-                              final minutes = remainingSeconds ~/ 60;
-                              final seconds = remainingSeconds % 60;
-                              return Text(
-                                'Time remaining: ${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
-                                style: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.bold),
-                              );
-                            }
-                            return SizedBox.shrink();
-                          },
-                        ),
-                      ],
+                                SizedBox(height: 10),
+                                Text(
+                                    'The 6-digit OTP was sent to the ${userParentDealerName}. OTP expiry time is 10 minutes.',
+                                    style: TextStyle(fontSize: 15)),
+                                StreamBuilder<int>(
+                                  stream: Stream.periodic(Duration(seconds: 1),
+                                      (i) => 600 - i - 1).take(600),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      final remainingSeconds = snapshot.data!;
+                                      final minutes = remainingSeconds ~/ 60;
+                                      final seconds = remainingSeconds % 60;
+                                      return Text(
+                                        'Time remaining: ${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold),
+                                      );
+                                    }
+                                    return SizedBox.shrink();
+                                  },
+                                ),
+                              ],
+                            ),
                       SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -797,76 +807,49 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
 
                                 setState(() => isLoading = true);
 
-                                try {
-                                  bool success =
-                                      await fetchOtp(dealerCodeController.text);
-                                  if (success) {
-                                    setState(() {
-                                      isOtpVisible = true;
-                                      isLoading = false;
-                                      Navigator.pop(context);
-                                    });
-                                  } else {
-                                    setState(() {
-                                      isOtpVisible = false;
-                                      isLoading = false;
-                                      Navigator.pop(context);
-                                    });
-                                  }
-                                } catch (error) {
-                                  setState(() => isLoading = false);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(error.toString())),
-                                  );
+                                bool success =
+                                    await fetchOtp(dealerCodeController.text);
+                                if (success) {
+                                  setState(() {
+                                    isOtpVisible = true;
+                                    isLoading = false;
+                                    Navigator.pop(context);
+                                  });
+                                } else {
+                                  setState(() {
+                                    isOtpVisible = false;
+                                    isLoading = false;
+                                    Navigator.pop(context);
+                                  });
                                 }
                               },
-                              child: isLoading
-                                  ? CircularProgressIndicator()
-                                  : Text("Get OTP"),
+                              child: Text("Get OTP",
+                                  style: TextStyle(
+                                      fontSize: getScreenWidth(18),
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.blueAccent)),
                             ),
                           if (isOtpVisible)
                             TextButton(
                               onPressed: () async {
                                 String otp =
                                     otpControllers.map((e) => e.text).join();
-                                if (otp.length < 6) {
+                                if (otp.length == 6) {
+                                  saveDealerDetails(
+                                      dealerCodeController.text, otp);
+                                } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                         content: Text(
                                             "Please enter a valid 6-digit OTP.")),
                                   );
-                                  return;
-                                }
-
-                                setState(() => isLoading = true);
-
-                                try {
-                                  bool saveSuccess = await saveDealerDetails(
-                                    dealerCodeController.text,
-                                    otp,
-                                  );
-                                  if (saveSuccess) {
-                                    setState(() => isLoading = false);
-                                    getDashboardCounts();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(
-                                              "Details saved successfully.")),
-                                    );
-                                    Navigator.pop(context, true);
-                                    Navigator.pop(context, true);
-                                    // Navigator.pushNamed(context, '/dashboardPage');
-                                  }
-                                } catch (error) {
-                                  setState(() => isLoading = false);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(error.toString())),
-                                  );
                                 }
                               },
-                              child: isLoading
-                                  ? CircularProgressIndicator()
-                                  : Text("Save"),
+                              child: Text("Save",
+                                  style: TextStyle(
+                                      fontSize: getScreenWidth(18),
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.blueAccent)),
                             ),
                         ],
                       ),
@@ -884,7 +867,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
   Widget _buildDashboardCard(String title, String count, Color bgColor,
       Color borderColor, String fromButton) {
     return Container(
-        margin: EdgeInsets.symmetric(horizontal: 0.0, vertical: 16.0),
+        margin: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
         child: InkWell(
           onTap: () {},
           child: Row(
@@ -893,7 +876,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
               Text(
                 '${title} ',
                 style: TextStyle(
-                    fontSize: 30,
+                    fontSize: getScreenWidth(24),
                     fontWeight: FontWeight.bold,
                     color: appThemeColor),
                 textAlign: TextAlign.center,
@@ -901,7 +884,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
               Text(
                 count,
                 style: TextStyle(
-                    fontSize: 30,
+                    fontSize: getScreenWidth(24),
                     fontWeight: FontWeight.w900,
                     color: Colors.blueAccent),
                 textAlign: TextAlign.center,
