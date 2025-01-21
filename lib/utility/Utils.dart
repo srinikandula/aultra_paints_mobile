@@ -332,65 +332,9 @@ class Utils {
                   child: SizedBox(
                     // width: getProportionateScreenWidth(500),
                     // height: getProportionateScreenWidth(250),
+                    height: getScreenWidth(60),
                     child: Image.asset(
-                      'assets/images/app_logo_load.png',
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                )
-              ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      // margin: EdgeInsets.only(top: getProportionateScreenHeight(80), right: getProportionateScreenHeight(10)),
-                      child: Text(
-                        "Loading...",
-                        style: TextStyle(
-                            fontSize: getProportionateScreenWidth(20),
-                            fontFamily: ffGBold,
-                            color: black),
-                      ),
-                    )
-                  ],
-                )
-              ],
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  static returnDashboardScreenLoader(BuildContext context) {
-    SizeConfig().init(context);
-    showGeneralDialog(
-      context: context,
-      barrierColor: colorC8C7C7.withOpacity(0.9),
-      // barrierColor: Colors.black12.withOpacity(0.6), // Background color
-      barrierDismissible: false,
-      // barrierLabel: 'Dialog',
-      // transitionDuration: Duration(milliseconds: 400),
-      pageBuilder: (context, __, ___) {
-        return Stack(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  margin: EdgeInsets.only(
-                      left: getProportionateScreenHeight(80),
-                      right: getProportionateScreenHeight(10)),
-                  child: SizedBox(
-                    // width: getProportionateScreenWidth(500),
-                    // height: getProportionateScreenWidth(250),
-                    child: Image.asset(
-                      'assets/images/app_logo_load.png',
+                      'assets/images/app_file_icon.png',
                       fit: BoxFit.fill,
                     ),
                   ),

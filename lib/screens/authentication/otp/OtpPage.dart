@@ -304,10 +304,15 @@ class _OtpPageState extends State<OtpPage> {
       children: [
         Container(
           width: screenWidth * 0.8,
-          height: getScreenWidth(40),
+          // height: getScreenWidth(40),
           child: Row(
             children: [
-              Image.asset('assets/images/app_logo.png'),
+              Container(
+                  height: getScreenWidth(40),
+                  child: Image.asset('assets/images/app_icon.png')),
+              Container(
+                  height: getScreenWidth(25),
+                  child: Image.asset('assets/images/app_name.png')),
             ],
           ),
         ),
