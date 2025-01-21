@@ -253,20 +253,21 @@ class _LayoutPageState extends State<LayoutPage> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.14),
         child: Container(
-          // decoration: BoxDecoration(
-          //   // color: appBarColor, // Background color
-          //   color: Colors.white, // Background color
-          //   borderRadius: BorderRadius.circular(20), // Rounded corners
-          //   boxShadow: [
-          //     BoxShadow(
-          //       color: Colors.grey.withOpacity(0.1),
-          //       spreadRadius: 3,
-          //       blurRadius: 5,
-          //       offset: const Offset(0, 3), // Shadow position
-          //     ),
-          //   ],
-          //   // border: Border.all(color: Colors.black, width: 1),
-          // ),
+            // color: Color
+          decoration: BoxDecoration(
+            // color: appBarColor, // Background color
+            color: Colors.white, // Background color
+            borderRadius: BorderRadius.circular(20), // Rounded corners
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 3,
+                blurRadius: 5,
+                offset: const Offset(0, 3), // Shadow position
+              ),
+            ],
+            // border: Border.all(color: Colors.black, width: 1),
+          ),
           // padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           padding: EdgeInsets.only(
             top: MediaQuery.of(context).size.height * 0.05,
@@ -279,8 +280,16 @@ class _LayoutPageState extends State<LayoutPage> {
             children: [
               Row(
                 children: [
+                  // Image.asset(
+                  //   'assets/images/app_logo.png',
+                  //   height: getScreenHeight(50),
+                  // ),
                   Image.asset(
-                    'assets/images/app_logo.png',
+                    'assets/images/app_file_icon.png',
+                    height: getScreenHeight(50),
+                  ),
+                  Image.asset(
+                    'assets/images/app_name.png',
                     height: getScreenHeight(50),
                   ),
                 ],
