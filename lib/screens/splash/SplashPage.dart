@@ -50,9 +50,8 @@ class _SplashPageState extends State<SplashPage> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) => const LayoutPage(child: DashboardNewPage())
-          )
-      );
+              builder: (context) =>
+                  const LayoutPage(child: DashboardNewPage())));
     } else {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => const LoginPage()));
@@ -87,7 +86,7 @@ class _SplashPageState extends State<SplashPage> {
       if (response.statusCode == 200) {
         callTimer();
       } else {
-        if (!mounted) return; // Ensure the widget is still mounted
+        // Ensure the widget is still mounted
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginPage()),

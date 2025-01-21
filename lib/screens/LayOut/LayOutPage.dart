@@ -19,14 +19,10 @@ import '../../utility/size_config.dart';
 
 import 'package:http/http.dart' as http;
 
-
 class LayoutPage extends StatefulWidget {
   final Widget child; // Page content
 
-  const LayoutPage({
-    Key? key,
-    required this.child
-  }) : super(key: key);
+  const LayoutPage({Key? key, required this.child}) : super(key: key);
 
   @override
   State<LayoutPage> createState() => _LayoutPageState();
@@ -109,10 +105,7 @@ class _LayoutPageState extends State<LayoutPage> {
       var tempResp = json.decode(response.body);
       var apiResp = tempResp['data'];
       dashBoardList = [
-        {
-          "title": "Rewards ",
-          "count": apiResp['cash']
-        },
+        {"title": "Rewards ", "count": apiResp['cash']},
       ];
       setState(() {
         dashBoardList = dashBoardList;
@@ -128,7 +121,8 @@ class _LayoutPageState extends State<LayoutPage> {
         // }
       });
     } else {
-      error_handling.errorValidation(context, response.body, response.body, false);
+      error_handling.errorValidation(
+          context, response.body, response.body, false);
     }
   }
 
@@ -153,7 +147,8 @@ class _LayoutPageState extends State<LayoutPage> {
         parentDealerName = apiResp['name'] ?? '';
       });
     } else {
-      error_handling.errorValidation(context, response.body, response.body, false);
+      error_handling.errorValidation(
+          context, response.body, response.body, false);
     }
   }
 
@@ -167,7 +162,10 @@ class _LayoutPageState extends State<LayoutPage> {
     try {
       response = await http.post(
         Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json', "Authorization": accesstoken},
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": accesstoken
+        },
         body: json.encode({
           'dealerCode': dealerCode,
           'otp': otp,
@@ -178,17 +176,22 @@ class _LayoutPageState extends State<LayoutPage> {
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        if (['', null, 0, false].contains(responseData?["data"]?['parentDealerCode'])) {
+        if (['', null, 0, false]
+            .contains(responseData?["data"]?['parentDealerCode'])) {
           throw Exception(responseData["message"] ?? "Failed to save details.");
         } else {
-          print('${responseData['data']?['parentDealerCode']}=================??????????????????????/');
+          print(
+              '${responseData['data']?['parentDealerCode']}=================??????????????????????/');
           SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('USER_PARENT_DEALER_CODE', responseData['data']?['parentDealerCode'] ?? '');
-          userViewModel.setParentDealerCode(responseData['data']?['parentDealerCode']);
+          await prefs.setString('USER_PARENT_DEALER_CODE',
+              responseData['data']?['parentDealerCode'] ?? '');
+          userViewModel
+              .setParentDealerCode(responseData['data']?['parentDealerCode']);
           return true;
         }
       } else {
-        throw Exception("Failed to save details. Status code: ${response.statusCode}");
+        throw Exception(
+            "Failed to save details. Status code: ${response.statusCode}");
       }
     } catch (error) {
       print("Error saving dealer details: $error");
@@ -204,7 +207,10 @@ class _LayoutPageState extends State<LayoutPage> {
     try {
       response = await http.post(
         Uri.parse(apiUrl),
-        headers: {"Content-Type": "application/json", "Authorization": accesstoken},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": accesstoken
+        },
         body: json.encode({'dealerCode': dealerCode.trim()}),
       );
       if (response.statusCode == 200) {
@@ -224,10 +230,15 @@ class _LayoutPageState extends State<LayoutPage> {
           Loader.hideLoader(context);
           final responseData = json.decode(response.body);
           print(responseData['message']);
-          _showSnackBar("${responseData['message']}.", context, false,);
+          _showSnackBar(
+            "${responseData['message']}.",
+            context,
+            false,
+          );
           return false;
         } else {
-          throw Exception("Failed to fetch OTP. Status code: ${response.statusCode}");
+          throw Exception(
+              "Failed to fetch OTP. Status code: ${response.statusCode}");
         }
       }
     } catch (error) {
@@ -251,9 +262,10 @@ class _LayoutPageState extends State<LayoutPage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.14),
+        preferredSize:
+            Size.fromHeight(MediaQuery.of(context).size.height * 0.16),
         child: Container(
-            // color: Color
+          // color: Color
           decoration: BoxDecoration(
             // color: appBarColor, // Background color
             color: Colors.white, // Background color
@@ -370,7 +382,9 @@ class _LayoutPageState extends State<LayoutPage> {
         accountId: USER_ID.toString(),
         accountMobile: USER_MOBILE_NUMBER.toString(),
         accountType: USER_ACCOUNT_TYPE.toString(),
-        parentDealerCode: parentDealerCode != '' ? parentDealerCode : userViewModel.parentDealerCode,
+        parentDealerCode: parentDealerCode != ''
+            ? parentDealerCode
+            : userViewModel.parentDealerCode,
         parentDealerName: parentDealerName,
         onLogout: () => {logOut(context)},
       ),
@@ -387,15 +401,14 @@ class MyDrawer extends StatelessWidget {
   final String parentDealerCode;
   final String parentDealerName;
 
-  MyDrawer({
-    required this.accountName,
-    required this.accountId,
-    required this.accountMobile,
-    required this.accountType,
-    required this.onLogout,
-    required this.parentDealerCode,
-    required this.parentDealerName
-  });
+  MyDrawer(
+      {required this.accountName,
+      required this.accountId,
+      required this.accountMobile,
+      required this.accountType,
+      required this.onLogout,
+      required this.parentDealerCode,
+      required this.parentDealerName});
 
   @override
   Widget build(BuildContext context) {
@@ -406,7 +419,10 @@ class MyDrawer extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.only(topRight: Radius.circular(0), bottomRight: Radius.circular(0),),
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(0),
+            bottomRight: Radius.circular(0),
+          ),
         ),
         child: ListView(
           // padding: EdgeInsets.symmetric(vertical: screenHeight * 0.05, horizontal: 0),
@@ -418,17 +434,44 @@ class MyDrawer extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(accountName, style: TextStyle(color: drawerTitleColor, fontFamily: ffGBold, fontSize: 30,),),
-                  Text(accountType, style: TextStyle(color: drawerSubListColor, fontFamily: ffGMedium, fontSize: 16,)),
-                  Text(accountMobile, style: TextStyle(color: drawerSubListColor, fontFamily: ffGMedium, fontSize: 16,)),
+                  Text(
+                    accountName,
+                    style: TextStyle(
+                      color: drawerTitleColor,
+                      fontFamily: ffGBold,
+                      fontSize: 30,
+                    ),
+                  ),
+                  Text(accountType,
+                      style: TextStyle(
+                        color: drawerSubListColor,
+                        fontFamily: ffGMedium,
+                        fontSize: 16,
+                      )),
+                  Text(accountMobile,
+                      style: TextStyle(
+                        color: drawerSubListColor,
+                        fontFamily: ffGMedium,
+                        fontSize: 16,
+                      )),
                   if (accountType == 'Painter')
                     Container(
                       // height: screenHeight * 0.2,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text('Dealer Name ', style: TextStyle(color: drawerSubListColor, fontFamily: ffGMedium, fontSize: 16,)),
-                          Text(parentDealerName, style: TextStyle(color: drawerSubListColor, fontFamily: ffGBold, fontSize: 16, fontWeight: FontWeight.bold)),
+                          Text('Dealer Name ',
+                              style: TextStyle(
+                                color: drawerSubListColor,
+                                fontFamily: ffGMedium,
+                                fontSize: 16,
+                              )),
+                          Text(parentDealerName,
+                              style: TextStyle(
+                                  color: drawerSubListColor,
+                                  fontFamily: ffGBold,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
                           // Icon(FontAwesomeIcons.circl, size: 10, color: drawerSubListColor,),
                         ],
                       ),
@@ -445,13 +488,31 @@ class MyDrawer extends StatelessWidget {
               child: Column(
                 children: [
                   ListTile(
-                    title: Text('Home', style: TextStyle(color: appThemeColor, fontFamily: ffGSemiBold, fontSize: 22,),),
-                    onTap: () { Navigator.pushNamed(context, '/dashboardPage'); },
+                    title: Text(
+                      'Home',
+                      style: TextStyle(
+                        color: appThemeColor,
+                        fontFamily: ffGSemiBold,
+                        fontSize: 22,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pushNamed(context, '/dashboardPage');
+                    },
                   ),
-                  if(accountType == 'Dealer')
+                  if (accountType == 'Dealer')
                     ListTile(
-                      title: Text('My Painters', style: TextStyle(color: appThemeColor, fontFamily: ffGSemiBold, fontSize: 22,),),
-                      onTap: () { Navigator.pushNamed(context, '/painters'); },
+                      title: Text(
+                        'My Painters',
+                        style: TextStyle(
+                          color: appThemeColor,
+                          fontFamily: ffGSemiBold,
+                          fontSize: 22,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/painters');
+                      },
                     ),
                 ],
               ),
@@ -466,7 +527,12 @@ class MyDrawer extends StatelessWidget {
                 title: Center(
                   child: Text(
                     'Logout',
-                    style: TextStyle(decorationThickness: 1.5, color: drawerSubListColor, fontFamily: ffGMedium, fontSize: 22,),
+                    style: TextStyle(
+                      decorationThickness: 1.5,
+                      color: drawerSubListColor,
+                      fontFamily: ffGMedium,
+                      fontSize: 22,
+                    ),
                   ),
                 ),
               ),
