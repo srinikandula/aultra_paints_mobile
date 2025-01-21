@@ -133,7 +133,7 @@ class _OtpPageState extends State<OtpPage> {
     // await prefs.setString('USER_EMAIL', userData['email']);
     await prefs.setString('USER_MOBILE_NUMBER', userData['mobile']);
     await prefs.setString('USER_ACCOUNT_TYPE', userData['accountType']);
-    // await prefs.setString('USER_PARENT_DEALER_CODE', userData['parentDealerCode'] ?? '');
+    await prefs.setString('USER_PARENT_DEALER_CODE', userData['parentDealerCode'] ?? '');
 
     Navigator.pushNamed(context, '/dashboardPage', arguments: {});
   }

@@ -8,8 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../services/UserViewModel.dart';
 import '../../services/error_handling.dart';
 import '../../utility/Colors.dart';
 import '../../utility/Fonts.dart';
@@ -21,12 +23,10 @@ import '../../utility/loader.dart';
 import '../../utility/size_config.dart';
 
 class DashboardNewPage extends StatefulWidget {
-  final DashboardNewPage child; // Page content
+  const DashboardNewPage({
+    Key? key,
+  }) : super(key: key);
 
-  const DashboardNewPage({Key? key, required this.child}) : super(key: key);
-
-  // @override
-  // State<DashboardNewPage> createState() => _DashboardNewPageState();
   _DashboardNewPageState createState() => _DashboardNewPageState();
 }
 
@@ -111,7 +111,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       var apiResp = tempResp['data'];
       dashBoardList = [
         {
-          "title": "Rewards ",
+          "title": "Reward Points ",
           "count": apiResp['cash']
         },
       ];
@@ -121,9 +121,13 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
         parentDealerCode = apiResp['parentDealerCode'] ?? '';
         if (parentDealerCode.isEmpty && accountType == 'Painter') {
           showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
+        } else if (parentDealerCode.isNotEmpty && accountType == 'Painter') {
+          getRewardSchemes();
+          getProductOffers();
+        } else if (accountType != 'Painter') {
+          getRewardSchemes();
+          getProductOffers();
         }
-        getRewardSchemes();
-        getProductOffers();
 
         _scrollController.addListener(() {
           if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && !isLoading && hasMore) {
@@ -146,7 +150,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       response = await http.post(
         Uri.parse(apiUrl),
         headers: {"Content-Type": "application/json", "Authorization": accesstoken},
-        body: json.encode({'dealerCode': dealerCode}),
+        body: json.encode({'dealerCode': dealerCode.trim()}),
       );
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -179,6 +183,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
   }
 
   Future saveDealerDetails(String dealerCode, String otp) async {
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
     Utils.clearToasts(context);
     Utils.returnScreenLoader(context);
     http.Response response;
@@ -201,6 +206,13 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
         if (['', null, 0, false].contains(responseData?["data"]?['parentDealerCode'])) {
           throw Exception(responseData["message"] ?? "Failed to save details.");
         } else {
+          print('${responseData['data']?['parentDealerCode']}=================??????????????????????/');
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('USER_PARENT_DEALER_CODE', responseData['data']?['parentDealerCode'] ?? '');
+          userViewModel.setParentDealerCode(responseData['data']?['parentDealerCode']);
+          getRewardSchemes();
+          getProductOffers();
+          setState(() {});
           return true;
         }
       } else {
@@ -295,7 +307,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
 
   @override
   Widget build(BuildContext context) {
-    PageController _pageController = PageController(viewportFraction: 0.6); // Adjust viewportFraction for partial visibility
+    PageController _pageController = PageController(viewportFraction: 0.6);
 
     // Timer to auto-scroll the PageView
     Timer.periodic(Duration(seconds: 1), (Timer timer) {
@@ -323,119 +335,136 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
         onWillPop: _onWillPop,
       child: Scaffold(
         key: _scaffoldKey,
-        drawer: MyDrawer(
-          accountName: USER_FULL_NAME.toString(),
-          accountId: USER_ID.toString(),
-          accountMobile: USER_MOBILE_NUMBER.toString(),
-          accountType: USER_ACCOUNT_TYPE.toString(),
-          onLogout: () => {logOut(context)},
-        ),
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13), // Custom height
-          child: Container(
-            // decoration: BoxDecoration(
-            //   borderRadius: BorderRadius.circular(30),
-            //   color: Colors.white,
-            //   boxShadow: [
-            //     BoxShadow(
-            //       color: Colors.grey.withOpacity(0.2),
-            //       spreadRadius: 2,
-            //       blurRadius: 5,
-            //       offset: Offset(0, 3),
-            //     ),
-            //   ],
-            // ),
-            // color: Colors.white, // Background color
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).size.height * 0.05,
-              left: MediaQuery.of(context).size.width * 0.05,
-              right: MediaQuery.of(context).size.width * 0.05,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Row(
-                  // mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/images/app_logo.png',
-                      height: getScreenHeight(50),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        _scaffoldKey.currentState?.openDrawer();
-                      },
-                      child: Container(
-                        height: 30,
-                        width: 30,
-                        decoration: BoxDecoration(
-                          color: loginBgColor,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Image.asset(
-                            'assets/images/menu@3x.png',
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Image.asset(
-                    //   'assets/images/app_logo.png',
-                    //   height: getScreenHeight(50),
-                    // ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/qrScanner').then((result) {
-                          if (result == true) {
-                            getDashboardCounts();
-                            setState(() {});
-                          }
-                        });
-                      },
-                      child: Container(
-                        height: 30,
-                        width: 30,
-                        decoration: BoxDecoration(
-                          color: loginBgColor,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(6.0),
-                          child: Center(
-                            child: Icon(
-                              FontAwesomeIcons.qrcode,
-                              size: 22,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
         body: SingleChildScrollView( // Add SingleChildScrollView
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
+                // decoration: BoxDecoration(
+                //   // color: appBarColor, // Background color
+                //   color: Colors.white, // Background color
+                //   borderRadius: BorderRadius.circular(20), // Rounded corners
+                //   boxShadow: [
+                //     BoxShadow(
+                //       color: Colors.grey.withOpacity(0.1),
+                //       spreadRadius: 3,
+                //       blurRadius: 5,
+                //       offset: const Offset(0, 3), // Shadow position
+                //     ),
+                //   ],
+                //   // border: Border.all(color: Colors.black, width: 1),
+                // ),
                 margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                 padding: const EdgeInsets.only(bottom: 5, top: 10),
                 child: Text(
                   'Welcome back, ${USER_FULL_NAME}',
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold,),
                   textAlign: TextAlign.center,
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                // padding: const EdgeInsets.only(bottom: 10),
+                child: Text(
+                  'Reward Schemes',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: appThemeColor),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              SizedBox(
+                height: cardHeight,
+                child: rewardSchemes.isEmpty
+                    ? Center(child: CircularProgressIndicator())
+                    : PageView.builder(
+                  controller: _pageController,
+                  itemCount: rewardSchemes.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    final item = rewardSchemes[index];
+                    return Transform.scale(
+                      scale: index == _pageController.page?.round()
+                          ? 1.0 // Scale center card fully
+                          : 0.9, // Slightly shrink side cards
+                      child: Align(
+                        alignment: Alignment.topCenter, // Align cards to the top
+                        child: Container(
+                          margin: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.1),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 250,
+                                height: 250,
+                                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: FadeInImage.assetNetwork(
+                                    placeholder: 'assets/images/app_logo_load.png', // Placeholder image
+                                    image: item['rewardSchemeImageUrl'] ?? '', // Network image URL
+                                    fit: BoxFit.cover,
+                                    imageErrorBuilder: (context, error, stackTrace) {
+                                      return Image.asset(
+                                        'assets/images/app_logo_load.png', // Fallback image
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                child: dashBoardList.isEmpty
+                    ? Container(
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  child: ListView(
+                    physics: AlwaysScrollableScrollPhysics(), // Ensures scroll behavior
+                    children: [],
+                  ),
+                )
+                    : ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(), // Ensures scrollability
+                  padding: EdgeInsets.zero,
+                  itemCount: dashBoardList.length,
+                  itemBuilder: (context, index) {
+                    var dashboardCard = dashBoardList[index];
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          onTap: () {},
+                          child: _buildDashboardCard(
+                            dashboardCard['title'].toString(),
+                            dashboardCard['count'].toString(),
+                            white,
+                            buttonTextBgColor,
+                            '',
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                      ],
+                    );
+                  },
                 ),
               ),
               Container(
@@ -535,131 +564,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                   ),
                 ),
               ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                child: dashBoardList.isEmpty
-                    ? Container(
-                  height: MediaQuery.of(context).size.height * 0.6,
-                  child: ListView(
-                    physics: AlwaysScrollableScrollPhysics(), // Ensures scroll behavior
-                    children: [],
-                  ),
-                )
-                    : ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(), // Ensures scrollability
-                  padding: EdgeInsets.zero,
-                  itemCount: dashBoardList.length,
-                  itemBuilder: (context, index) {
-                    var dashboardCard = dashBoardList[index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        InkWell(
-                          onTap: () {},
-                          child: _buildDashboardCard(
-                            dashboardCard['title'].toString(),
-                            dashboardCard['count'].toString(),
-                            white,
-                            buttonTextBgColor,
-                            '',
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                      ],
-                    );
-                  },
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                // padding: const EdgeInsets.only(bottom: 10),
-                child: Text(
-                  'Current Schemes',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: appThemeColor),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              SizedBox(
-                height: cardHeight,
-                child: rewardSchemes.isEmpty
-                    ? Center(child: CircularProgressIndicator())
-                    : PageView.builder(
-                  controller: _pageController,
-                  itemCount: rewardSchemes.length,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    final item = rewardSchemes[index];
-                    return Transform.scale(
-                      scale: index == _pageController.page?.round()
-                          ? 1.0 // Scale center card fully
-                          : 0.9, // Slightly shrink side cards
-                      child: Align(
-                        alignment: Alignment.topCenter, // Align cards to the top
-                        child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                spreadRadius: 2,
-                                blurRadius: 5,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 250,
-                                height: 250,
-                                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: FadeInImage.assetNetwork(
-                                    placeholder: 'assets/images/app_logo_load.png', // Placeholder image
-                                    image: item['rewardSchemeImageUrl'] ?? '', // Network image URL
-                                    fit: BoxFit.cover,
-                                    imageErrorBuilder: (context, error, stackTrace) {
-                                      return Image.asset(
-                                        'assets/images/app_logo_load.png', // Fallback image
-                                        fit: BoxFit.cover,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
             ],
           ),
         ),
 
-      )
-    );
-  }
-
-  Widget _buildDashboardCard(String title, String count, Color bgColor, Color borderColor, String fromButton) {
-    return Container(
-        margin: EdgeInsets.symmetric(horizontal: 0.0, vertical: 16.0),
-      child: InkWell(
-        onTap: () {},
-        child: Row(
-          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('${title} ', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: appThemeColor), textAlign: TextAlign.center,),
-            Text(count, style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: Colors.blueAccent), textAlign: TextAlign.center,),
-          ],
-        ),
       )
     );
   }
@@ -794,9 +702,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                             TextButton(
                               onPressed: () async {
                                 if (dealerCodeController.text.isEmpty) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("Please enter Dealer Code."),),
-                                  );
+                                  // ScaffoldMessenger.of(context).showSnackBar(
+                                  //   SnackBar(content: Text("Please enter Dealer Code."),),
+                                  // );
+                                  error_handling.errorValidation(context, '', 'Please enter Dealer Code.', false);
                                   return;
                                 }
 
@@ -847,6 +756,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                     );
                                     Navigator.pop(context, true);
                                     Navigator.pop(context, true);
+                                    // Navigator.pushNamed(context, '/dashboardPage');
                                   }
                                 } catch (error) {
                                   setState(() => isLoading = false);
@@ -869,74 +779,20 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       },
     );
   }
-}
 
-class MyDrawer extends StatelessWidget {
-  final String accountName;
-  final String accountId;
-  final String accountMobile;
-  final String accountType;
-  final VoidCallback onLogout;
-
-  MyDrawer({
-    required this.accountName,
-    required this.accountId,
-    required this.accountMobile,
-    required this.accountType,
-    required this.onLogout,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
-    return Drawer(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(topRight: Radius.circular(0), bottomRight: Radius.circular(0),),
-        ),
-        child: ListView(
-          padding: EdgeInsets.symmetric(vertical: screenHeight * 0.1, horizontal: 20),
-          children: <Widget>[
-            Text(accountName, style: TextStyle(color: drawerTitleColor, fontFamily: ffGBold, fontSize: 24,),),
-            Text(accountMobile, style: TextStyle(color: drawerTitleColor, fontFamily: ffGMedium, fontSize: 14,),),
-            Divider(thickness: 1),
-            SizedBox(height: 15), // Consistent spacing before the ListTile items
-            Container(
-              height: screenHeight * 0.7,
-              child: Column(
-                children: [
-                  ListTile(
-                    title: Text('Home', style: TextStyle(color: appThemeColor, fontFamily: ffGSemiBold, fontSize: 22,),),
-                    onTap: () { Navigator.pop(context); },
-                  ),
-                  if(accountType == 'Dealer') ListTile(
-                    title: Text('Painters', style: TextStyle(color: appThemeColor, fontFamily: ffGSemiBold, fontSize: 22,),),
-                    onTap: () { Navigator.pushNamed(context, '/painters'); },
-                  ),
-                ],
-              ),
-            ),
-            Divider(thickness: 1),
-            InkWell(
-              onTap: () {
-                // Navigator.pop(context);
-                onLogout();
-              },
-              child: ListTile(
-                title: Center(
-                  child: Text(
-                    'Logout',
-                    style: TextStyle(decorationThickness: 1.5, color: drawerSubListColor, fontFamily: ffGMedium, fontSize: 22,),
-                  ),
-                ),
-              ),
-            ),
+  Widget _buildDashboardCard(String title, String count, Color bgColor, Color borderColor, String fromButton) {
+    return Container(
+        margin: EdgeInsets.symmetric(horizontal: 0.0, vertical: 16.0),
+      child: InkWell(
+        onTap: () {},
+        child: Row(
+          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('${title} ', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: appThemeColor), textAlign: TextAlign.center,),
+            Text(count, style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: Colors.blueAccent), textAlign: TextAlign.center,),
           ],
         ),
-      ),
+      )
     );
   }
 }

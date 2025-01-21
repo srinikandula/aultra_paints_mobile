@@ -47,8 +47,12 @@ class _SplashPageState extends State<SplashPage> {
     var authtoken = prefs.getString('accessToken');
 
     if (authtoken != null) {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const LayoutPage(child: DashboardNewPage())));
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const LayoutPage(child: DashboardNewPage())
+          )
+      );
     } else {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => const LoginPage()));

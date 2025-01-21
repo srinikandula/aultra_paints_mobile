@@ -115,6 +115,8 @@ const Color lightBlueColor = Color.fromRGBO(162, 207, 254, 9);
 const Color orangeColor = Color.fromRGBO(255, 157, 0, 1);
 const Color blueColor = Color.fromRGBO(66, 165, 245, 1);
 
+const Color appBarColor = Color.fromRGBO(44, 62, 80, 1);
+
 Color bookedBlue = Color(0xFF1292E5);
 Color inTransitOrange = Color(0xFFFF9D00);
 Color deliveredGreen = Color(0xFF28C840);
