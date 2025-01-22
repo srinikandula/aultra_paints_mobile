@@ -156,7 +156,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     } else {
       Navigator.pop(context);
       error_handling.errorValidation(
-          context, response.body, response.body, false);
+          context, response.statusCode, response.body, false);
     }
   }
 
@@ -189,7 +189,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       }
     } else {
       error_handling.errorValidation(
-          context, response.body, response.body, false);
+          context, response.statusCode, response.body, false);
     }
   }
 
@@ -234,7 +234,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       setState(() => saveOtpButtonLoader = false);
       // Navigator.pop(context);
       error_handling.errorValidation(
-          context, response.body, response.body, false);
+          context, response.statusCode, response.body, false);
     }
   }
 
@@ -244,44 +244,35 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     }
     if (isLoading) return;
     setState(() => isLoading = true);
-    try {
-      Utils.clearToasts(context);
-      // Utils.returnScreenLoader(context);
-      http.Response response;
-      var apiUrl = BASE_URL + GET_PRODUCT_OFFERS;
-      print(apiUrl);
-      response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": accesstoken
-        },
-        body: json.encode({'page': currentPage, 'limit': 4}),
-      );
-      final responseData = json.decode(response.body);
-      if (response.statusCode == 200) {
-        // Navigator.pop(context);
-        List<dynamic> newOffers = responseData;
-        setState(() {
-          currentPage++;
-          productOffers.addAll(newOffers);
-          if (newOffers.length < 4) {
-            hasMore = false; // No more data to load
-          }
-        });
-        setState(() => isLoading = false);
-        return true;
-      } else if (response.statusCode == 404) {
-        return false;
-      } else {
-        // Navigator.pop(context);
-        error_handling.errorValidation(
-            context, response.body, response.body, false);
-      }
-    } catch (error) {
-      // final errorData = json.decode(error);
-      Navigator.pop(context);
-      error_handling.errorValidation(context, error, error, false);
+
+    Utils.clearToasts(context);
+    // Utils.returnScreenLoader(context);
+    http.Response response;
+    var apiUrl = BASE_URL + GET_PRODUCT_OFFERS;
+    print(apiUrl);
+    response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": accesstoken
+      },
+      body: json.encode({'page': currentPage, 'limit': 4}),
+    );
+    final responseData = json.decode(response.body);
+    if (response.statusCode == 200) {
+      List<dynamic> newOffers = responseData;
+      setState(() {
+        currentPage++;
+        productOffers.addAll(newOffers);
+        if (newOffers.length < 4) {
+          hasMore = false; // No more data to load
+        }
+      });
+      setState(() => isLoading = false);
+      return true;
+    } else {
+      error_handling.errorValidation(
+          context, response.statusCode, response.body, false);
     }
   }
 
@@ -290,6 +281,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     // Utils.returnScreenLoader(context);
     http.Response response;
     var apiUrl = BASE_URL + GET_REWARDS_SCHEMES;
+    print(apiUrl);
 
     response = await http.get(
       Uri.parse(apiUrl),
@@ -302,16 +294,14 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     if (response.statusCode == 200) {
       // Navigator.pop(context);
       final responseData = json.decode(response.body);
-      // print('======> ${responseData}');
-      rewardSchemes = responseData;
-      return true;
+
+      setState(() {
+        rewardSchemes = responseData;
+      });
     } else {
-      // Navigator.pop(context);
       error_handling.errorValidation(
-          context, response.body, response.body, false);
+          context, response.statusCode, response.body, false);
     }
-    // Navigator.pop(context);
-    // error_handling.errorValidation(context, response, response, false);
   }
 
   void logOut(context) async {
@@ -351,10 +341,9 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     double cardWidth = screenWidth * 0.9; // 80% of the screen width
-    double cardHeight = 270; // Fixed height for the cards
-    // double cardHeight = screenHeight * 0.9;
-    double rewardCardHeight =
-        screenHeight * 0.9; // 80% of theFixed height for the cards
+    // Fixed height for the cards
+
+    double cardHeight = getTabletCheck() ? 300 : 270;
 
     return WillPopScope(
         onWillPop: _onWillPop,
@@ -386,7 +375,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                   child: Text(
                     'Welcome, ${USER_FULL_NAME}',
                     style: TextStyle(
-                      fontSize: getScreenWidth(26),
+                      fontSize: getScreenWidth(getTabletCheck() ? 18 : 26),
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -401,7 +390,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                     style: TextStyle(
                         decoration: TextDecoration.underline,
                         decorationThickness: 1.5,
-                        fontSize: getScreenWidth(16),
+                        fontSize: getScreenWidth(getTabletCheck() ? 14 : 16),
                         fontWeight: FontWeight.bold,
                         color: appThemeColor),
                     textAlign: TextAlign.center,
@@ -446,7 +435,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                               children: [
                                 // Reward Image
                                 Container(
-                                  height: getScreenWidth(160),
+                                  height: getScreenWidth(
+                                      getTabletCheck() ? 100 : 150),
                                   padding: EdgeInsets.symmetric(
                                       horizontal: getScreenWidth(8),
                                       vertical: getScreenHeight(6)),
@@ -482,7 +472,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                         overflow: TextOverflow
                                             .ellipsis, // Title of the reward
                                         style: TextStyle(
-                                          fontSize: getScreenWidth(14),
+                                          fontSize: getScreenWidth(
+                                              getTabletCheck() ? 12 : 14),
                                           fontWeight: FontWeight.bold,
                                         ),
                                         textAlign: TextAlign.center,
@@ -494,7 +485,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          fontSize: getScreenWidth(12),
+                                          fontSize: getScreenWidth(
+                                              getTabletCheck() ? 10 : 12),
                                           color: Colors.grey[700],
                                         ),
                                         textAlign: TextAlign.center,
@@ -566,14 +558,14 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                     style: TextStyle(
                         decoration: TextDecoration.underline,
                         decorationThickness: 1.5,
-                        fontSize: getScreenWidth(18),
+                        fontSize: getScreenWidth(getTabletCheck() ? 16 : 18),
                         fontWeight: FontWeight.bold,
                         color: appThemeColor),
                     textAlign: TextAlign.center,
                   ),
                 ),
                 SizedBox(
-                  height: cardHeight,
+                  height: getTabletCheck() ? 300 : 270,
                   child: rewardSchemes.isEmpty
                       ? Center(child: CircularProgressIndicator())
                       : PageView.builder(
@@ -614,8 +606,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       Container(
-                                        width: getScreenWidth(250),
-                                        height: getScreenWidth(220),
+                                        width: getScreenWidth(
+                                            getTabletCheck() ? 100 : 250),
+                                        height: getScreenWidth(
+                                            getTabletCheck() ? 100 : 250),
                                         padding: EdgeInsets.symmetric(
                                             horizontal: getScreenWidth(10),
                                             vertical: getScreenHeight(10)),
@@ -679,12 +673,12 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
               child: Dialog(
                 backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(getScreenWidth(10)),
                 ),
                 elevation: 10,
                 child: Container(
-                  width: 400,
-                  padding: EdgeInsets.all(16),
+                  width: getScreenWidth(getTabletCheck() ? 500 : 400),
+                  padding: EdgeInsets.all(getScreenWidth(16)),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -692,15 +686,18 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                       Text(
                         "Dealer Details",
                         style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                            fontSize:
+                                getScreenWidth(getTabletCheck() ? 16 : 20),
+                            fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: getScreenHeight(10)),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius:
+                              BorderRadius.circular(getScreenWidth(16)),
                           border: Border.all(
-                            width: 1,
+                            width: getScreenWidth(1),
                             color: Colors.grey,
                             style: BorderStyle.solid,
                           ),
@@ -711,14 +708,22 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                           onTapOutside: (event) {
                             FocusManager.instance.primaryFocus?.unfocus();
                           },
+                          style: TextStyle(
+                            fontSize:
+                                getScreenWidth(getTabletCheck() ? 12 : 18),
+                            color: Colors.black,
+                            fontFamily: ffGMedium,
+                          ),
                           decoration: InputDecoration(
                             labelText: 'Enter Dealer Code',
                             labelStyle: TextStyle(
                               fontFamily: 'Medium',
-                              fontSize: 18.0,
+                              fontSize:
+                                  getScreenWidth(getTabletCheck() ? 12 : 18),
                               color: Colors.grey,
                             ),
-                            contentPadding: EdgeInsets.all(15),
+                            contentPadding: EdgeInsets.all(
+                                getScreenWidth(getTabletCheck() ? 8 : 15)),
                             border: InputBorder.none,
                           ),
                         ),
@@ -726,21 +731,29 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                       !isOtpVisible
                           ? SizedBox.shrink()
                           : Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                SizedBox(height: 20),
+                                SizedBox(height: getScreenHeight(20)),
                                 Text("Enter OTP",
-                                    style: TextStyle(fontSize: 16)),
+                                    style: TextStyle(
+                                        fontSize: getScreenWidth(16))),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: List.generate(6, (index) {
                                     return SizedBox(
-                                      width: 40,
+                                      width: getScreenWidth(40),
                                       child: TextField(
                                         controller: otpControllers[index],
                                         maxLength: 1,
                                         keyboardType: TextInputType.number,
                                         textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: getScreenWidth(
+                                              getTabletCheck() ? 12 : 18),
+                                          color: Colors.black,
+                                          fontFamily: ffGMedium,
+                                        ),
                                         decoration: InputDecoration(
                                           counterText: "",
                                           border: OutlineInputBorder(),
@@ -758,10 +771,12 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                     );
                                   }),
                                 ),
-                                SizedBox(height: 10),
+                                SizedBox(height: getScreenHeight(10)),
                                 Text(
                                     'The 6-digit OTP was sent to the ${userParentDealerName}. OTP expiry time is 10 minutes.',
-                                    style: TextStyle(fontSize: 15)),
+                                    style: TextStyle(
+                                        fontSize: getScreenWidth(
+                                            getTabletCheck() ? 12 : 15))),
                                 StreamBuilder<int>(
                                   stream: Stream.periodic(Duration(seconds: 1),
                                       (i) => 600 - i - 1).take(600),
@@ -773,7 +788,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                       return Text(
                                         'Time remaining: ${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
                                         style: TextStyle(
-                                            fontSize: 15,
+                                            fontSize: getScreenWidth(
+                                                getTabletCheck() ? 12 : 15),
                                             fontWeight: FontWeight.bold),
                                       );
                                     }
@@ -782,7 +798,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                 ),
                               ],
                             ),
-                      SizedBox(height: 20),
+                      SizedBox(height: getScreenHeight(20)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -825,7 +841,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                               },
                               child: Text("Get OTP",
                                   style: TextStyle(
-                                      fontSize: getScreenWidth(18),
+                                      fontSize: getScreenWidth(
+                                          getTabletCheck() ? 12 : 18),
                                       fontWeight: FontWeight.w900,
                                       color: Colors.blueAccent)),
                             ),
@@ -847,7 +864,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                               },
                               child: Text("Save",
                                   style: TextStyle(
-                                      fontSize: getScreenWidth(18),
+                                      fontSize: getScreenWidth(
+                                          getTabletCheck() ? 14 : 18),
                                       fontWeight: FontWeight.w900,
                                       color: Colors.blueAccent)),
                             ),
@@ -876,7 +894,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
               Text(
                 '${title} ',
                 style: TextStyle(
-                    fontSize: getScreenWidth(24),
+                    fontSize: getScreenWidth(getTabletCheck() ? 18 : 24),
                     fontWeight: FontWeight.bold,
                     color: appThemeColor),
                 textAlign: TextAlign.center,
@@ -884,7 +902,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
               Text(
                 count,
                 style: TextStyle(
-                    fontSize: getScreenWidth(24),
+                    fontSize: getScreenWidth(getTabletCheck() ? 18 : 24),
                     fontWeight: FontWeight.w900,
                     color: Colors.blueAccent),
                 textAlign: TextAlign.center,

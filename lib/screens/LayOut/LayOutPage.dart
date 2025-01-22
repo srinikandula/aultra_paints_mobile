@@ -1,10 +1,7 @@
 import 'dart:convert';
 
-import 'package:aultra_paints_mobile/screens/dashboard/DashboardNewPage.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -262,7 +259,8 @@ class _LayoutPageState extends State<LayoutPage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(getScreenHeight(125)),
+        preferredSize:
+            Size.fromHeight(getScreenHeight(getTabletCheck() ? 140 : 125)),
         child: Container(
           // color: Color
           decoration: BoxDecoration(
@@ -419,6 +417,7 @@ class MyDrawer extends StatelessWidget {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
     return Drawer(
+      width: getScreenWidth(getTabletCheck() ? 200 : 260),
       backgroundColor: Colors.transparent,
       child: Container(
         decoration: BoxDecoration(
@@ -434,7 +433,9 @@ class MyDrawer extends StatelessWidget {
           children: <Widget>[
             Container(
               // height: screenHeight * 0.1,
-              margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+              margin: EdgeInsets.symmetric(
+                  horizontal: getScreenWidth(20),
+                  vertical: getScreenHeight(10)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -443,20 +444,20 @@ class MyDrawer extends StatelessWidget {
                     style: TextStyle(
                       color: drawerTitleColor,
                       fontFamily: ffGBold,
-                      fontSize: 30,
+                      fontSize: getScreenWidth(getTabletCheck() ? 24 : 30),
                     ),
                   ),
                   Text(accountType,
                       style: TextStyle(
                         color: drawerSubListColor,
                         fontFamily: ffGMedium,
-                        fontSize: 16,
+                        fontSize: getScreenWidth(16),
                       )),
                   Text(accountMobile,
                       style: TextStyle(
                         color: drawerSubListColor,
                         fontFamily: ffGMedium,
-                        fontSize: 16,
+                        fontSize: getScreenWidth(16),
                       )),
                   if (accountType == 'Painter')
                     Container(
@@ -468,13 +469,13 @@ class MyDrawer extends StatelessWidget {
                               style: TextStyle(
                                 color: drawerSubListColor,
                                 fontFamily: ffGMedium,
-                                fontSize: 16,
+                                fontSize: getScreenWidth(16),
                               )),
                           Text(parentDealerName,
                               style: TextStyle(
                                   color: drawerSubListColor,
                                   fontFamily: ffGBold,
-                                  fontSize: 16,
+                                  fontSize: getScreenWidth(16),
                                   fontWeight: FontWeight.bold)),
                           // Icon(FontAwesomeIcons.circl, size: 10, color: drawerSubListColor,),
                         ],
@@ -487,8 +488,9 @@ class MyDrawer extends StatelessWidget {
             Divider(thickness: 1),
             // SizedBox(height: 15), // Consistent spacing before the ListTile items
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-              height: screenHeight * 0.7,
+              margin: EdgeInsets.symmetric(
+                  horizontal: getScreenWidth(30), vertical: getScreenWidth(10)),
+              height: getScreenHeight(getTabletCheck() ? 400 : 530),
               child: Column(
                 children: [
                   ListTile(
@@ -497,7 +499,7 @@ class MyDrawer extends StatelessWidget {
                       style: TextStyle(
                         color: appThemeColor,
                         fontFamily: ffGSemiBold,
-                        fontSize: 22,
+                        fontSize: getScreenWidth(22),
                       ),
                     ),
                     onTap: () {
@@ -511,7 +513,7 @@ class MyDrawer extends StatelessWidget {
                         style: TextStyle(
                           color: appThemeColor,
                           fontFamily: ffGSemiBold,
-                          fontSize: 22,
+                          fontSize: getScreenWidth(22),
                         ),
                       ),
                       onTap: () {
@@ -535,7 +537,7 @@ class MyDrawer extends StatelessWidget {
                       decorationThickness: 1.5,
                       color: drawerSubListColor,
                       fontFamily: ffGMedium,
-                      fontSize: 22,
+                      fontSize: getScreenWidth(22),
                     ),
                   ),
                 ),
