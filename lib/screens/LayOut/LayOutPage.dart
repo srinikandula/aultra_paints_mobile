@@ -262,14 +262,14 @@ class _LayoutPageState extends State<LayoutPage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: PreferredSize(
-        preferredSize:
-            Size.fromHeight(MediaQuery.of(context).size.height * 0.16),
+        preferredSize: Size.fromHeight(getScreenHeight(125)),
         child: Container(
           // color: Color
           decoration: BoxDecoration(
             // color: appBarColor, // Background color
             color: Colors.white, // Background color
-            borderRadius: BorderRadius.circular(20), // Rounded corners
+            borderRadius:
+                BorderRadius.circular(getScreenWidth(20)), // Rounded corners
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.1),
@@ -281,12 +281,16 @@ class _LayoutPageState extends State<LayoutPage> {
             // border: Border.all(color: Colors.black, width: 1),
           ),
           // padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          // padding: EdgeInsets.only(
+          //   top: MediaQuery.of(context).size.height * 0.05,
+          //   left: MediaQuery.of(context).size.width * 0.04,
+          //   right: MediaQuery.of(context).size.width * 0.04,
+          //   bottom: MediaQuery.of(context).size.width * 0.02,
+          // ),
           padding: EdgeInsets.only(
-            top: MediaQuery.of(context).size.height * 0.05,
-            left: MediaQuery.of(context).size.width * 0.04,
-            right: MediaQuery.of(context).size.width * 0.04,
-            bottom: MediaQuery.of(context).size.width * 0.02,
-          ),
+              left: getScreenWidth(10),
+              right: getScreenWidth(10),
+              top: getScreenHeight(40)),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -306,7 +310,7 @@ class _LayoutPageState extends State<LayoutPage> {
                   ),
                 ],
               ),
-              SizedBox(height: 8),
+              SizedBox(height: getScreenHeight(8)),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -333,7 +337,7 @@ class _LayoutPageState extends State<LayoutPage> {
                         child: Center(
                           child: Icon(
                             FontAwesomeIcons.bars,
-                            size: 22,
+                            size: getScreenWidth(22),
                             // color: Colors.white,
                             color: appThemeColor,
                           ),
@@ -362,7 +366,7 @@ class _LayoutPageState extends State<LayoutPage> {
                         child: Center(
                           child: Icon(
                             FontAwesomeIcons.qrcode,
-                            size: 22,
+                            size: getScreenWidth(22),
                             // color: Colors.white,
                             color: appThemeColor,
                           ),
