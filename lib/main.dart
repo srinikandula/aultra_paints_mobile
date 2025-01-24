@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:aultra_paints_mobile/screens/LayOut/LayOutPage.dart';
 import 'package:aultra_paints_mobile/screens/dashboard/DashboardNewPage.dart';
+import 'package:aultra_paints_mobile/screens/launch/launchPage.dart';
 import 'package:aultra_paints_mobile/screens/painter/PainterPage.dart';
-import 'package:aultra_paints_mobile/screens/splash/onboarding.dart';
 import 'package:aultra_paints_mobile/services/UserViewModel.dart';
 
 import '/screens/authentication/otp/OtpPage.dart';
@@ -82,12 +82,12 @@ class MyAppState extends State<MyApp> {
       theme: ThemeData(
         platform: TargetPlatform.iOS,
       ),
-      home: const OnBoarding(),
+      home: const LaunchPage(),
       // home: const DashboardPage(),
       builder: EasyLoading.init(),
       routes: {
         "/splashPage": (context) => const SplashPage(),
-        "/onBoardPage": (context) => const OnBoarding(),
+        "/launchPage": (context) => const LaunchPage(),
         "/loginPage": (context) => const LoginPage(),
         "/signupPage": (context) => const SignupPage(),
         "/otpPage": (context) => const OtpPage(),

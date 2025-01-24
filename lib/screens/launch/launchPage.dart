@@ -12,14 +12,14 @@ import '../LayOut/LayOutPage.dart';
 import '../authentication/login/LoginPage.dart';
 import '../dashboard/DashboardNewPage.dart';
 
-class OnBoarding extends StatefulWidget {
-  const OnBoarding({Key? key}) : super(key: key);
+class LaunchPage extends StatefulWidget {
+  const LaunchPage({Key? key}) : super(key: key);
 
   @override
-  State<OnBoarding> createState() => _OnBoardingState();
+  State<LaunchPage> createState() => _LaunchPageState();
 }
 
-class _OnBoardingState extends State<OnBoarding> {
+class _LaunchPageState extends State<LaunchPage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -54,7 +54,7 @@ class _OnBoardingState extends State<OnBoarding> {
               const LayoutPage(child: DashboardNewPage())));
     } else {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const OnBoarding()));
+          context, MaterialPageRoute(builder: (context) => const LaunchPage()));
     }
   }
 

@@ -11,7 +11,6 @@ import '../../utility/Utils.dart';
 import '../LayOut/LayOutPage.dart';
 import '../authentication/login/LoginPage.dart';
 import '../dashboard/DashboardNewPage.dart';
-import 'onboarding.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);
