@@ -59,13 +59,15 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/
-    - assets/images/
-#    - assets/certificate/STAR_mlldev_com.crt
-#    - assets/certificate/STAR_mllqa_com.crt
-    - assets/certificate/AultraPaints_b20bd50c61d9d911.crt
-    - assets/certificate/AultraPaints_b20bd50c61d9d911.pem
-    - assets/certificate/AultraPaints_gd_bundle-g2-g1.crt
+  - assets/certificate/AultraPaints_b20bd50c61d9d911.crt_1
+  - assets/certificate/AultraPaints_b20bd50c61d9d911.crt
+  - assets/certificate/AultraPaints_b20bd50c61d9d911.pem
+  - assets/certificate/AultraPaints_gd_bundle-g2-g1.crt
+  - assets/
+  - assets/images/
+  #  - assets/certificate/STAR_mlldev_com.crt
+  #  - assets/certificate/STAR_mllqa_com.crt
+    
 
 #
 #  fonts:

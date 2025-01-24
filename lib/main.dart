@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:aultra_paints_mobile/screens/LayOut/LayOutPage.dart';
 import 'package:aultra_paints_mobile/screens/dashboard/DashboardNewPage.dart';
+import 'package:aultra_paints_mobile/screens/dashboard/PainterPopUpPage.dart';
 import 'package:aultra_paints_mobile/screens/launch/launchPage.dart';
 import 'package:aultra_paints_mobile/screens/painter/PainterPage.dart';
 import 'package:aultra_paints_mobile/services/UserViewModel.dart';
@@ -82,7 +83,7 @@ class MyAppState extends State<MyApp> {
       theme: ThemeData(
         platform: TargetPlatform.iOS,
       ),
-      home: const LaunchPage(),
+      home: const SplashPage(),
       // home: const DashboardPage(),
       builder: EasyLoading.init(),
       routes: {
@@ -94,6 +95,7 @@ class MyAppState extends State<MyApp> {
         "/dashboardPage": (context) => LayoutPage(child: DashboardNewPage()),
         "/painters": (context) => LayoutPage(child: PainterPage()),
         "/qrScanner": (context) => const QrScanner(),
+        "/painterPopUpPage": (context) => const PainterPopUpPage(),
       },
     );
   }

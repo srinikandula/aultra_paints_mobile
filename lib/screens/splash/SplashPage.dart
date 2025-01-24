@@ -1,16 +1,15 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
-
-import 'package:aultra_paints_mobile/utility/size_config.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../utility/Utils.dart';
 import '../LayOut/LayOutPage.dart';
 import '../authentication/login/LoginPage.dart';
 import '../dashboard/DashboardNewPage.dart';
+import '../launch/launchPage.dart';
+import '../orders/qrScanner/QrScanner.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);
@@ -21,127 +20,144 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   final _formKey = GlobalKey<FormState>();
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  Uint8List? _cachedCert; // Cached certificate for reuse
+  final String _certificatePath =
+      // 'assets/certificate/AultraPaints_b20bd50c61d9d911.crt'; // Path to certificate
+      'assets/certificate/AultraPaints_b20bd50c61d9d911.crt_1'; // Path to certificate
 
   @override
   void initState() {
     super.initState();
-    certificateCheck();
+    certificateCheck(); // Start certificate validation
   }
 
-  void _showSnackBar(String message, BuildContext context, ColorCheck) {
+  void _showSnackBar(String message, bool isSuccess) {
     final snackBar = SnackBar(
-        content: Text(message),
-        backgroundColor: ColorCheck ? Colors.green : Colors.red,
-        duration: Utils.returnStatusToastDuration(ColorCheck));
+      content: Text(message),
+      backgroundColor: isSuccess ? Colors.green : Colors.red,
+      duration: Utils.returnStatusToastDuration(isSuccess),
+    );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  callTimer() {
+  Future<void> callTimer() async {
     Timer(const Duration(seconds: 2), () => onNavigate());
   }
 
-  onNavigate() async {
+  Future<void> onNavigate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var authtoken = prefs.getString('accessToken');
+    String? authToken = prefs.getString('accessToken');
 
-    if (authtoken != null) {
+    if (authToken != null) {
       Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  const LayoutPage(child: DashboardNewPage())));
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LayoutPage(child: DashboardNewPage()),
+        ),
+      );
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => const QrScanner()),
+      // );
     } else {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const LoginPage()));
+        context,
+        // MaterialPageRoute(builder: (context) => const LoginPage()),
+        MaterialPageRoute(builder: (context) => const LaunchPage()),
+      );
     }
   }
 
   Future<HttpClient> createHttpClientWithCertificate() async {
     SecurityContext context = SecurityContext.defaultContext;
+
     try {
-      // final certData =
-      //     await rootBundle.load('assets/certificate/STAR_mlldev_com.crt'); //dev
-      final certData = await rootBundle
-          .load('assets/certificate/AultraPaints_b20bd50c61d9d911.crt'); //QA
-      context.setTrustedCertificatesBytes(certData.buffer.asUint8List());
+      // Load the certificate if not already cached
+      if (_cachedCert == null) {
+        final certData = await rootBundle.load(_certificatePath);
+        _cachedCert = certData.buffer.asUint8List();
+        debugPrint("Certificate loaded and cached successfully.");
+      }
+
+      // Apply the cached certificate to the SecurityContext
+      context.setTrustedCertificatesBytes(_cachedCert!);
+      debugPrint("Certificate applied to the SecurityContext.");
     } catch (e) {
-      print("Error loading certificate: $e");
+      debugPrint("Error loading certificate: $e");
       throw Exception("Failed to load certificate");
     }
+
     return HttpClient(context: context)
-      ..badCertificateCallback = (cert, host, port) => false;
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) {
+        debugPrint("Bad certificate callback triggered for $host:$port");
+        debugPrint("Server certificate details: $cert");
+        // Temporarily allow all certificates for debugging
+        return true; // Set this to `false` in production after debugging
+      };
   }
 
   Future<void> certificateCheck() async {
     try {
       HttpClient client = await createHttpClientWithCertificate();
-
       final request =
-          await client.getUrl(Uri.parse('https://api.aultrapaints.com'));
-
+          // await client.getUrl(Uri.parse('https://api.aultrapaints.com/')); //mobile
+          await client.getUrl(Uri.parse('https://erp.aultrapaints.com/')); //web
+      // await client.getUrl(Uri.parse('https://dealerportal.mllqa.com/'));
       final response = await request.close();
 
+      debugPrint('Response status code: ${response.statusCode}');
+
+      // debugPrint('Response: ${response.statusCode}');
+      // debugPrint('Headers: ${response.headers}');
+      // response.transform(utf8.decoder).listen((data) {
+      //   debugPrint('Response Body: $data');
+      // });
       if (response.statusCode == 200) {
         callTimer();
       } else {
-        // Ensure the widget is still mounted
+        _showSnackBar('Certification verification failed', false);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginPage()),
         );
-
-        // _showSnackBar('Certification verification failed', context, false);
       }
     } catch (e) {
       if (!mounted) return; // Ensure the widget is still mounted
-      _showSnackBar('An error occurred: $e', context, false);
+      debugPrint('An error occurred during certificate check: $e');
+      _showSnackBar('An error occurred: $e', false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double unitHeightValue = MediaQuery.of(context).size.height;
     return Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: Colors.white,
-        body: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * 1,
-                child: Center(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
+      backgroundColor: Colors.white,
+      body: Form(
+        key: _formKey,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // App Logo Section
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.9,
+                child: Row(
                   children: [
-                    // Container(
-                    //   width: MediaQuery.of(context).size.width * 0.8,
-                    //   height: MediaQuery.of(context).size.width * 0.6,
-                    //   decoration: const BoxDecoration(
-                    //       image: DecorationImage(
-                    //           image: AssetImage('assets/images/app_logo.png'),
-                    //           fit: BoxFit.fitWidth)),
-                    // ),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      // height: getScreenWidth(40),
-                      child: Row(
-                        children: [
-                          Container(
-                              height: MediaQuery.of(context).size.width * 0.3,
-                              child: Image.asset('assets/images/app_icon.png')),
-                          Container(
-                              height: MediaQuery.of(context).size.width * 0.1,
-                              child: Image.asset('assets/images/app_name.png')),
-                        ],
-                      ),
+                    Image.asset(
+                      'assets/images/app_icon.png',
+                      height: MediaQuery.of(context).size.width * 0.3,
+                    ),
+                    Image.asset(
+                      'assets/images/app_name.png',
+                      height: MediaQuery.of(context).size.width * 0.1,
                     ),
                   ],
-                )),
+                ),
               ),
-            )));
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

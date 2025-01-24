@@ -11,7 +11,6 @@ import '../../services/error_handling.dart';
 import '../../utility/Colors.dart';
 import '../../utility/Fonts.dart';
 import '../../utility/Utils.dart';
-import '../../utility/loader.dart';
 import '../../utility/size_config.dart';
 
 import 'package:http/http.dart' as http;
@@ -124,7 +123,6 @@ class _LayoutPageState extends State<LayoutPage> {
   }
 
   Future getUserDealer(dynamic dealer) async {
-    print('${dealer}>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
     Utils.clearToasts(context);
     Utils.returnScreenLoader(context);
     http.Response response;
@@ -177,8 +175,6 @@ class _LayoutPageState extends State<LayoutPage> {
             .contains(responseData?["data"]?['parentDealerCode'])) {
           throw Exception(responseData["message"] ?? "Failed to save details.");
         } else {
-          print(
-              '${responseData['data']?['parentDealerCode']}=================??????????????????????/');
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('USER_PARENT_DEALER_CODE',
               responseData['data']?['parentDealerCode'] ?? '');
@@ -196,55 +192,6 @@ class _LayoutPageState extends State<LayoutPage> {
     }
   }
 
-  Future fetchOtp(String dealerCode) async {
-    Utils.clearToasts(context);
-    Utils.returnScreenLoader(context);
-    http.Response response;
-    var apiUrl = BASE_URL + GET_USER_PARENT_DEALER_CODE_DETAILS;
-    try {
-      response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": accesstoken
-        },
-        body: json.encode({'dealerCode': dealerCode.trim()}),
-      );
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        // Assume the API returns {"success": true/false, "message": "..."}
-        if (['', null, 0, false].contains(responseData["data"]['dealerCode'])) {
-          throw Exception(responseData["message"] ?? "Failed to fetch OTP.");
-        } else {
-          userParentDealerMobile = responseData["data"]['mobile'];
-          userParentDealerName = responseData["data"]['name'];
-          return true;
-        }
-      } else {
-        print(response.statusCode == 400);
-        if (response.statusCode == 400) {
-          // throw Exception("Failed to fetch Dealer Code. Status code");
-          Loader.hideLoader(context);
-          final responseData = json.decode(response.body);
-          print(responseData['message']);
-          _showSnackBar(
-            "${responseData['message']}.",
-            context,
-            false,
-          );
-          return false;
-        } else {
-          throw Exception(
-              "Failed to fetch OTP. Status code: ${response.statusCode}");
-        }
-      }
-    } catch (error) {
-      print("Error fetching OTP: $error");
-      Navigator.pop(context);
-      throw Exception("An error occurred while requesting OTP.");
-    }
-  }
-
   void logOut(context) async {
     clearStorage();
   }
@@ -257,6 +204,8 @@ class _LayoutPageState extends State<LayoutPage> {
     double appBarHeight = screenHeight * 0.09; // 15% of screen height
 
     final userViewModel = Provider.of<UserViewModel>(context);
+
+    SizeConfig().init(context);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -313,11 +262,11 @@ class _LayoutPageState extends State<LayoutPage> {
                   children: [
                     Image.asset(
                       'assets/images/app_file_icon.png',
-                      height: getScreenHeight(50),
+                      height: getScreenWidth(50),
                     ),
                     Image.asset(
                       'assets/images/app_name.png',
-                      height: getScreenHeight(30),
+                      height: getScreenWidth(30),
                     ),
                   ],
                 ),
