@@ -86,7 +86,7 @@ class _LayoutPageState extends State<LayoutPage> {
 
   Future getDashboardCounts() async {
     Utils.clearToasts(context);
-    Utils.returnScreenLoader(context);
+    // Utils.returnScreenLoader(context);
     http.Response response;
     var apiUrl = BASE_URL + GET_USER_DETAILS + USER_ID;
 
@@ -95,26 +95,18 @@ class _LayoutPageState extends State<LayoutPage> {
       "Authorization": accesstoken
     });
 
-    Navigator.pop(context); // Close the loader
+    // Navigator.pop(context); // Close the loader
 
     if (response.statusCode == 200) {
       var tempResp = json.decode(response.body);
       var apiResp = tempResp['data'];
-      dashBoardList = [
-        {"title": "Rewards ", "count": apiResp['cash']},
-      ];
+
       setState(() {
-        dashBoardList = dashBoardList;
         accountType = USER_ACCOUNT_TYPE;
         parentDealerCode = apiResp['parentDealerCode'] ?? '';
         if (parentDealerCode.isNotEmpty && accountType == 'Painter') {
           getUserDealer(parentDealerCode);
-        } else if (parentDealerCode.isEmpty && accountType == 'Painter') {
-          // showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
         }
-        // if (parentDealerCode.isNotEmpty) {
-        //   getUserDealer(parentDealerCode);
-        // }
       });
     } else {
       error_handling.errorValidation(
@@ -144,51 +136,6 @@ class _LayoutPageState extends State<LayoutPage> {
     } else {
       error_handling.errorValidation(
           context, response.body, response.body, false);
-    }
-  }
-
-  Future saveDealerDetails(String dealerCode, String otp) async {
-    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
-    Utils.clearToasts(context);
-    Utils.returnScreenLoader(context);
-    http.Response response;
-    var apiUrl = BASE_URL + VERIFY_OTP_UPDATE_USER;
-
-    try {
-      response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          "Authorization": accesstoken
-        },
-        body: json.encode({
-          'dealerCode': dealerCode,
-          'otp': otp,
-          'mobile': userParentDealerMobile,
-          'painterMobile': USER_MOBILE_NUMBER
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        if (['', null, 0, false]
-            .contains(responseData?["data"]?['parentDealerCode'])) {
-          throw Exception(responseData["message"] ?? "Failed to save details.");
-        } else {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('USER_PARENT_DEALER_CODE',
-              responseData['data']?['parentDealerCode'] ?? '');
-          userViewModel
-              .setParentDealerCode(responseData['data']?['parentDealerCode']);
-          return true;
-        }
-      } else {
-        throw Exception(
-            "Failed to save details. Status code: ${response.statusCode}");
-      }
-    } catch (error) {
-      print("Error saving dealer details: $error");
-      throw Exception("An error occurred while saving dealer details.");
     }
   }
 

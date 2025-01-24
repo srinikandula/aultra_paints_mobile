@@ -183,17 +183,18 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
         "Content-Type": "application/json",
         "Authorization": accesstoken
       },
-      body: json.encode({'page': currentPage, 'limit': 4}),
+      body: json.encode({'page': currentPage, 'limit': 100}),
     );
     final responseData = json.decode(response.body);
     if (response.statusCode == 200) {
       List<dynamic> newOffers = responseData;
       setState(() {
-        currentPage++;
-        productOffers.addAll(newOffers);
-        if (newOffers.length < 4) {
-          hasMore = false; // No more data to load
-        }
+        productOffers = responseData;
+        // currentPage++;
+        // productOffers.addAll(newOffers);
+        // if (newOffers.length < 4) {
+        //   hasMore = false; // No more data to load
+        // }
       });
       setState(() => isLoading = false);
       return true;
@@ -248,22 +249,22 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
 
   @override
   Widget build(BuildContext context) {
-    PageController _pageController = PageController(viewportFraction: 0.6);
+    // PageController _pageController = PageController(viewportFraction: 0.5);
 
-    // Timer to auto-scroll the PageView
-    Timer.periodic(Duration(seconds: 2), (Timer timer) {
-      if (_pageController.hasClients && rewardSchemes.isNotEmpty) {
-        int nextPage = (_pageController.page?.toInt() ?? 0) + 1;
-        if (nextPage >= rewardSchemes.length) {
-          nextPage = 0; // Loop back to the first item
-        }
-        _pageController.animateToPage(
-          nextPage,
-          duration: Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
+    // // Timer to auto-scroll the PageView
+    // Timer.periodic(Duration(seconds: 2), (Timer timer) {
+    //   if (_pageController.hasClients && productOffers.isNotEmpty) {
+    //     int nextPage = (_pageController.page?.toInt() ?? 0) + 1;
+    //     if (nextPage >= productOffers.length) {
+    //       nextPage = 0; // Loop back to the first item
+    //     }
+    //     _pageController.animateToPage(
+    //       nextPage,
+    //       duration: Duration(milliseconds: 500),
+    //       curve: Curves.easeInOut,
+    //     );
+    //   }
+    // });
 
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -297,319 +298,329 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  margin: EdgeInsets.symmetric(
-                    horizontal: screenWidth * 0,
-                    vertical: screenHeight * 0,
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: screenWidth * 0.06,
-                    vertical: screenHeight * 0.02,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0x33800180),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Welcome, ${USER_FULL_NAME}',
-                        style: TextStyle(
-                          color: const Color(0xFF3533CD),
-                          fontSize: unitHeightValue * 0.024,
-                          fontWeight: FontWeight.w400,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      Row(children: [
-                        Text(
-                          '${dashBoardList[0]['title']}',
-                          style: TextStyle(
-                            color: const Color(0xFF3533CD),
-                            fontSize: unitHeightValue * 0.024,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Container(
-                          // margin: EdgeInsets.only(left: 10),
-                          margin: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.02,
-                            vertical: screenHeight * 0,
-                          ),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.02,
-                            vertical: screenHeight * 0,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Text(
-                            '${dashBoardList[0]['count']}',
-                            style: TextStyle(
-                              color: const Color(0xFF3533CD),
-                              fontSize: unitHeightValue * 0.024,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        )
-                      ])
-                    ],
-                  ),
-                ),
-                //Product offer scroll
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: getScreenWidth(16)),
-                      padding:
-                          EdgeInsets.symmetric(vertical: getScreenHeight(10)),
-                      child: Text(
-                        'Ongoing Offers',
-                        style: TextStyle(
-                          // decoration: TextDecoration.underline,
-                          decorationThickness: 1.5,
-                          fontSize: unitHeightValue * 0.03,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF3533CD),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    // Horizontal Reward Schemes List
-                    SizedBox(
-                      // height: screenHeight * 0.32,
-                      height: screenHeight * 0.29,
-                      // width: screenWidth * 0.5,
-                      child: Container(
-                        margin: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.03,
-                            vertical: screenHeight * 0),
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: productOffers.length +
-                              (hasMore
-                                  ? 1
-                                  : 0), // Show loading indicator if more data is available
-                          itemBuilder: (context, index) {
-                            if (index < productOffers.length) {
-                              final offer = productOffers[index];
-                              return Container(
-                                width: screenWidth * 0.35,
-                                margin: EdgeInsets.symmetric(
-                                    horizontal: screenWidth * 0.028,
-                                    vertical: screenHeight * 0.01),
-                                decoration: BoxDecoration(
-                                  // color: Colors.white,
-                                  color: const Color(0x33800180),
-                                  borderRadius:
-                                      BorderRadius.circular(getScreenWidth(20)),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.1),
-                                      spreadRadius: 2,
-                                      blurRadius: getScreenWidth(5),
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  children: [
-                                    // Reward Image
-                                    SizedBox(
-                                      width: screenWidth * 0.35,
-                                      height: screenWidth * 0.35,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(
-                                                getScreenWidth(20))),
-                                        child: FadeInImage.assetNetwork(
-                                          placeholder:
-                                              'assets/images/app_file_icon.png', // Placeholder image
-                                          image:
-                                              offer['productOfferImageUrl'] ??
-                                                  '', // Network image URL
-                                          fit: BoxFit.cover,
-                                          imageErrorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Image.asset(
-                                              'assets/images/app_file_icon.png', // Fallback image
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      margin: EdgeInsets.symmetric(
-                                          horizontal: screenWidth * 0.018,
-                                          vertical: screenHeight * 0.01),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: screenWidth * 0.03,
-                                          vertical: screenHeight * 0.01),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0x33800180),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            offer['productOfferTitle'],
-                                            maxLines: 2,
-                                            overflow: TextOverflow
-                                                .ellipsis, // Title of the reward
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: unitHeightValue * 0.014,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                          // SizedBox(height: getScreenHeight(1)),
-                                          // Text(
-                                          //   offer[
-                                          //       'productOfferDescription'], // Description of the reward
-                                          //   maxLines: 1,
-                                          //   overflow: TextOverflow.ellipsis,
-                                          //   style: TextStyle(
-                                          //     fontSize: getScreenWidth(
-                                          //         getTabletCheck() ? 10 : 12),
-                                          //     color: Colors.grey[700],
-                                          //   ),
-                                          //   textAlign: TextAlign.center,
-                                          // ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            } else {
-                              // Show a loading spinner at the bottom
-                              return Center(
-                                child: Padding(
-                                  padding: EdgeInsets.all(getScreenWidth(8)),
-                                  child: CircularProgressIndicator(),
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                //rewards scroll
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: getScreenWidth(16)),
-                      padding:
-                          EdgeInsets.symmetric(vertical: getScreenHeight(10)),
-                      child: Text(
-                        'Reward Schemes',
-                        style: TextStyle(
-                          // decoration: TextDecoration.underline,
-                          decorationThickness: 1.5,
-                          fontSize: unitHeightValue * 0.03,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF3533CD),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    SizedBox(
-                      height: screenHeight * 0.28,
-                      child: rewardSchemes.isEmpty
-                          ? Center(child: CircularProgressIndicator())
-                          : PageView.builder(
-                              controller: _pageController,
-                              itemCount: rewardSchemes.length,
-                              scrollDirection: Axis.horizontal,
-                              itemBuilder: (context, index) {
-                                final item = rewardSchemes[index];
-                                // Make sure _currentPage is initialized before using it
-                                double scale =
-                                    0.9; // Default scale for side cards
-                                if (_currentPage != null) {
-                                  scale = index == _currentPage!.round()
-                                      ? 1.0
-                                      : 0.9;
-                                }
-                                return Transform.scale(
-                                  scale: scale, // Slightly shrink side cards
-                                  child: Align(
-                                    alignment: Alignment
-                                        .topCenter, // Align cards to the top
-                                    child: Container(
-                                      // margin: EdgeInsets.symmetric(
-                                      //     vertical: getScreenHeight(8)),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(
-                                            getScreenWidth(20)),
-                                        // color: Colors.white,
-                                        color: const Color(0x33800180),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.1),
-                                            spreadRadius: 2,
-                                            blurRadius: 5,
-                                            offset: Offset(0, 3),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                            // width: getScreenWidth(
-                                            //     getTabletCheck() ? 100 : 250),
-                                            // height: getScreenWidth(
-                                            //     getTabletCheck() ? 100 : 250),
-                                            height: screenHeight * 0.28,
-
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              child: FadeInImage.assetNetwork(
-                                                placeholder:
-                                                    'assets/images/app_file_icon.png', // Placeholder image
-                                                image: item[
-                                                        'rewardSchemeImageUrl'] ??
-                                                    '', // Network image URL
-                                                fit: BoxFit.cover,
-                                                imageErrorBuilder: (context,
-                                                    error, stackTrace) {
-                                                  return Image.asset(
-                                                    'assets/images/app_file_icon.png', // Fallback image
-                                                    fit: BoxFit.cover,
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                    ),
-                  ],
-                ),
+                returnNameRewards(),
+                returnProductsScroll(),
+                returnRewardsScroll()
               ],
             ),
           )),
         ));
+  }
+
+  returnNameRewards() {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
+    return Container(
+      margin: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0,
+        vertical: screenHeight * 0,
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0.06,
+        vertical: screenHeight * 0.02,
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0x33800180),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Welcome, ${USER_FULL_NAME}',
+            style: TextStyle(
+              color: const Color(0xFF3533CD),
+              fontSize: unitHeightValue * 0.024,
+              fontWeight: FontWeight.w400,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          Row(children: [
+            Text(
+              '${dashBoardList[0]['title']}',
+              style: TextStyle(
+                color: const Color(0xFF3533CD),
+                fontSize: unitHeightValue * 0.024,
+                fontWeight: FontWeight.w400,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            Container(
+              // margin: EdgeInsets.only(left: 10),
+              margin: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.02,
+                vertical: screenHeight * 0,
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.02,
+                vertical: screenHeight * 0,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: Text(
+                '${dashBoardList[0]['count']}',
+                style: TextStyle(
+                  color: const Color(0xFF3533CD),
+                  fontSize: unitHeightValue * 0.024,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            )
+          ])
+        ],
+      ),
+    );
+  }
+
+  returnProductsScroll() {
+    PageController _pageController = PageController(viewportFraction: 0.5);
+
+    // Timer to auto-scroll the PageView
+    Timer.periodic(Duration(seconds: 2), (Timer timer) {
+      if (_pageController.hasClients && productOffers.isNotEmpty) {
+        int nextPage = (_pageController.page?.toInt() ?? 0) + 1;
+        if (nextPage >= productOffers.length) {
+          nextPage = 0; // Loop back to the first item
+        }
+        _pageController.animateToPage(
+          nextPage,
+          duration: Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
+    return //Product offer scroll
+        Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: getScreenWidth(16)),
+          padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
+          child: Text(
+            'Ongoing Offers',
+            style: TextStyle(
+              // decoration: TextDecoration.underline,
+              decorationThickness: 1.5,
+              fontSize: unitHeightValue * 0.03,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF3533CD),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        // Horizontal Reward Schemes List
+        SizedBox(
+          // height: screenHeight * 0.32,
+          height: screenHeight * 0.29,
+          // width: screenWidth * 0.5,
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+            child: PageView.builder(
+              controller: _pageController,
+              scrollDirection: Axis.horizontal,
+              itemCount: productOffers.length +
+                  (hasMore
+                      ? 1
+                      : 0), // Show loading indicator if more data is available
+              itemBuilder: (context, index) {
+                if (index < productOffers.length) {
+                  final offer = productOffers[index];
+                  return Container(
+                    width: screenWidth * 0.35,
+                    margin: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.028,
+                        vertical: screenHeight * 0.01),
+                    padding: EdgeInsets.only(top: getScreenHeight(4)),
+                    decoration: BoxDecoration(
+                      // color: Colors.white,
+                      color: const Color(0x33800180),
+                      borderRadius: BorderRadius.circular(getScreenWidth(20)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 2,
+                          blurRadius: getScreenWidth(5),
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        // Reward Image
+                        SizedBox(
+                          width: screenWidth * 0.35,
+                          height: screenWidth * 0.35,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(getScreenWidth(20))),
+                            child: FadeInImage.assetNetwork(
+                              placeholder:
+                                  'assets/images/app_file_icon.png', // Placeholder image
+                              image: offer['productOfferImageUrl'] ??
+                                  '', // Network image URL
+                              fit: BoxFit.cover,
+                              imageErrorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  'assets/images/app_file_icon.png', // Fallback image
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.018,
+                              vertical: screenHeight * 0.01),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.03,
+                              vertical: screenHeight * 0.01),
+                          decoration: BoxDecoration(
+                            color: const Color(0x33800180),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                offer['productOfferTitle'],
+                                maxLines: 2,
+                                overflow: TextOverflow
+                                    .ellipsis, // Title of the reward
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: unitHeightValue * 0.014,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                //  else {
+                //   // Show a loading spinner at the bottom
+                //   return Center(
+                //     child: Padding(
+                //       padding: EdgeInsets.all(getScreenWidth(8)),
+                //       child: CircularProgressIndicator(),
+                //     ),
+                //   );
+                // }
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  returnRewardsScroll() {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
+    return //rewards scroll
+        Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: getScreenWidth(16)),
+          padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
+          child: Text(
+            'Reward Schemes',
+            style: TextStyle(
+              // decoration: TextDecoration.underline,
+              decorationThickness: 1.5,
+              fontSize: unitHeightValue * 0.03,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF3533CD),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SizedBox(
+          height: screenHeight * 0.28,
+          child: rewardSchemes.isEmpty
+              ? Center(child: CircularProgressIndicator())
+              : ListView.builder(
+                  // controller: _pageController,
+                  itemCount: rewardSchemes.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    final item = rewardSchemes[index];
+                    // Make sure _currentPage is initialized before using it
+                    double scale = 0.9; // Default scale for side cards
+                    if (_currentPage != null) {
+                      scale = index == _currentPage!.round() ? 1.0 : 0.9;
+                    }
+                    return Transform.scale(
+                      scale: scale, // Slightly shrink side cards
+                      child: Align(
+                        alignment:
+                            Alignment.topCenter, // Align cards to the top
+                        child: Container(
+                          // margin: EdgeInsets.symmetric(
+                          //     vertical: getScreenHeight(8)),
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.circular(getScreenWidth(20)),
+                            // color: Colors.white,
+                            color: const Color(0x33800180),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.1),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                // width: getScreenWidth(
+                                //     getTabletCheck() ? 100 : 250),
+                                // height: getScreenWidth(
+                                //     getTabletCheck() ? 100 : 250),
+                                height: screenHeight * 0.28,
+
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: FadeInImage.assetNetwork(
+                                    placeholder:
+                                        'assets/images/app_file_icon.png', // Placeholder image
+                                    image: item['rewardSchemeImageUrl'] ??
+                                        '', // Network image URL
+                                    fit: BoxFit.cover,
+                                    imageErrorBuilder:
+                                        (context, error, stackTrace) {
+                                      return Image.asset(
+                                        'assets/images/app_file_icon.png', // Fallback image
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
   }
 }

@@ -36,44 +36,12 @@ class _QrScannerState extends State<QrScanner> {
   @override
   void initState() {
     fetchLocalStorageDate();
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   showApiResponsePopup(context, {
-    //     "message": "Coupon redeemed Successfully..!",
-    //     "data": {
-    //       "rewardPoints": 10,
-    //       "couponCode": 8655792
-    //     }
-    //   }); // Call after the widget is built.
-    // });
-    // showApiResponsePopupTest(context);
-    // showApiResponsePopup(context, {'message': 'testing', 'data': {}});
     super.initState();
   }
 
   fetchLocalStorageDate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     accesstoken = prefs.getString('accessToken');
-    // sendScannedValue('a5be85ed-4b0d-480c-9851-9864638b89f5');
-
-    // final apiResponse = {
-    //   "message": "Coupon redeemed Successfully..!",
-    //   "data": {
-    //     "qr_code_id": "433b889c-b38f-4bd9-89f9-0498a5d8dfa6",
-    //     "isProcessed": true,
-    //     "updatedBy": "6771ab7eedc91a9596744def",
-    //     "redeemablePoints": 5
-    //   }
-    // };
-
-    // showApiResponsePopup(context, apiResponse);
-  }
-
-  void _showSnackBar(String message, BuildContext context, ColorCheck) {
-    final snackBar = SnackBar(
-        content: Text(message),
-        backgroundColor: ColorCheck ? Colors.green : Colors.red,
-        duration: Utils.returnStatusToastDuration(ColorCheck));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Future sendScannedValue(scannedValue) async {
@@ -87,12 +55,9 @@ class _QrScannerState extends State<QrScanner> {
       "Content-Type": "application/json",
       "Authorization": accesstoken
     });
-    print('--=scan url===>${apiUrl}');
     if (response.statusCode == 200) {
       Navigator.pop(context);
       var apiResp = json.decode(response.body);
-      print('scan resp=====>${apiResp}');
-      // _showSnackBar(apiResp['message'], context, true);
       // Navigator.pop(context, true);
       showApiResponsePopup(context, apiResp);
     } else {
@@ -107,7 +72,7 @@ class _QrScannerState extends State<QrScanner> {
 
   onBackPressed() {
     Utils.clearToasts(context);
-    Navigator.pop(context, true);
+    // Navigator.pop(context, true);
     Navigator.pop(context, true);
   }
 
@@ -120,25 +85,24 @@ class _QrScannerState extends State<QrScanner> {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double unitHeightValue = MediaQuery.of(context).size.height;
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        // backgroundColor: whiteBgColor,
-        body: Container(
-            height: screenHeight, // 100% height
-            width: screenWidth,  // 100% width
-            decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                Color(0xFFFFF7AD),
-                Color(0xFFFFA9F9),
-              ],
-            ),
+          // backgroundColor: whiteBgColor,
+          body: Container(
+        height: screenHeight, // 100% height
+        width: screenWidth, // 100% width
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              Color(0xFFFFF7AD),
+              Color(0xFFFFA9F9),
+            ],
           ),
-          child: Column(
+        ),
+        child: Column(
           children: [
             SingleParamHeader('QR Scanner', '', context, false,
                 () => Navigator.pop(context, true)),
@@ -155,19 +119,21 @@ class _QrScannerState extends State<QrScanner> {
                             left: MediaQuery.of(context).size.width * 0.03,
                             right: MediaQuery.of(context).size.width * 0.03),
                         height: MediaQuery.of(context).size.height * 0.8,
-                        child: allowScanner == false ? null : QrCamera(
-                          qrCodeCallback: (code) {
-                            HapticFeedback.vibrate();
-                            print(
-                                'scanned code==== $code, ${code.runtimeType}');
-                            if (code != null) {
-                              setState(() {
-                                allowScanner = false;
-                              });
-                              sendScannedValue(code);
-                            }
-                          },
-                        ),
+                        child: allowScanner == false
+                            ? null
+                            : QrCamera(
+                                qrCodeCallback: (code) {
+                                  HapticFeedback.vibrate();
+                                  print(
+                                      'scanned code==== $code, ${code.runtimeType}');
+                                  if (code != null) {
+                                    setState(() {
+                                      allowScanner = false;
+                                    });
+                                    sendScannedValue(code);
+                                  }
+                                },
+                              ),
                       )
                     ],
                   ),
@@ -176,12 +142,12 @@ class _QrScannerState extends State<QrScanner> {
             ),
           ],
         ),
-        )
-      ),
+      )),
     );
   }
 
-  void showApiResponsePopup(BuildContext context, Map<String, dynamic> response) {
+  void showApiResponsePopup(
+      BuildContext context, Map<String, dynamic> response) {
     final message = response["message"] ?? "No message";
     final data = response["data"] ?? {};
     var couponCode = data["couponCode"] ?? '';

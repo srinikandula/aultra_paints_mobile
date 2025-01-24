@@ -99,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         Loader.hideLoader(context);
         _showSnackBar(
-          apiResp['message'] ?? "Unexpected error occurred.",
+          apiResp['message'],
           context,
           false,
         );
@@ -153,163 +153,85 @@ class _LoginPageState extends State<LoginPage> {
       onWillPop: _onWillPop,
       child: SafeArea(
           child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        key: _scaffoldKey,
-        body: Container(
-        // Apply the gradient background
-          height: screenHeight, // 100% height
-          width: screenWidth,  // 100% width
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                Color(0xFFFFF7AD),
-                Color(0xFFFFA9F9),
-              ],
-            ),
-          ),
-          child: SafeArea(
-            child: Stack(
-              children: [
-                Form(
-                  key: _formKey,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Stack(
-                          children: [
-                            SizedBox(
-                              width: screenWidth,
-                              child: Row(
-                                children: [
-                                  InkWell(
-                                    onTap: () => Navigator.pushNamed(context, '/onBoardPage'),
-                                    child: Container(
-                                      margin: EdgeInsets.symmetric(
-                                        horizontal: screenWidth * 0.02,
-                                        vertical: screenHeight * 0.02,
-                                      ),
-                                      child: Icon(Icons.keyboard_double_arrow_left_sharp, color: Color(0xFF7A0180), size: screenWidth * 0.08,),
-                                    ),
-                                  ),
-                                ]
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: screenHeight * 0.66,
+              resizeToAvoidBottomInset: true,
+              key: _scaffoldKey,
+              body: Container(
+                // Apply the gradient background
+                height: screenHeight, // 100% height
+                width: screenWidth, // 100% width
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Color(0xFFFFF7AD),
+                      Color(0xFFFFA9F9),
+                    ],
+                  ),
+                ),
+                child: SafeArea(
+                  child: Stack(
+                    children: [
+                      Form(
+                        key: _formKey,
+                        child: SingleChildScrollView(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
+                              Stack(
+                                children: [
+                                  SizedBox(
+                                    width: screenWidth,
+                                    child: Row(children: [
+                                      InkWell(
+                                        onTap: () => Navigator.pushNamed(
+                                            context, '/onBoardPage'),
+                                        child: Container(
+                                          margin: EdgeInsets.symmetric(
+                                            horizontal: screenWidth * 0.02,
+                                            vertical: screenHeight * 0.02,
+                                          ),
+                                          child: Icon(
+                                            Icons
+                                                .keyboard_double_arrow_left_sharp,
+                                            color: Color(0xFF7A0180),
+                                            size: screenWidth * 0.08,
+                                          ),
+                                        ),
+                                      ),
+                                    ]),
+                                  ),
+                                ],
+                              ),
                               SizedBox(
-                                width: screenWidth * 0.5,
-                                // width: getScreenWidth(300),
-                                // height: getScreenWidth(40),
+                                height: screenHeight * 0.66,
                                 child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     SizedBox(
-                                        height: screenHeight * 0.2,
-                                        child: Image.asset('assets/images/app_file_icon.png')),
-                                    SizedBox(
-                                        height: screenHeight * 0.14,
-                                        child: Image.asset('assets/images/app_name.png')),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: screenWidth * 0.1,
-                                  vertical: screenHeight * 0.01,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  gradient: const LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      Color(0xFF000000),
-                                      Color(0xFF3533CD),
-                                    ],
-                                  ),
-                                ),
-                                child: SizedBox(
-                                  height: screenHeight * 0.06,
-                                  child: TextField(
-                                    // keyboardType: TextInputType.number,
-                                    keyboardType: TextInputType.text,
-                                    onTapOutside: (event) {
-                                      FocusManager.instance.primaryFocus?.unfocus();
-                                    },
-                                    style: TextStyle(
-                                      fontSize: getScreenWidth(18),
-                                      color: Colors.white,
-                                      fontFamily: ffGMedium,
+                                      width: screenWidth * 0.5,
+                                      // width: getScreenWidth(300),
+                                      // height: getScreenWidth(40),
+                                      child: Column(
+                                        children: [
+                                          SizedBox(
+                                              height: screenHeight * 0.2,
+                                              child: Image.asset(
+                                                  'assets/images/app_file_icon.png')),
+                                          SizedBox(
+                                              height: screenHeight * 0.14,
+                                              child: Image.asset(
+                                                  'assets/images/app_name.png')),
+                                        ],
+                                      ),
                                     ),
-                                    decoration: InputDecoration(
-                                      // labelText: '',
-                                      labelStyle: TextStyle(
-                                        fontFamily: ffGMedium,
-                                        fontSize: getScreenWidth(18),
-                                        color: textInputPlaceholderColor,
-                                      ),
-                                      hintText: 'Mobile Number', // Placeholder text
-                                      hintStyle: TextStyle(
-                                        fontSize: unitHeightValue * 0.02,
-                                        color: textInputPlaceholderColor.withOpacity(0.7),
-                                        fontFamily: ffGMedium,
-                                      ),
-                                      floatingLabelBehavior: FloatingLabelBehavior.auto, // Default behavior
-                                      prefixIcon: Icon(
-                                        Icons.phone_android_rounded,
-                                        color: Color(0xFF7A0180),
-                                        size: unitHeightValue * 0.03,
-                                      ),
-                                      contentPadding: EdgeInsets.symmetric(
+                                    Container(
+                                      margin: EdgeInsets.symmetric(
                                         horizontal: screenWidth * 0.1,
-                                        vertical: screenHeight * 0.02,
+                                        vertical: screenHeight * 0.01,
                                       ),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10), // Optional border
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      filled: true, // Optional for a filled background
-                                      fillColor: Colors.grey.withOpacity(0.1), // Optional background color
-                                    ),
-                                    onChanged: (value) {
-                                      _loginRequest.phoneNumber = value.trim();
-                                    },
-                                  ),
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  Utils.clearToasts(context);
-                                  var tempFirstValue = _loginRequest.phoneNumber.trim();
-                                  var tempSecondValue = _loginRequest.password.trim();
-                                  if (tempFirstValue == '') {
-                                    _showSnackBar("Please enter Mobile Number", context, false);
-                                  } else {
-                                    checkUserLogin(tempFirstValue, tempSecondValue);
-                                  }
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal: screenWidth * 0.1,
-                                    vertical: screenHeight * 0.01,
-                                  ),
-                                  child: Card(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(getProportionateScreenWidth(20))
-                                      ),
-                                      side: BorderSide(width: 1, color: appThemeColor),
-                                    ),
-                                    child: Container(
                                       decoration: BoxDecoration(
+                                        color: white,
                                         borderRadius: BorderRadius.circular(20),
                                         gradient: const LinearGradient(
                                           begin: Alignment.centerLeft,
@@ -320,73 +242,185 @@ class _LoginPageState extends State<LoginPage> {
                                           ],
                                         ),
                                       ),
-                                      alignment: Alignment.center,
-                                      height: screenHeight * 0.06,
-                                      child: Text(
-                                        "Generate OTP",
-                                        style: TextStyle(
-                                          fontSize: unitHeightValue * 0.02,
-                                          color: Colors.white, fontWeight: FontWeight.w300
+                                      child: SizedBox(
+                                        height: screenHeight * 0.06,
+                                        child: TextField(
+                                          // keyboardType: TextInputType.number,
+                                          keyboardType: TextInputType.text,
+                                          onTapOutside: (event) {
+                                            FocusManager.instance.primaryFocus
+                                                ?.unfocus();
+                                          },
+                                          style: TextStyle(
+                                            fontSize: getScreenWidth(18),
+                                            color: Colors.white,
+                                            fontFamily: ffGMedium,
+                                          ),
+                                          decoration: InputDecoration(
+                                            // labelText: '',
+                                            labelStyle: TextStyle(
+                                              fontFamily: ffGMedium,
+                                              fontSize: getScreenWidth(18),
+                                              color: textInputPlaceholderColor,
+                                            ),
+                                            hintText:
+                                                'Mobile Number', // Placeholder text
+                                            hintStyle: TextStyle(
+                                              fontSize: unitHeightValue * 0.02,
+                                              color: textInputPlaceholderColor
+                                                  .withOpacity(0.7),
+                                              fontFamily: ffGMedium,
+                                            ),
+                                            floatingLabelBehavior:
+                                                FloatingLabelBehavior
+                                                    .auto, // Default behavior
+                                            prefixIcon: Icon(
+                                              Icons.phone_android_rounded,
+                                              color: Color(0xFF7A0180),
+                                              size: unitHeightValue * 0.03,
+                                            ),
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                              horizontal: screenWidth * 0.1,
+                                              // vertical: screenHeight * 0.02,
+                                            ),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      10), // Optional border
+                                              borderSide: BorderSide.none,
+                                            ),
+                                            filled:
+                                                true, // Optional for a filled background
+                                            fillColor: Colors.grey.withOpacity(
+                                                0.1), // Optional background color
+                                          ),
+                                          onChanged: (value) {
+                                            _loginRequest.phoneNumber =
+                                                value.trim();
+                                          },
                                         ),
                                       ),
                                     ),
-                                  ),
+                                    InkWell(
+                                      onTap: () {
+                                        Utils.clearToasts(context);
+                                        var tempFirstValue =
+                                            _loginRequest.phoneNumber.trim();
+                                        var tempSecondValue =
+                                            _loginRequest.password.trim();
+                                        if (tempFirstValue == '') {
+                                          _showSnackBar(
+                                              "Please enter Mobile Number",
+                                              context,
+                                              false);
+                                        } else {
+                                          checkUserLogin(
+                                              tempFirstValue, tempSecondValue);
+                                        }
+                                      },
+                                      child: Container(
+                                        margin: EdgeInsets.symmetric(
+                                          horizontal: screenWidth * 0.1,
+                                          vertical: screenHeight * 0.01,
+                                        ),
+                                        child: Card(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(
+                                                    getProportionateScreenWidth(
+                                                        20))),
+                                            side: BorderSide(
+                                                width: 1, color: appThemeColor),
+                                          ),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              gradient: const LinearGradient(
+                                                begin: Alignment.centerLeft,
+                                                end: Alignment.centerRight,
+                                                colors: [
+                                                  Color(0xFF000000),
+                                                  Color(0xFF3533CD),
+                                                ],
+                                              ),
+                                            ),
+                                            alignment: Alignment.center,
+                                            height: screenHeight * 0.06,
+                                            child: Text(
+                                              "Generate OTP",
+                                              style: TextStyle(
+                                                  fontSize:
+                                                      unitHeightValue * 0.02,
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w300),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
+                              Container(
+                                  width: screenWidth,
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.1,
+                                    vertical: screenHeight * 0.050,
+                                  ),
+                                  decoration: const BoxDecoration(
+                                      border: Border(
+                                          top: BorderSide(
+                                    color: Colors.white,
+                                    width: 1.0,
+                                  ))),
+                                  child: Column(children: [
+                                    Text("DIDN'T HAVE ACCOUNT",
+                                        style: TextStyle(
+                                          color: const Color(0xFF7A0180),
+                                          fontSize: unitHeightValue * 0.018,
+                                          fontWeight: FontWeight.bold,
+                                        )),
+                                    const SizedBox(height: 5),
+                                    GestureDetector(
+                                        onTap: () => Navigator.pushNamed(
+                                            context, '/signupPage'),
+                                        child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              gradient: const LinearGradient(
+                                                begin: Alignment.centerLeft,
+                                                end: Alignment.centerRight,
+                                                colors: [
+                                                  Color(0xFF000000),
+                                                  Color(0xFF3533CD),
+                                                ],
+                                              ),
+                                            ),
+                                            width: screenWidth * 0.4,
+                                            height: screenHeight * 0.04,
+                                            child: Center(
+                                              child: Text(
+                                                'SIGN UP NOW',
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize:
+                                                        unitHeightValue * 0.02,
+                                                    fontWeight:
+                                                        FontWeight.w300),
+                                              ),
+                                            )))
+                                  ]))
                             ],
                           ),
                         ),
-                        Container(
-                          width: screenWidth,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.1,
-                            vertical: screenHeight * 0.050,
-                          ),
-                          decoration: const BoxDecoration(
-                            border: Border(top: BorderSide(color: Colors.white, width: 1.0,))
-                          ),
-                          child: Column(
-                            children: [
-                              Text("DIDN'T HAVE ACCOUNT", style: TextStyle(
-                                color: const Color(0xFF7A0180), fontSize: unitHeightValue * 0.018, fontWeight: FontWeight.bold,
-                              )),
-                              const SizedBox(height: 5),
-                              GestureDetector(
-                                onTap: () => Navigator.pushNamed(context, '/signupPage'),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    gradient: const LinearGradient(
-                                      begin: Alignment.centerLeft,
-                                      end: Alignment.centerRight,
-                                      colors: [
-                                        Color(0xFF000000),
-                                        Color(0xFF3533CD),
-                                      ],
-                                    ),
-                                  ),
-                                  width: screenWidth * 0.4,
-                                  height: screenHeight * 0.04,
-                                  child: Center(
-                                    child: Text(
-                                      'SIGN UP NOW',
-                                      style: TextStyle(color: Colors.white, fontSize: unitHeightValue * 0.02, fontWeight: FontWeight.w300),
-                                    ),
-                                  )
-                                )
-                              )
-                            ]
-                          )
-                        )
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
-        )
-      )),
+              ))),
     );
   }
 }
