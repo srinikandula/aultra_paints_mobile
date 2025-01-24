@@ -253,126 +253,97 @@ class _LayoutPageState extends State<LayoutPage> {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
+    double appBarHeight = screenHeight * 0.09; // 15% of screen height
 
     final userViewModel = Provider.of<UserViewModel>(context);
 
     return Scaffold(
       key: _scaffoldKey,
       appBar: PreferredSize(
-        preferredSize:
-            Size.fromHeight(getScreenHeight(getTabletCheck() ? 140 : 125)),
+        preferredSize: Size.fromHeight(appBarHeight),
         child: Container(
-          // color: Color
-          decoration: BoxDecoration(
-            // color: appBarColor, // Background color
-            color: Colors.white, // Background color
-            borderRadius:
-                BorderRadius.circular(getScreenWidth(20)), // Rounded corners
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 3,
-                blurRadius: 5,
-                offset: const Offset(0, 3), // Shadow position
-              ),
-            ],
-            // border: Border.all(color: Colors.black, width: 1),
+          decoration: const BoxDecoration(
+            color: white,
+            // borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                Color(0xFFFFF7AD),
+                Color(0xFFFFA9F9),
+              ],
+            ),
           ),
-          // padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-          // padding: EdgeInsets.only(
-          //   top: MediaQuery.of(context).size.height * 0.05,
-          //   left: MediaQuery.of(context).size.width * 0.04,
-          //   right: MediaQuery.of(context).size.width * 0.04,
-          //   bottom: MediaQuery.of(context).size.width * 0.02,
+          // padding: EdgeInsets.symmetric(
+          //   horizontal: screenWidth * 0.05,
+          //   vertical: screenHeight * 0.04,
           // ),
           padding: EdgeInsets.only(
-              left: getScreenWidth(10),
-              right: getScreenWidth(10),
-              top: getScreenHeight(40)),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+              left: screenWidth * 0.05,
+              right: screenWidth * 0.05,
+              top: screenHeight * 0.03),
+          // padding: EdgeInsets.only(
+          //     left: getScreenWidth(10),
+          //     right: getScreenWidth(10),
+          //     top: getScreenHeight(40)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  // Image.asset(
-                  //   'assets/images/app_logo.png',
-                  //   height: getScreenHeight(50),
-                  // ),
-                  Image.asset(
-                    'assets/images/app_file_icon.png',
-                    height: getScreenHeight(50),
+              InkWell(
+                onTap: () {
+                  _scaffoldKey.currentState?.openDrawer();
+                },
+                child: Container(
+                  child: Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Center(
+                      child: Icon(
+                        FontAwesomeIcons.bars,
+                        size: unitHeightValue * .028,
+                        // color: Colors.white,
+                        color: appThemeColor,
+                      ),
+                    ),
                   ),
-                  Image.asset(
-                    'assets/images/app_name.png',
-                    height: getScreenHeight(50),
-                  ),
-                ],
+                ),
               ),
-              SizedBox(height: getScreenHeight(8)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      _scaffoldKey.currentState?.openDrawer();
-                    },
-                    child: Container(
-                      // height: 30,
-                      // width: 30,
-                      // decoration: BoxDecoration(
-                      //   color: loginBgColor,
-                      //   borderRadius: BorderRadius.circular(15),
-                      // ),
-                      // child: Padding(
-                      //   padding: const EdgeInsets.all(4.0),
-                      //   child: Image.asset(
-                      //     'assets/images/menu@3x.png',
-                      //     fit: BoxFit.fill,
-                      //   ),
-                      // ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(6.0),
-                        child: Center(
-                          child: Icon(
-                            FontAwesomeIcons.bars,
-                            size: getScreenWidth(22),
-                            // color: Colors.white,
-                            color: appThemeColor,
-                          ),
-                        ),
+              Container(
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'assets/images/app_file_icon.png',
+                      height: getScreenHeight(50),
+                    ),
+                    Image.asset(
+                      'assets/images/app_name.png',
+                      height: getScreenHeight(30),
+                    ),
+                  ],
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, '/qrScanner').then((result) {
+                    if (result == true) {
+                      getDashboardCounts();
+                      setState(() {});
+                    }
+                  });
+                },
+                child: Container(
+                  child: Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Center(
+                      child: Icon(
+                        FontAwesomeIcons.qrcode,
+                        size: unitHeightValue * .028,
+                        // color: Colors.white,
+                        color: appThemeColor,
                       ),
                     ),
                   ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/qrScanner').then((result) {
-                        if (result == true) {
-                          getDashboardCounts();
-                          setState(() {});
-                        }
-                      });
-                    },
-                    child: Container(
-                      // height: 30,
-                      // width: 30,
-                      // decoration: BoxDecoration(
-                      //   color: loginBgColor,
-                      //   borderRadius: BorderRadius.circular(15),
-                      // ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(6.0),
-                        child: Center(
-                          child: Icon(
-                            FontAwesomeIcons.qrcode,
-                            size: getScreenWidth(22),
-                            // color: Colors.white,
-                            color: appThemeColor,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ],
           ),
@@ -416,15 +387,22 @@ class MyDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
     return Drawer(
-      width: getScreenWidth(getTabletCheck() ? 200 : 260),
+      // width: getScreenWidth(getTabletCheck() ? 200 : 260),
+      width: screenWidth * 0.7,
       backgroundColor: Colors.transparent,
       child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topRight: Radius.circular(0),
-            bottomRight: Radius.circular(0),
+        decoration: const BoxDecoration(
+          color: white,
+          // borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              Color(0xFFFFF7AD),
+              Color(0xFFFFA9F9),
+            ],
           ),
         ),
         child: ListView(
@@ -442,22 +420,22 @@ class MyDrawer extends StatelessWidget {
                   Text(
                     accountName,
                     style: TextStyle(
-                      color: drawerTitleColor,
+                      color: const Color(0xFF3533CD),
                       fontFamily: ffGBold,
-                      fontSize: getScreenWidth(getTabletCheck() ? 24 : 30),
+                      fontSize: unitHeightValue * 0.03,
                     ),
                   ),
                   Text(accountType,
                       style: TextStyle(
-                        color: drawerSubListColor,
+                        color: const Color(0xFF3533CD),
                         fontFamily: ffGMedium,
-                        fontSize: getScreenWidth(16),
+                        fontSize: unitHeightValue * 0.018,
                       )),
                   Text(accountMobile,
                       style: TextStyle(
-                        color: drawerSubListColor,
+                        color: const Color(0xFF3533CD),
                         fontFamily: ffGMedium,
-                        fontSize: getScreenWidth(16),
+                        fontSize: unitHeightValue * 0.018,
                       )),
                   if (accountType == 'Painter')
                     Container(
@@ -467,15 +445,15 @@ class MyDrawer extends StatelessWidget {
                         children: [
                           Text('Dealer Name ',
                               style: TextStyle(
-                                color: drawerSubListColor,
+                                color: const Color(0xFF3533CD),
                                 fontFamily: ffGMedium,
-                                fontSize: getScreenWidth(16),
+                                fontSize: unitHeightValue * 0.018,
                               )),
                           Text(parentDealerName,
                               style: TextStyle(
-                                  color: drawerSubListColor,
+                                  color: const Color(0xFF3533CD),
                                   fontFamily: ffGBold,
-                                  fontSize: getScreenWidth(16),
+                                  fontSize: unitHeightValue * 0.018,
                                   fontWeight: FontWeight.bold)),
                           // Icon(FontAwesomeIcons.circl, size: 10, color: drawerSubListColor,),
                         ],
@@ -489,17 +467,22 @@ class MyDrawer extends StatelessWidget {
             // SizedBox(height: 15), // Consistent spacing before the ListTile items
             Container(
               margin: EdgeInsets.symmetric(
-                  horizontal: getScreenWidth(30), vertical: getScreenWidth(10)),
-              height: getScreenHeight(getTabletCheck() ? 400 : 530),
+                horizontal: screenWidth * 0.05,
+                vertical: screenHeight * 0,
+              ),
+              height: screenHeight * 0.71,
+              // margin: EdgeInsets.symmetric(
+              //     horizontal: getScreenWidth(30), vertical: getScreenWidth(10)),
+              // height: getScreenHeight(getTabletCheck() ? 400 : 530),
               child: Column(
                 children: [
                   ListTile(
                     title: Text(
                       'Home',
                       style: TextStyle(
-                        color: appThemeColor,
+                        color: const Color(0xFF3533CD),
                         fontFamily: ffGSemiBold,
-                        fontSize: getScreenWidth(22),
+                        fontSize: unitHeightValue * 0.028,
                       ),
                     ),
                     onTap: () {
@@ -509,11 +492,11 @@ class MyDrawer extends StatelessWidget {
                   if (accountType == 'Dealer')
                     ListTile(
                       title: Text(
-                        'My Painters',
+                        'My Partners',
                         style: TextStyle(
-                          color: appThemeColor,
+                          color: const Color(0xFF3533CD),
                           fontFamily: ffGSemiBold,
-                          fontSize: getScreenWidth(22),
+                          fontSize: unitHeightValue * 0.028,
                         ),
                       ),
                       onTap: () {
@@ -534,10 +517,9 @@ class MyDrawer extends StatelessWidget {
                   child: Text(
                     'Logout',
                     style: TextStyle(
-                      decorationThickness: 1.5,
-                      color: drawerSubListColor,
+                      color: const Color(0xFF3533CD),
                       fontFamily: ffGMedium,
-                      fontSize: getScreenWidth(22),
+                      fontSize: unitHeightValue * 0.028,
                     ),
                   ),
                 ),

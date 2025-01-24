@@ -11,6 +11,7 @@ import '../../utility/Utils.dart';
 import '../LayOut/LayOutPage.dart';
 import '../authentication/login/LoginPage.dart';
 import '../dashboard/DashboardNewPage.dart';
+import 'onboarding.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);
@@ -26,7 +27,6 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    callTimer();
     certificateCheck();
   }
 
@@ -102,6 +102,9 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
     return Scaffold(
         key: _scaffoldKey,
         backgroundColor: Colors.white,

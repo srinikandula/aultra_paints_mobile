@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:aultra_paints_mobile/screens/LayOut/LayOutPage.dart';
 import 'package:aultra_paints_mobile/screens/dashboard/DashboardNewPage.dart';
 import 'package:aultra_paints_mobile/screens/painter/PainterPage.dart';
+import 'package:aultra_paints_mobile/screens/splash/onboarding.dart';
 import 'package:aultra_paints_mobile/services/UserViewModel.dart';
 
 import '/screens/authentication/otp/OtpPage.dart';
@@ -81,20 +82,18 @@ class MyAppState extends State<MyApp> {
       theme: ThemeData(
         platform: TargetPlatform.iOS,
       ),
-      home: const SplashPage(),
+      home: const OnBoarding(),
       // home: const DashboardPage(),
       builder: EasyLoading.init(),
       routes: {
         "/splashPage": (context) => const SplashPage(),
+        "/onBoardPage": (context) => const OnBoarding(),
         "/loginPage": (context) => const LoginPage(),
         "/signupPage": (context) => const SignupPage(),
         "/otpPage": (context) => const OtpPage(),
         "/dashboardPage": (context) => LayoutPage(child: DashboardNewPage()),
         "/painters": (context) => LayoutPage(child: PainterPage()),
         "/qrScanner": (context) => const QrScanner(),
-        // '/': (context) => LayoutPage(child: DashboardNewPage(), title: 'Home'),
-        // '/profile': (context) => LayoutPage(child: ProfilePage(), title: 'Profile'),
-        // '/settings': (context) => LayoutPage(child: SettingsPage(), title: 'Settings'),
       },
     );
   }

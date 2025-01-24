@@ -138,9 +138,9 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
             'dealerCode': parentDealerCode,
             'dealerName': userParentDealerName
           });
+        } else {
+          getProductOffers('first');
         }
-
-        getProductOffers('first');
 
         //  getRewardSchemes();
 
@@ -324,7 +324,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     PageController _pageController = PageController(viewportFraction: 0.6);
 
     // Timer to auto-scroll the PageView
-    Timer.periodic(Duration(seconds: 1), (Timer timer) {
+    Timer.periodic(Duration(seconds: 2), (Timer timer) {
       if (_pageController.hasClients && rewardSchemes.isNotEmpty) {
         int nextPage = (_pageController.page?.toInt() ?? 0) + 1;
         if (nextPage >= rewardSchemes.length) {
@@ -338,8 +338,9 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       }
     });
 
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
     double cardWidth = screenWidth * 0.9; // 80% of the screen width
     // Fixed height for the cards
 
@@ -348,311 +349,325 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     return WillPopScope(
         onWillPop: _onWillPop,
         child: Scaffold(
-          backgroundColor: Colors.white54,
+          // backgroundColor: Colors.white54,
           key: _scaffoldKey,
           body: SingleChildScrollView(
             // Add SingleChildScrollView
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  // decoration: BoxDecoration(
-                  //   // color: appBarColor, // Background color
-                  //   color: Colors.white, // Background color
-                  //   borderRadius: BorderRadius.circular(20), // Rounded corners
-                  //   boxShadow: [
-                  //     BoxShadow(
-                  //       color: Colors.grey.withOpacity(0.1),
-                  //       spreadRadius: 3,
-                  //       blurRadius: 5,
-                  //       offset: const Offset(0, 3), // Shadow position
-                  //     ),
-                  //   ],
-                  //   // border: Border.all(color: Colors.black, width: 1),
-                  // ),
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                  padding: const EdgeInsets.only(bottom: 5, top: 10),
-                  child: Text(
-                    'Welcome, ${USER_FULL_NAME}',
-                    style: TextStyle(
-                      fontSize: getScreenWidth(getTabletCheck() ? 18 : 26),
-                      fontWeight: FontWeight.bold,
+            child: Container(
+              height: screenHeight,
+              decoration: const BoxDecoration(
+                color: white,
+                // borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Color(0xFFFFF7AD),
+                    Color(0xFFFFA9F9),
+                  ],
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0,
+                      vertical: screenHeight * 0,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                //Product offer scroll
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: getScreenWidth(16)),
-                  padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
-                  child: Text(
-                    'Product Offers',
-                    style: TextStyle(
-                        decoration: TextDecoration.underline,
-                        decorationThickness: 1.5,
-                        fontSize: getScreenWidth(getTabletCheck() ? 14 : 16),
-                        fontWeight: FontWeight.bold,
-                        color: appThemeColor),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                // Horizontal Reward Schemes List
-                SizedBox(
-                  height: getScreenHeight(
-                      270), // Set the height for the horizontal list
-                  child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: getScreenWidth(8)),
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: productOffers.length +
-                          (hasMore
-                              ? 1
-                              : 0), // Show loading indicator if more data is available
-                      itemBuilder: (context, index) {
-                        if (index < productOffers.length) {
-                          final offer = productOffers[index];
-                          return Container(
-                            width: getScreenWidth(150), // Width of each item
-                            margin: EdgeInsets.only(
-                                left: getScreenWidth(4),
-                                right: getScreenWidth(4),
-                                bottom: getScreenHeight(10)),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.circular(getScreenWidth(10)),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.1),
-                                  spreadRadius: 2,
-                                  blurRadius: getScreenWidth(5),
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.06,
+                      vertical: screenHeight * 0.02,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0x33800180),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Welcome, ${USER_FULL_NAME}',
+                          style: TextStyle(
+                            color: const Color(0xFF3533CD),
+                            fontSize: unitHeightValue * 0.024,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              '${dashBoardList[0]['title']}',
+                              style: TextStyle(
+                                color: const Color(0xFF3533CD),
+                                fontSize: unitHeightValue * 0.024,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            child: Column(
-                              children: [
-                                // Reward Image
-                                Container(
-                                  height: getScreenWidth(
-                                      getTabletCheck() ? 100 : 150),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: getScreenWidth(8),
-                                      vertical: getScreenHeight(6)),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(
-                                            getScreenWidth(10))),
-                                    child: FadeInImage.assetNetwork(
-                                      placeholder:
-                                          'assets/images/app_file_icon.png', // Placeholder image
-                                      image: offer['productOfferImageUrl'] ??
-                                          '', // Network image URL
-                                      fit: BoxFit.cover,
-                                      imageErrorBuilder:
-                                          (context, error, stackTrace) {
-                                        return Image.asset(
-                                          'assets/images/app_file_icon.png', // Fallback image
-                                          fit: BoxFit.cover,
-                                        );
-                                      },
+                            Container(
+                              // margin: EdgeInsets.only(left: 10),
+                              margin: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.02,
+                                vertical: screenHeight * 0,
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.02,
+                                vertical: screenHeight * 0,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              child: Text(
+                                '${dashBoardList[0]['count']}',
+                                style: TextStyle(
+                                  color: const Color(0xFF3533CD),
+                                  fontSize: unitHeightValue * 0.024,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            )
+                          ]
+                        )
+                      ],
+                    ),
+                  ),
+                  //rewards scroll
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: getScreenWidth(16)),
+                    padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
+                    child: Text(
+                      'Reward Schemes',
+                      style: TextStyle(
+                        // decoration: TextDecoration.underline,
+                        decorationThickness: 1.5,
+                        fontSize: unitHeightValue * 0.03,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF3533CD),),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  SizedBox(
+                    height: screenHeight * 0.28,
+                    child: rewardSchemes.isEmpty
+                        ? Center(child: CircularProgressIndicator())
+                        : PageView.builder(
+                      controller: _pageController,
+                      itemCount: rewardSchemes.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        final item = rewardSchemes[index];
+                        // Make sure _currentPage is initialized before using it
+                        double scale = 0.9; // Default scale for side cards
+                        if (_currentPage != null) {
+                          scale = index == _currentPage!.round() ? 1.0 : 0.9;
+                        }
+                        return Transform.scale(
+                          scale: scale, // Slightly shrink side cards
+                          child: Align(
+                            alignment: Alignment
+                                .topCenter, // Align cards to the top
+                            child: Container(
+                              // margin: EdgeInsets.symmetric(
+                              //     vertical: getScreenHeight(8)),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(getScreenWidth(20)),
+                                // color: Colors.white,
+                                color: const Color(0x33800180),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.1),
+                                    spreadRadius: 2,
+                                    blurRadius: 5,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    // width: getScreenWidth(
+                                    //     getTabletCheck() ? 100 : 250),
+                                    // height: getScreenWidth(
+                                    //     getTabletCheck() ? 100 : 250),
+                                    height: screenHeight * 0.28,
+
+                                    child: ClipRRect(
+                                      borderRadius:
+                                      BorderRadius.circular(10),
+                                      child: FadeInImage.assetNetwork(
+                                        placeholder: 'assets/images/app_file_icon.png', // Placeholder image
+                                        image: item['rewardSchemeImageUrl'] ?? '', // Network image URL
+                                        fit: BoxFit.cover,
+                                        imageErrorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Image.asset(
+                                            'assets/images/app_file_icon.png', // Fallback image
+                                            fit: BoxFit.cover,
+                                          );
+                                        },
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: getScreenWidth(2),
-                                      vertical: getScreenHeight(2)),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        offer['productOfferTitle'],
-                                        maxLines: 2,
-                                        overflow: TextOverflow
-                                            .ellipsis, // Title of the reward
-                                        style: TextStyle(
-                                          fontSize: getScreenWidth(
-                                              getTabletCheck() ? 12 : 14),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      SizedBox(height: getScreenHeight(1)),
-                                      Text(
-                                        offer[
-                                            'productOfferDescription'], // Description of the reward
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: getScreenWidth(
-                                              getTabletCheck() ? 10 : 12),
-                                          color: Colors.grey[700],
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          );
-                        } else {
-                          // Show a loading spinner at the bottom
-                          return Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(getScreenWidth(8)),
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        }
+                          ),
+                        );
                       },
                     ),
                   ),
-                ),
-
-                //reward points count
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: getScreenWidth(10)),
-                  child: dashBoardList.isEmpty
-                      ? Container(
-                          height: MediaQuery.of(context).size.height * 0.6,
-                          child: ListView(
-                            physics:
-                                AlwaysScrollableScrollPhysics(), // Ensures scroll behavior
-                            children: [],
-                          ),
-                        )
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          physics:
-                              NeverScrollableScrollPhysics(), // Ensures scrollability
-                          padding: EdgeInsets.zero,
-                          itemCount: dashBoardList.length,
-                          itemBuilder: (context, index) {
-                            var dashboardCard = dashBoardList[index];
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                InkWell(
-                                  onTap: () {},
-                                  child: _buildDashboardCard(
-                                    dashboardCard['title'].toString(),
-                                    dashboardCard['count'].toString(),
-                                    white,
-                                    buttonTextBgColor,
-                                    '',
-                                  ),
-                                ),
-                                SizedBox(height: getScreenHeight(5)),
-                              ],
-                            );
-                          },
-                        ),
-                ),
-                //rewards scroll
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: getScreenWidth(16)),
-                  child: Text(
-                    'Reward Schemes',
-                    style: TextStyle(
-                        decoration: TextDecoration.underline,
-                        decorationThickness: 1.5,
-                        fontSize: getScreenWidth(getTabletCheck() ? 16 : 18),
-                        fontWeight: FontWeight.bold,
-                        color: appThemeColor),
-                    textAlign: TextAlign.center,
+                  //Product offer scroll
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: getScreenWidth(16)),
+                    padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
+                    child: Text(
+                      'Ongoing Offers',
+                      style: TextStyle(
+                          // decoration: TextDecoration.underline,
+                          decorationThickness: 1.5,
+                          fontSize: unitHeightValue * 0.03,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF3533CD),),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: getTabletCheck() ? 300 : 270,
-                  child: rewardSchemes.isEmpty
-                      ? Center(child: CircularProgressIndicator())
-                      : PageView.builder(
-                          controller: _pageController,
-                          itemCount: rewardSchemes.length,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) {
-                            final item = rewardSchemes[index];
-                            // Make sure _currentPage is initialized before using it
-                            double scale = 0.9; // Default scale for side cards
-                            if (_currentPage != null) {
-                              scale =
-                                  index == _currentPage!.round() ? 1.0 : 0.9;
-                            }
-                            return Transform.scale(
-                              scale: scale, // Slightly shrink side cards
-                              child: Align(
-                                alignment: Alignment
-                                    .topCenter, // Align cards to the top
-                                child: Container(
-                                  margin: EdgeInsets.symmetric(
-                                      vertical: getScreenHeight(8)),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                        getScreenWidth(10)),
-                                    color: Colors.white,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.1),
-                                        spreadRadius: 2,
-                                        blurRadius: 5,
-                                        offset: Offset(0, 3),
-                                      ),
-                                    ],
+                  // Horizontal Reward Schemes List
+                  SizedBox(
+                    // height: screenHeight * 0.32,
+                    height: screenHeight * 0.28,
+                    // width: screenWidth * 0.5,
+                    child: Container(
+                      margin: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.03,
+                          vertical: screenHeight * 0),
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: productOffers.length +
+                            (hasMore
+                                ? 1
+                                : 0), // Show loading indicator if more data is available
+                        itemBuilder: (context, index) {
+                          if (index < productOffers.length) {
+                            final offer = productOffers[index];
+                            return Container(
+                              width: screenWidth * 0.35,
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.028,
+                                  vertical: screenHeight * 0.01),
+                              decoration: BoxDecoration(
+                                // color: Colors.white,
+                                color: const Color(0x33800180),
+                                borderRadius: BorderRadius.circular(getScreenWidth(20)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.1),
+                                    spreadRadius: 2,
+                                    blurRadius: getScreenWidth(5),
+                                    offset: const Offset(0, 3),
                                   ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: getScreenWidth(
-                                            getTabletCheck() ? 100 : 250),
-                                        height: getScreenWidth(
-                                            getTabletCheck() ? 100 : 250),
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: getScreenWidth(10),
-                                            vertical: getScreenHeight(10)),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: FadeInImage.assetNetwork(
-                                            placeholder:
-                                                'assets/images/app_file_icon.png', // Placeholder image
-                                            image:
-                                                item['rewardSchemeImageUrl'] ??
-                                                    '', // Network image URL
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  // Reward Image
+                                  SizedBox(
+                                    width: screenWidth * 0.35,
+                                    height: screenWidth * 0.35,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(getScreenWidth(20))),
+                                      child: FadeInImage.assetNetwork(
+                                        placeholder:
+                                            'assets/images/app_file_icon.png', // Placeholder image
+                                        image: offer['productOfferImageUrl'] ??
+                                            '', // Network image URL
+                                        fit: BoxFit.cover,
+                                        imageErrorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Image.asset(
+                                            'assets/images/app_file_icon.png', // Fallback image
                                             fit: BoxFit.cover,
-                                            imageErrorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Image.asset(
-                                                'assets/images/app_file_icon.png', // Fallback image
-                                                fit: BoxFit.cover,
-                                              );
-                                            },
-                                          ),
-                                        ),
+                                          );
+                                        },
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                  Container(
+                                    margin: EdgeInsets.symmetric(
+                                        horizontal: screenWidth * 0.018,
+                                        vertical: screenHeight * 0.01),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: screenWidth * 0.03,
+                                        vertical: screenHeight * 0.01),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0x33800180),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          offer['productOfferTitle'],
+                                          maxLines: 2,
+                                          overflow: TextOverflow
+                                              .ellipsis, // Title of the reward
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: unitHeightValue * 0.014,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        // SizedBox(height: getScreenHeight(1)),
+                                        // Text(
+                                        //   offer[
+                                        //       'productOfferDescription'], // Description of the reward
+                                        //   maxLines: 1,
+                                        //   overflow: TextOverflow.ellipsis,
+                                        //   style: TextStyle(
+                                        //     fontSize: getScreenWidth(
+                                        //         getTabletCheck() ? 10 : 12),
+                                        //     color: Colors.grey[700],
+                                        //   ),
+                                        //   textAlign: TextAlign.center,
+                                        // ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             );
-                          },
-                        ),
-                ),
-              ],
-            ),
+                          } else {
+                            // Show a loading spinner at the bottom
+                            return Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(getScreenWidth(8)),
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
           ),
         ));
   }
 
-  void showPopupForDealerCode(
-      BuildContext context, Map<String, dynamic> response) {
+  void showPopupForDealerCode(BuildContext context, Map<String, dynamic> response) {
     print('======dealer code===>${!response['dealerCode'].isEmpty}');
-    final
-        // showPopupForDealerCode(context, {'dealerCode': parentDealerCode, 'dealerName': userParentDealerName});
-
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
         // Controller for the input fields
         TextEditingController dealerCodeController = TextEditingController();
     List<TextEditingController> otpControllers =
@@ -671,60 +686,92 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
             return WillPopScope(
               onWillPop: () async => false, // Disable the back button
               child: Dialog(
-                backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(getScreenWidth(10)),
-                ),
                 elevation: 10,
                 child: Container(
-                  width: getScreenWidth(getTabletCheck() ? 500 : 400),
-                  padding: EdgeInsets.all(getScreenWidth(16)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: const LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Color(0xFFFFF7AD),
+                        Color(0xFFFFA9F9),
+                      ],
+                    ),
+                  ),
+                  width: screenWidth * 0.9,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.05,
+                    vertical: screenHeight * 0.015,
+                  ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Dealer Details",
+                        "Dealer Code",
                         style: TextStyle(
-                            fontSize:
-                                getScreenWidth(getTabletCheck() ? 16 : 20),
-                            fontWeight: FontWeight.bold),
+                          color: const Color(0xFF7A0180),
+                          fontSize: unitHeightValue * 0.018,
+                          fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: getScreenHeight(10)),
+
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(getScreenWidth(16)),
-                          border: Border.all(
-                            width: getScreenWidth(1),
-                            color: Colors.grey,
-                            style: BorderStyle.solid,
+                          color: white,
+                          borderRadius: BorderRadius.circular(20),
+                          gradient: const LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Color(0xFF000000),
+                              Color(0xFF3533CD),
+                            ],
                           ),
                         ),
-                        child: TextField(
-                          controller: dealerCodeController,
-                          keyboardType: TextInputType.text,
-                          onTapOutside: (event) {
-                            FocusManager.instance.primaryFocus?.unfocus();
-                          },
-                          style: TextStyle(
-                            fontSize:
-                                getScreenWidth(getTabletCheck() ? 12 : 18),
-                            color: Colors.black,
-                            fontFamily: ffGMedium,
-                          ),
-                          decoration: InputDecoration(
-                            labelText: 'Enter Dealer Code',
-                            labelStyle: TextStyle(
-                              fontFamily: 'Medium',
-                              fontSize:
-                                  getScreenWidth(getTabletCheck() ? 12 : 18),
-                              color: Colors.grey,
+                        child: SizedBox(
+                          height: screenHeight * 0.06,
+                          child: TextField(
+                            // keyboardType: TextInputType.number,
+                            controller: dealerCodeController,
+                            keyboardType: TextInputType.text,
+                            onTapOutside: (event) {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                            },
+                            style: TextStyle(
+                              fontSize: getScreenWidth(18),
+                              color: Colors.white,
+                              fontFamily: ffGMedium,
                             ),
-                            contentPadding: EdgeInsets.all(
-                                getScreenWidth(getTabletCheck() ? 8 : 15)),
-                            border: InputBorder.none,
+                            decoration: InputDecoration(
+                              // labelText: '',
+                              labelStyle: TextStyle(
+                                fontFamily: ffGMedium,
+                                fontSize: getScreenWidth(18),
+                                color: textInputPlaceholderColor,
+                              ),
+                              hintText: 'Enter Dealer Code', // Placeholder text
+                              hintStyle: TextStyle(
+                                fontSize: unitHeightValue * 0.02,
+                                color: textInputPlaceholderColor.withOpacity(0.7),
+                                fontFamily: ffGMedium,
+                              ),
+                              floatingLabelBehavior: FloatingLabelBehavior.auto, // Default behavior
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.1,
+                                vertical: screenHeight * 0.02,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10), // Optional border
+                                borderSide: BorderSide.none,
+                              ),
+                              filled: true, // Optional for a filled background
+                              fillColor: Colors.grey.withOpacity(0.1), // Optional background color
+                            ),
+                            // onChanged: (value) {
+                            //   _loginRequest.phoneNumber = value.trim();
+                            // },
                           ),
                         ),
                       ),
@@ -734,15 +781,34 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 SizedBox(height: getScreenHeight(20)),
-                                Text("Enter OTP",
-                                    style: TextStyle(
-                                        fontSize: getScreenWidth(16))),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Dealer Code",
+                                      style: TextStyle(
+                                          color: const Color(0xFF7A0180),
+                                          fontSize: unitHeightValue * 0.018,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ]
+                                ),
+                                Row(
+                                  mainAxisAlignment:MainAxisAlignment.spaceBetween,
                                   children: List.generate(6, (index) {
-                                    return SizedBox(
+                                    return Container(
                                       width: getScreenWidth(40),
+                                      decoration: BoxDecoration(
+                                        color: white,
+                                        borderRadius: BorderRadius.circular(20),
+                                        gradient: const LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [
+                                            Color(0xFF000000),
+                                            Color(0xFF3533CD),
+                                          ],
+                                        ),
+                                      ),
                                       child: TextField(
                                         controller: otpControllers[index],
                                         maxLength: 1,
@@ -751,12 +817,21 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                         style: TextStyle(
                                           fontSize: getScreenWidth(
                                               getTabletCheck() ? 12 : 18),
-                                          color: Colors.black,
+                                          color: Colors.white,
                                           fontFamily: ffGMedium,
                                         ),
                                         decoration: InputDecoration(
-                                          counterText: "",
-                                          border: OutlineInputBorder(),
+                                          fillColor: Colors.transparent, // Let the Container's background show
+                                          counterText: "", // Hide the counter text (default "0/1")
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(20), // Optional border
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          filled: true,
                                         ),
                                         onChanged: (value) {
                                           if (value.isNotEmpty && index < 5) {
@@ -775,6 +850,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                 Text(
                                     'The 6-digit OTP was sent to the ${userParentDealerName}. OTP expiry time is 10 minutes.',
                                     style: TextStyle(
+                                        color: const Color(0xFF7A0180),
                                         fontSize: getScreenWidth(
                                             getTabletCheck() ? 12 : 15))),
                                 StreamBuilder<int>(
@@ -788,6 +864,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                       return Text(
                                         'Time remaining: ${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
                                         style: TextStyle(
+                                            color: const Color(0xFF7A0180),
                                             fontSize: getScreenWidth(
                                                 getTabletCheck() ? 12 : 15),
                                             fontWeight: FontWeight.bold),
@@ -839,12 +916,32 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                   });
                                 }
                               },
-                              child: Text("Get OTP",
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.1,
+                                  vertical: screenHeight * 0.01,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      Color(0xFF000000),
+                                      Color(0xFF3533CD),
+                                    ],
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                height: screenHeight * 0.06,
+                                child: Text(
+                                  "Get OTP",
                                   style: TextStyle(
-                                      fontSize: getScreenWidth(
-                                          getTabletCheck() ? 12 : 18),
-                                      fontWeight: FontWeight.w900,
-                                      color: Colors.blueAccent)),
+                                      fontSize: unitHeightValue * 0.02,
+                                      color: Colors.white, fontWeight: FontWeight.w300
+                                  ),
+                                ),
+                              ),
                             ),
                           if (isOtpVisible)
                             TextButton(
@@ -862,12 +959,37 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                   );
                                 }
                               },
-                              child: Text("Save",
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.1,
+                                  vertical: screenHeight * 0.01,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      Color(0xFF000000),
+                                      Color(0xFF3533CD),
+                                    ],
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                height: screenHeight * 0.06,
+                                child: Text(
+                                  "OK",
                                   style: TextStyle(
-                                      fontSize: getScreenWidth(
-                                          getTabletCheck() ? 14 : 18),
-                                      fontWeight: FontWeight.w900,
-                                      color: Colors.blueAccent)),
+                                      fontSize: unitHeightValue * 0.02,
+                                      color: Colors.white, fontWeight: FontWeight.w300
+                                  ),
+                                ),
+                              ),
+                            //   child: Text("OK",
+                            //       style: TextStyle(
+                            //           fontSize: unitHeightValue * 0.02,
+                            //           fontWeight: FontWeight.w500,
+                            //         color: const Color(0xFF7A0180),)),
                             ),
                         ],
                       ),
