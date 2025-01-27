@@ -102,7 +102,9 @@ class _SplashPageState extends State<SplashPage> {
       final request =
           // await client.getUrl(Uri.parse('https://api.aultrapaints.com/')); //mobile
           // await client.getUrl(Uri.parse('https://erp.aultrapaints.com/')); //web
-          await client.getUrl(Uri.parse('https://dealerportal.mllqa.com/'));
+          // await client.getUrl(Uri.parse('https://dealerportal.mllqa.com/'));
+          await client.getUrl(
+              Uri.parse('https://logifreightapp.mahindralogistics.com/'));
       final response = await request.close();
 
       debugPrint('Response status code: ${response.statusCode}');
