@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,7 +8,6 @@ import '../LayOut/LayOutPage.dart';
 import '../authentication/login/LoginPage.dart';
 import '../dashboard/DashboardNewPage.dart';
 import '../launch/launchPage.dart';
-import '../orders/qrScanner/QrScanner.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);
@@ -132,34 +130,100 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Form(
-        key: _formKey,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // App Logo Section
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.9,
-                child: Row(
-                  children: [
-                    Image.asset(
-                      'assets/images/app_icon.png',
-                      height: MediaQuery.of(context).size.width * 0.3,
-                    ),
-                    Image.asset(
-                      'assets/images/app_name.png',
-                      height: MediaQuery.of(context).size.width * 0.1,
-                    ),
-                  ],
-                ),
+        backgroundColor: Colors.white,
+        // body: Form(
+        //   key: _formKey,
+        //   child: Center(
+        //     child: Column(
+        //       mainAxisAlignment: MainAxisAlignment.center,
+        //       children: [
+        //         // App Logo Section
+        //         SizedBox(
+        //           width: MediaQuery.of(context).size.width * 0.9,
+        //           child: Row(
+        //             children: [
+        //               Image.asset(
+        //                 'assets/images/app_icon.png',
+        //                 height: MediaQuery.of(context).size.width * 0.3,
+        //               ),
+        //               Image.asset(
+        //                 'assets/images/app_name.png',
+        //                 height: MediaQuery.of(context).size.width * 0.1,
+        //               ),
+        //             ],
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
+        body: Container(
+            height: screenHeight, // 100% height
+            width: screenWidth, // 100% width
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Color(0xFFFFF7AD),
+                  Color(0xFFFFA9F9),
+                ],
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+            child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  child: SizedBox(
+                    height: screenHeight,
+                    child: Center(
+                        child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.1,
+                              vertical: screenHeight * 0.2,
+                            ),
+                            height: screenHeight,
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
+                                    width: screenWidth * 0.9,
+                                    child: Column(
+                                      children: [
+                                        SizedBox(
+                                            height: screenHeight * 0.3,
+                                            child: Image.asset(
+                                                'assets/images/app_file_icon.png')),
+                                        SizedBox(
+                                            height: screenHeight * 0.14,
+                                            child: Image.asset(
+                                                'assets/images/app_name.png')),
+                                      ],
+                                    ),
+                                  ),
+                                  // Column(
+                                  //     mainAxisAlignment: MainAxisAlignment.center,
+                                  //     children: [
+                                  //       Text('Let’s Get', style: TextStyle(
+                                  //           color: const Color(0xFF7A0180), fontSize: unitHeightValue * 0.04, fontWeight: FontWeight.w300
+                                  //       )),
+                                  //       Text('Started!', style: TextStyle(
+                                  //         color: const Color(0xFF7A0180), fontSize: unitHeightValue * 0.04, fontWeight: FontWeight.bold,
+                                  //       ))
+                                  //     ]
+                                  // ),
+                                ])),
+                      ],
+                    )),
+                  ),
+                ))));
   }
 }

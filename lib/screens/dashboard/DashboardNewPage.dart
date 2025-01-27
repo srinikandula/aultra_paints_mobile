@@ -123,7 +123,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       var tempResp = json.decode(response.body);
       var apiResp = tempResp['data'];
       dashBoardList = [
-        {"title": "Reward Points ", "count": apiResp['rewardPoints'].toString()},
+        {
+          "title": "Reward Points ",
+          "count": apiResp['rewardPoints'].toString()
+        },
       ];
 
       accountType = USER_ACCOUNT_TYPE;
@@ -452,6 +455,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                       ],
                     ),
                     child: Column(
+                      // crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // Reward Image
                         SizedBox(
