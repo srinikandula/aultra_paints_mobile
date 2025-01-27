@@ -73,7 +73,8 @@ class _QrScannerState extends State<QrScanner> {
   onBackPressed() {
     Utils.clearToasts(context);
     // Navigator.pop(context, true);
-    Navigator.pop(context, true);
+    Navigator.pushNamed(context, '/dashboardPage', arguments: {});
+    // Navigator.pop(context, true);
   }
 
   Future<bool> _onWillPop() async {
@@ -158,7 +159,7 @@ class _QrScannerState extends State<QrScanner> {
 
     showDialog(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {

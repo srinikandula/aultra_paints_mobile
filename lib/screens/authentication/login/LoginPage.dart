@@ -185,7 +185,7 @@ class _LoginPageState extends State<LoginPage> {
                                     child: Row(children: [
                                       InkWell(
                                         onTap: () => Navigator.pushNamed(
-                                            context, '/onBoardPage'),
+                                            context, '/launchPage'),
                                         child: Container(
                                           margin: EdgeInsets.symmetric(
                                             horizontal: screenWidth * 0.02,
@@ -379,8 +379,8 @@ class _LoginPageState extends State<LoginPage> {
                                     Text("DIDN'T HAVE ACCOUNT",
                                         style: TextStyle(
                                           color: const Color(0xFF7A0180),
-                                          fontSize: unitHeightValue * 0.018,
-                                          fontWeight: FontWeight.bold,
+                                          fontSize: unitHeightValue * 0.016,
+                                          fontWeight: FontWeight.w400,
                                         )),
                                     const SizedBox(height: 5),
                                     GestureDetector(

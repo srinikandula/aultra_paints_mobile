@@ -210,7 +210,7 @@ class _LaunchPageState extends State<LaunchPage> {
                                 child: Column(
                                     children: [
                                       Text("DIDN'T HAVE ACCOUNT", style: TextStyle(
-                                        color: const Color(0xFF7A0180), fontSize: unitHeightValue * 0.018, fontWeight: FontWeight.w400,
+                                        color: const Color(0xFF7A0180), fontSize: unitHeightValue * 0.016, fontWeight: FontWeight.w400,
                                       )),
                                       const SizedBox(height: 5),
                                       GestureDetector(
@@ -247,43 +247,6 @@ class _LaunchPageState extends State<LaunchPage> {
                 )
             )
         )
-      // body: Form(
-      //     key: _formKey,
-      //     child: SingleChildScrollView(
-      //       child: SizedBox(
-      //         height: MediaQuery.of(context).size.height * 1,
-      //         child: Center(
-      //             child: Column(
-      //           crossAxisAlignment: CrossAxisAlignment.center,
-      //           mainAxisAlignment: MainAxisAlignment.center,
-      //           children: [
-      //             // Container(
-      //             //   width: MediaQuery.of(context).size.width * 0.8,
-      //             //   height: MediaQuery.of(context).size.width * 0.6,
-      //             //   decoration: const BoxDecoration(
-      //             //       image: DecorationImage(
-      //             //           image: AssetImage('assets/images/app_logo.png'),
-      //             //           fit: BoxFit.fitWidth)),
-      //             // ),
-      //             Container(
-      //               width: MediaQuery.of(context).size.width * 0.9,
-      //               // height: getScreenWidth(40),
-      //               child: Row(
-      //                 children: [
-      //                   Container(
-      //                       height: MediaQuery.of(context).size.width * 0.3,
-      //                       child: Image.asset('assets/images/app_icon.png')),
-      //                   Container(
-      //                       height: MediaQuery.of(context).size.width * 0.1,
-      //                       child: Image.asset('assets/images/app_name.png')),
-      //                 ],
-      //               ),
-      //             ),
-      //           ],
-      //         )),
-      //       ),
-      //     )
-      // )
     );
   }
 }
