@@ -123,7 +123,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       var tempResp = json.decode(response.body);
       var apiResp = tempResp['data'];
       dashBoardList = [
-        {"title": "Reward Points ", "count": apiResp['cash'].toString()},
+        {"title": "Reward Points ", "count": apiResp['rewardPoints'].toString()},
       ];
 
       accountType = USER_ACCOUNT_TYPE;
