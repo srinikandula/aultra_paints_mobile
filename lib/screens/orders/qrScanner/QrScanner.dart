@@ -42,27 +42,6 @@ class _QrScannerState extends State<QrScanner> {
   fetchLocalStorageDate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     accesstoken = prefs.getString('accessToken');
-    // sendScannedValue('a5be85ed-4b0d-480c-9851-9864638b89f5');
-
-    // final apiResponse = {
-    //   "message": "Coupon redeemed Successfully..!",
-    //   "data": {
-    //     "qr_code_id": "433b889c-b38f-4bd9-89f9-0498a5d8dfa6",
-    //     "isProcessed": true,
-    //     "updatedBy": "6771ab7eedc91a9596744def",
-    //     "redeemablePoints": 5
-    //   }
-    // };
-
-    // showApiResponsePopup(context, apiResponse);
-  }
-
-  void _showSnackBar(String message, BuildContext context, ColorCheck) {
-    final snackBar = SnackBar(
-        content: Text(message),
-        backgroundColor: ColorCheck ? Colors.green : Colors.red,
-        duration: Utils.returnStatusToastDuration(ColorCheck));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Future sendScannedValue(scannedValue) async {
@@ -76,12 +55,9 @@ class _QrScannerState extends State<QrScanner> {
       "Content-Type": "application/json",
       "Authorization": accesstoken
     });
-    print('--=scan url===>${apiUrl}');
     if (response.statusCode == 200) {
       Navigator.pop(context);
       var apiResp = json.decode(response.body);
-      print('scan resp=====>${apiResp}');
-      // _showSnackBar(apiResp['message'], context, true);
       // Navigator.pop(context, true);
       showApiResponsePopup(context, apiResp);
     } else {
@@ -96,8 +72,9 @@ class _QrScannerState extends State<QrScanner> {
 
   onBackPressed() {
     Utils.clearToasts(context);
-    Navigator.pop(context, true);
-    Navigator.pop(context, true);
+    // Navigator.pop(context, true);
+    Navigator.pushNamed(context, '/dashboardPage', arguments: {});
+    // Navigator.pop(context, true);
   }
 
   Future<bool> _onWillPop() async {
@@ -107,11 +84,26 @@ class _QrScannerState extends State<QrScanner> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        backgroundColor: whiteBgColor,
-        body: Column(
+          // backgroundColor: whiteBgColor,
+          body: Container(
+        height: screenHeight, // 100% height
+        width: screenWidth, // 100% width
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              Color(0xFFFFF7AD),
+              Color(0xFFFFA9F9),
+            ],
+          ),
+        ),
+        child: Column(
           children: [
             SingleParamHeader('QR Scanner', '', context, false,
                 () => Navigator.pop(context, true)),
@@ -151,13 +143,19 @@ class _QrScannerState extends State<QrScanner> {
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 
-  void showApiResponsePopup(BuildContext context, Map<String, dynamic> response) {
+  void showApiResponsePopup(
+      BuildContext context, Map<String, dynamic> response) {
     final message = response["message"] ?? "No message";
     final data = response["data"] ?? {};
+    var couponCode = data["couponCode"] ?? '';
+    var rewardPoints = data["rewardPoints"] ?? '';
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
 
     showDialog(
       context: context,
@@ -166,58 +164,74 @@ class _QrScannerState extends State<QrScanner> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return WillPopScope(
-              // onWillPop: () async => true,
               onWillPop: _onWillPop,
-              // onWillPop: () async => {
-              //   Navigator.pop(context, true);
-              //   return true;
-              // },
               child: Dialog(
-                backgroundColor: Colors.green,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 elevation: 10,
                 child: Container(
-                  width: 100,
-                  // height: 300,
-                  padding: EdgeInsets.all(20),
+                  width: screenWidth * 0.4,
+                  height: screenHeight * 0.25,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.1,
+                    vertical: screenHeight * 0.01,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: const LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Color(0xFFFFF7AD),
+                        Color(0xFFFFA9F9),
+                      ],
+                    ),
+                  ),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      SizedBox(height: 30),
-                      Container(
-                        child: Center(
-                          child: Text("${data['cash'] ?? 0} ₹", style: TextStyle(fontSize: 80, color: Colors.white, fontFamily: ffGSemiBold,),),
+                      Center(
+                        child: Text(
+                          rewardPoints.toString(),
+                          style: TextStyle(
+                            fontSize: unitHeightValue * 0.1,
+                            fontFamily: ffGSemiBold,
+                            color: const Color(0xFF3533CD),
+                          ),
                         ),
                       ),
-                      // Text(message, style: TextStyle(fontSize: 14, color: Colors.white, fontFamily: ffGSemiBold,)),
-                      SizedBox(height: 40),
-                      Container(
-                        child: Center(
-                          child: Text("Coupon Redeemed from Aultra Paints.", style: TextStyle(fontSize: 20, color: Colors.white, fontFamily: ffGSemiBold,), textAlign: TextAlign.center,),
-                        )
-                      ),
-                      SizedBox(height: 20),
-                      Container(
-                        child: Center(
-                          child: Text("With Coupon : ${data['couponCode'] ?? 0}", style: TextStyle(fontSize: 16, color: Colors.white, fontFamily: ffGSemiBold,),),
-                        )
+                      SizedBox(height: screenHeight * 0.02),
+                      Center(
+                        child: Text(
+                          "With Coupon : $couponCode",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF3533CD),
+                            fontFamily: ffGSemiBold,
+                          ),
+                        ),
                       ),
                       // SizedBox(height: 2),
                       // Text("Reward Points: ${data['rewardPoints'] ?? 0}", style: TextStyle(fontSize: 14, color: Colors.white, fontFamily: ffGSemiBold,),),
-                      // SizedBox(height: 40),
-                      Align(
-                        alignment: Alignment.center,
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.pop(context, true);
-                            Navigator.pop(context, true);
-                          },
-                          child: Text("OK", style: TextStyle(fontSize: 14, color: Colors.white, fontFamily: ffGSemiBold,)),
-                        ),
-                      ),
+                      // SizedBox(height: screenHeight * 0.02),
+                      // Align(
+                      //   alignment: Alignment.center,
+                      //   child: TextButton(
+                      //     onPressed: () {
+                      //       Navigator.pop(context, true);
+                      //       Navigator.pop(context, true);
+                      //     },
+                      //     child: const Text(
+                      //         "OK",
+                      //         style: TextStyle(
+                      //           fontSize: 14,
+                      //           color: Color(0xFF3533CD),
+                      //           fontFamily: ffGSemiBold,
+                      //         )
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

@@ -29,9 +29,12 @@ class SingleParamHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
     SizeConfig().init(context);
     return Container(
-      color: Colors.white,
+      // color: Colors.white,
       margin: EdgeInsets.only(
           left: getScreenWidth(20),
           right: getScreenWidth(20),
@@ -47,13 +50,14 @@ class SingleParamHeader extends StatelessWidget {
             child: Container(
                 padding: EdgeInsets.all(getScreenWidth(10)),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
+                  // color: Colors.grey.shade200,
                   borderRadius: BorderRadius.circular(getScreenWidth(50)),
                 ),
                 child: Icon(
-                  Icons.arrow_back_ios_new,
-                  size: getScreenWidth(18),
-                  color: backButtonCircleIconColor,
+                  Icons.keyboard_double_arrow_left_sharp,
+                  size: unitHeightValue * 0.04,
+                  // color: backButtonCircleIconColor,
+                  color: const Color(0xFF7A0180),
                 )),
           ),
           SizedBox(width: getScreenWidth(10)),
@@ -67,7 +71,8 @@ class SingleParamHeader extends StatelessWidget {
                     fontSize: getScreenWidth(20),
                     height: 1.2,
                     fontFamily: ffGBold,
-                    color: buttonBorderColor,
+                    // color: buttonBorderColor,
+                    color: const Color(0xFF7A0180),
                   ),
                 ),
                 subHeaderText != ""
@@ -76,7 +81,8 @@ class SingleParamHeader extends StatelessWidget {
                         style: TextStyle(
                           fontSize: getScreenWidth(12),
                           fontFamily: ffGSemiBold,
-                          color: buttonBorderColor,
+                          // color: buttonBorderColor,
+                          color: const Color(0xFF7A0180),
                         ),
                       )
                     : SizedBox.shrink(),

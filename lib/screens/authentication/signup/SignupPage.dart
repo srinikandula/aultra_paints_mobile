@@ -149,11 +149,25 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        backgroundColor: whiteBgColor,
-        body: Column(
+          // backgroundColor: whiteBgColor,
+          body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              Color(0xFFFFF7AD),
+              Color(0xFFFFA9F9),
+            ],
+          ),
+        ),
+        child: Column(
           children: [
             SingleParamHeader(
               'User\nRegistration',
@@ -163,24 +177,26 @@ class _SignupPageState extends State<SignupPage> {
               () => Navigator.pop(context, true),
             ),
             Expanded(
-              child: Scrollbar(
-                thumbVisibility: true,
-                thickness: getScreenWidth(2),
+              child: Container(
+                height: screenHeight * 0.9,
+                // thumbVisibility: true,
+                // thickness: screenWidth * 0.01,
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Container(
+                    // height: screenHeight * 0.9,
                     margin: EdgeInsets.symmetric(
-                        horizontal: getScreenWidth(20),
-                        vertical: getScreenHeight(10)),
+                        horizontal: screenWidth * 0.01,
+                        vertical: screenHeight * 0.01),
                     child: Column(
                       children: [
                         returnFormFeilds(),
-                        FooterButton(
-                          "Register",
-                          'fullWidth',
-                          context,
-                          () => validateFeilds(),
-                        )
+                        // FooterButton(
+                        //   "Register",
+                        //   'fullWidth',
+                        //   context,
+                        //   () => validateFeilds(),
+                        // )
                       ],
                     ),
                   ),
@@ -189,7 +205,7 @@ class _SignupPageState extends State<SignupPage> {
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 
@@ -220,271 +236,338 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Widget returnFormFeilds() {
-    final double screenWidth = MediaQuery.of(context).size.width;
+    // final _formKey = GlobalKey<FormState>();
     final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
     return Container(
-      height: screenHeight * 0.7,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          //user name
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Utils.returnInvoiceRedStar('Name'),
-              Container(
-                margin: EdgeInsets.only(top: getScreenHeight(5)),
-                padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
-                decoration: BoxDecoration(
-                  color: textinputBgColor,
-                  borderRadius: BorderRadius.circular(getScreenWidth(5)),
+      height: screenHeight,
+      child: SafeArea(
+          child: Stack(children: [
+          Form(
+            // key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: screenHeight * 0.66,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: screenWidth * 0.5,
+                        // width: getScreenWidth(300),
+                        // height: getScreenWidth(40),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                                height: screenHeight * 0.15,
+                                child: Image.asset('assets/images/app_file_icon.png')),
+                            SizedBox(
+                                height: screenHeight * 0.14,
+                                child: Image.asset('assets/images/app_name.png')),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.1,
+                          vertical: screenHeight * 0.01,
+                        ),
+                        decoration: BoxDecoration(
+                          color: white,
+                          borderRadius: BorderRadius.circular(20),
+                          gradient: const LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Color(0xFF000000),
+                              Color(0xFF3533CD),
+                            ],
+                          ),
+                        ),
+                        height: screenHeight * 0.06,
+                        child: TextFormField(
+                          // keyboardType: TextInputType.number,
+                          onTapOutside: (event) {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                          },
+                          autofocus: false,
+                          keyboardType: TextInputType.text,
+                          controller: _userName,
+                          style: TextStyle(
+                            fontSize: unitHeightValue * 0.02,
+                            color: Colors.white,
+                            fontFamily: ffGMedium,
+                          ),
+                          decoration: InputDecoration(
+                            // labelText: '',
+                            labelStyle: TextStyle(
+                              fontFamily: ffGMedium,
+                              fontSize: unitHeightValue * 0.02,
+                              color: textInputPlaceholderColor,
+                            ),
+                            hintText: 'Enter Name', // Placeholder text
+                            hintStyle: TextStyle(
+                              fontSize: unitHeightValue * 0.02,
+                              color: textInputPlaceholderColor.withOpacity(0.7),
+                              fontFamily: ffGMedium,
+                            ),
+                            floatingLabelBehavior: FloatingLabelBehavior.auto, // Default behavior
+                            prefixIcon: Icon(
+                              Icons.assignment_ind_sharp,
+                              color: Color(0xFF7A0180),
+                              size: unitHeightValue * 0.03,
+                            ),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.1,
+                              vertical: screenHeight * 0.02,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10), // Optional border
+                              borderSide: BorderSide.none,
+                            ),
+                            filled: true, // Optional for a filled background
+                            fillColor: Colors.grey.withOpacity(0.1), // Optional background color
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              if (_userName.text != value) {
+                                final cursorPosition = _userEmail.selection;
+                                _userName.text = value;
+                                _userName.selection = cursorPosition;
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.1,
+                          vertical: screenHeight * 0.01,
+                        ),
+                        decoration: BoxDecoration(
+                          color: white,
+                          borderRadius: BorderRadius.circular(20),
+                          gradient: const LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Color(0xFF000000),
+                              Color(0xFF3533CD),
+                            ],
+                          ),
+                        ),
+                        height: screenHeight * 0.06,
+                        child: TextFormField(
+                          // keyboardType: TextInputType.number,
+                          onTapOutside: (event) {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                          },
+                          autofocus: false,
+                          keyboardType: TextInputType.phone,
+                          controller: _userMobileNumber,
+                          style: TextStyle(
+                            fontSize: unitHeightValue * 0.02,
+                            color: Colors.white,
+                            fontFamily: ffGMedium,
+                          ),
+                          decoration: InputDecoration(
+                            // labelText: '',
+                            labelStyle: TextStyle(
+                              fontFamily: ffGMedium,
+                              fontSize: unitHeightValue * 0.02,
+                              color: textInputPlaceholderColor,
+                            ),
+                            hintText: 'Enter Number', // Placeholder text
+                            hintStyle: TextStyle(
+                              fontSize: unitHeightValue * 0.02,
+                              color: textInputPlaceholderColor.withOpacity(0.7),
+                              fontFamily: ffGMedium,
+                            ),
+                            floatingLabelBehavior: FloatingLabelBehavior.auto, // Default behavior
+                            prefixIcon: Icon(
+                              Icons.phone_android_rounded,
+                              color: Color(0xFF7A0180),
+                              size: unitHeightValue * 0.03,
+                            ),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.1,
+                              vertical: screenHeight * 0.02,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10), // Optional border
+                              borderSide: BorderSide.none,
+                            ),
+                            filled: true, // Optional for a filled background
+                            fillColor: Colors.grey.withOpacity(0.1), // Optional background color
+                          ),
+                          // onChanged: (value) {
+                          //   setState(() {
+                          //     if (_userMobileNumber.text != value) {
+                          //       final cursorPosition = _userMobileNumber.selection;
+                          //       _userMobileNumber.text = value;
+                          //       _userMobileNumber.selection = cursorPosition;
+                          //     }
+                          //   });
+                          // },
+                          onChanged: (value) {
+                            setState(() {
+                              _userMobileNumber.text = value;
+                              _userMobileNumber.selection = TextSelection.collapsed(offset: value.length);
+                            });
+                          },
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          validateFeilds();
+                        },
+                        child: Container(
+                          margin: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.1,
+                            vertical: screenHeight * 0.01,
+                          ),
+                          child: Card(
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                              side: BorderSide(width: 1, color: appThemeColor),
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: const LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Color(0xFF000000),
+                                    Color(0xFF3533CD),
+                                  ],
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              height: screenHeight * 0.06,
+                              child: Text(
+                                "Register",
+                                style: TextStyle(
+                                    fontSize: unitHeightValue * 0.02,
+                                    color: Colors.white, fontWeight: FontWeight.w300
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]
+                  )
                 ),
-                width: screenWidth * 0.9,
-                child: TextFormField(
-                  onTapOutside: (event) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                  autofocus: false,
-                  keyboardType: TextInputType.text,
-                  controller: _userName,
-                  style: TextStyle(
-                    fontSize: getScreenWidth(15),
-                    color: Colors.black,
-                    fontFamily: ffGMedium,
-                  ),
-                  decoration: InputDecoration(
-                      hintText: 'Enter Name',
-                      hintStyle: TextStyle(
-                          fontFamily: ffGMedium,
-                          fontSize: getScreenWidth(15),
-                          color: Colors.grey),
-                      contentPadding: EdgeInsets.all(15),
-                      border: InputBorder.none),
-                  onChanged: (value) {
-                    setState(() {
-                      if (_userName.text != value) {
-                        final cursorPosition = _userEmail.selection;
-                        _userName.text = value;
-                        _userName.selection = cursorPosition;
-                      }
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: getScreenHeight(5)),
-          //user email
-          // Column(
-          //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   children: [
-          //     Utils.returnInvoiceRedStar('Email'),
-          //     Container(
-          //       margin: const EdgeInsets.only(top: 5),
-          //       padding: const EdgeInsets.symmetric(vertical: 10),
-          //       decoration: BoxDecoration(
-          //         color: textinputBgColor,
-          //         borderRadius: BorderRadius.circular(5.0),
-          //       ),
-          //       width: screenWidth * 0.9,
-          //       child: TextFormField(
-          //         onTapOutside: (event) {
-          //           FocusManager.instance.primaryFocus?.unfocus();
-          //         },
-          //         autofocus: false,
-          //         keyboardType: TextInputType.emailAddress,
-          //         controller: _userEmail,
-          //         decoration: const InputDecoration(
-          //             hintText: 'Enter Email',
-          //             hintStyle: TextStyle(
-          //                 fontFamily: ffGMedium,
-          //                 fontSize: 15.0,
-          //                 color: Colors.grey),
-          //             contentPadding: EdgeInsets.all(15),
-          //             border: InputBorder.none),
-          //         onChanged: (value) {
-          //           setState(() {
-          //             if (_userEmail.text != value) {
-          //               final cursorPosition = _userEmail.selection;
-          //               _userEmail.text = value;
-          //               _userEmail.selection = cursorPosition;
-          //             }
-          //           });
-          //         },
-          //       ),
-          //     ),
-          //   ],
-          // ),
-          // SizedBox(height: 5),
-          //mobile number
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Utils.returnInvoiceRedStar('Mobile Number'),
-              Container(
-                margin: EdgeInsets.only(top: getScreenHeight(5)),
-                padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
-                decoration: BoxDecoration(
-                  color: textinputBgColor,
-                  borderRadius: BorderRadius.circular(getScreenWidth(5)),
-                ),
-                width: screenWidth * 0.9,
-                child: TextFormField(
-                  onTapOutside: (event) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                  autofocus: false,
-                  keyboardType: TextInputType.phone,
-                  controller: _userMobileNumber,
-                  style: TextStyle(
-                    fontSize: getScreenWidth(15),
-                    color: Colors.black,
-                    fontFamily: ffGMedium,
-                  ),
-                  decoration: InputDecoration(
-                      hintText: 'Enter Mobile Number',
-                      hintStyle: TextStyle(
-                          fontFamily: ffGMedium,
-                          fontSize: getScreenWidth(15),
-                          color: Colors.grey),
-                      contentPadding: EdgeInsets.all(15),
-                      border: InputBorder.none),
-                  onChanged: (value) {
-                    setState(() {
-                      if (_userMobileNumber.text != value) {
-                        final cursorPosition = _userMobileNumber.selection;
-                        _userMobileNumber.text = value;
-                        _userMobileNumber.selection = cursorPosition;
-                      }
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: getScreenHeight(5)),
-          // //user new password
-          // Column(
-          //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   children: [
-          //     Utils.returnInvoiceRedStar('New Password'),
-          //     Container(
-          //       margin: const EdgeInsets.only(top: 5),
-          //       padding: const EdgeInsets.symmetric(vertical: 10),
-          //       decoration: BoxDecoration(
-          //         color: textinputBgColor,
-          //         borderRadius: BorderRadius.circular(5.0),
-          //       ),
-          //       width: screenWidth * 0.9,
-          //       child: TextFormField(
-          //         onTapOutside: (event) {
-          //           FocusManager.instance.primaryFocus?.unfocus();
-          //         },
-          //         autofocus: false,
-          //         keyboardType: TextInputType.text,
-          //         controller: _userNewPassword,
-          //         obscureText: !newPasswordVisible,
-          //         decoration: InputDecoration(
-          //             hintText: 'Enter new password',
-          //             suffixIcon: Padding(
-          //               padding: const EdgeInsets.only(right: 4),
-          //               child: GestureDetector(
-          //                 onTap: () {
-          //                   setState(() {
-          //                     newPasswordVisible = !newPasswordVisible;
-          //                   });
-          //                 },
-          //                 child: Icon(
-          //                   newPasswordVisible
-          //                       ? Icons.visibility_rounded
-          //                       : Icons.visibility_off_rounded,
-          //                   color: appButtonColor,
-          //                   size: 24,
-          //                 ),
-          //               ),
-          //             ),
-          //             hintStyle: const TextStyle(
-          //                 fontFamily: ffGMedium,
-          //                 fontSize: 15.0,
-          //                 color: Colors.grey),
-          //             contentPadding: const EdgeInsets.all(15),
-          //             border: InputBorder.none),
-          //         onChanged: (value) {
-          //           setState(() {
-          //             if (_userNewPassword.text != value) {
-          //               final cursorPosition = _userNewPassword.selection;
-          //               _userNewPassword.text = value;
-          //               _userNewPassword.selection = cursorPosition;
-          //             }
-          //           });
-          //         },
-          //       ),
-          //     ),
-          //   ],
-          // ),
-          // SizedBox(height: 5),
-          // //user confirm password
-          // Column(
-          //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   children: [
-          //     Utils.returnInvoiceRedStar('Confirm Password'),
-          //     Container(
-          //       margin: const EdgeInsets.only(top: 5),
-          //       padding: const EdgeInsets.symmetric(vertical: 10),
-          //       decoration: BoxDecoration(
-          //         color: textinputBgColor,
-          //         borderRadius: BorderRadius.circular(5.0),
-          //       ),
-          //       width: screenWidth * 0.9,
-          //       child: TextFormField(
-          //         onTapOutside: (event) {
-          //           FocusManager.instance.primaryFocus?.unfocus();
-          //         },
-          //         autofocus: false,
-          //         keyboardType: TextInputType.text,
-          //         controller: _userConfirmPassword,
-          //         obscureText: !confirmPasswordVisible,
-          //         decoration: InputDecoration(
-          //             hintText: 'Enter confirm password',
-          //             suffixIcon: Padding(
-          //               padding: const EdgeInsets.only(right: 4),
-          //               child: GestureDetector(
-          //                 onTap: () {
-          //                   setState(() {
-          //                     confirmPasswordVisible = !confirmPasswordVisible;
-          //                   });
-          //                 },
-          //                 child: Icon(
-          //                   confirmPasswordVisible
-          //                       ? Icons.visibility_rounded
-          //                       : Icons.visibility_off_rounded,
-          //                   color: appButtonColor,
-          //                   size: 24,
-          //                 ),
-          //               ),
-          //             ),
-          //             hintStyle: const TextStyle(
-          //                 fontFamily: ffGMedium,
-          //                 fontSize: 15.0,
-          //                 color: Colors.grey),
-          //             contentPadding: const EdgeInsets.all(15),
-          //             border: InputBorder.none),
-          //         onChanged: (value) {
-          //           setState(() {
-          //             if (_userConfirmPassword.text != value) {
-          //               final cursorPosition = _userConfirmPassword.selection;
-          //               _userConfirmPassword.text = value;
-          //               _userConfirmPassword.selection = cursorPosition;
-          //             }
-          //           });
-          //         },
-          //       ),
-          //     ),
-          //   ],
-          // ),
-          // SizedBox(height: 5),
-        ],
-      ),
+                //user name
+                // Column(
+                //   crossAxisAlignment: CrossAxisAlignment.start,
+                //   children: [
+                //     Text("Name", style: TextStyle(
+                //       color: const Color(0xFF7A0180),
+                //       fontSize: unitHeightValue * 0.02,
+                //       fontWeight: FontWeight.bold,
+                //     )),
+                //     Container(
+                //       margin: EdgeInsets.only(top: getScreenHeight(5)),
+                //       padding:
+                //           EdgeInsets.symmetric(vertical: getScreenHeight(10)),
+                //       decoration: BoxDecoration(
+                //         color: textinputBgColor,
+                //         borderRadius: BorderRadius.circular(getScreenWidth(5)),
+                //       ),
+                //       width: screenWidth * 0.9,
+                //       child: TextFormField(
+                //         onTapOutside: (event) {
+                //           FocusManager.instance.primaryFocus?.unfocus();
+                //         },
+                //         autofocus: false,
+                //         keyboardType: TextInputType.text,
+                //         controller: _userName,
+                //         style: TextStyle(
+                //           fontSize: getScreenWidth(15),
+                //           color: Colors.black,
+                //           fontFamily: ffGMedium,
+                //         ),
+                //         decoration: InputDecoration(
+                //             hintText: 'Enter Name',
+                //             hintStyle: TextStyle(
+                //                 fontFamily: ffGMedium,
+                //                 fontSize: getScreenWidth(15),
+                //                 color: Colors.grey),
+                //             contentPadding: EdgeInsets.all(15),
+                //             border: InputBorder.none),
+                //         onChanged: (value) {
+                //           setState(() {
+                //             if (_userName.text != value) {
+                //               final cursorPosition = _userEmail.selection;
+                //               _userName.text = value;
+                //               _userName.selection = cursorPosition;
+                //             }
+                //           });
+                //         },
+                //       ),
+                //     ),
+                //   ],
+                // ),
+                // SizedBox(height: getScreenHeight(5)),
+                // //mobile number
+                // Column(
+                //   crossAxisAlignment: CrossAxisAlignment.start,
+                //   children: [
+                //     Text("Mobile Number", style: TextStyle(
+                //       color: const Color(0xFF7A0180),
+                //       fontSize: unitHeightValue * 0.02,
+                //       fontWeight: FontWeight.bold,
+                //     )),
+                //     Container(
+                //       margin: EdgeInsets.only(top: getScreenHeight(5)),
+                //       padding:
+                //           EdgeInsets.symmetric(vertical: getScreenHeight(10)),
+                //       decoration: BoxDecoration(
+                //         color: textinputBgColor,
+                //         borderRadius: BorderRadius.circular(getScreenWidth(5)),
+                //       ),
+                //       width: screenWidth * 0.9,
+                //       child: TextFormField(
+                //         onTapOutside: (event) {
+                //           FocusManager.instance.primaryFocus?.unfocus();
+                //         },
+                //         autofocus: false,
+                //         keyboardType: TextInputType.phone,
+                //         controller: _userMobileNumber,
+                //         style: TextStyle(
+                //           fontSize: getScreenWidth(15),
+                //           color: Colors.black,
+                //           fontFamily: ffGMedium,
+                //         ),
+                //         decoration: InputDecoration(
+                //             hintText: 'Enter Mobile Number',
+                //             hintStyle: TextStyle(
+                //                 fontFamily: ffGMedium,
+                //                 fontSize: getScreenWidth(15),
+                //                 color: Colors.grey),
+                //             contentPadding: EdgeInsets.all(15),
+                //             border: InputBorder.none),
+                //         onChanged: (value) {
+                //           setState(() {
+                //             if (_userMobileNumber.text != value) {
+                //               final cursorPosition = _userMobileNumber.selection;
+                //               _userMobileNumber.text = value;
+                //               _userMobileNumber.selection = cursorPosition;
+                //             }
+                //           });
+                //         },
+                //       ),
+                //     ),
+                //   ],
+                // ),
+              ],
+            ),
+          )
+      ])),
     );
   }
 }

@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:aultra_paints_mobile/screens/LayOut/LayOutPage.dart';
 import 'package:aultra_paints_mobile/screens/dashboard/DashboardNewPage.dart';
+import 'package:aultra_paints_mobile/screens/dashboard/PainterPopUpPage.dart';
+import 'package:aultra_paints_mobile/screens/launch/launchPage.dart';
 import 'package:aultra_paints_mobile/screens/painter/PainterPage.dart';
 import 'package:aultra_paints_mobile/services/UserViewModel.dart';
 
@@ -86,15 +88,14 @@ class MyAppState extends State<MyApp> {
       builder: EasyLoading.init(),
       routes: {
         "/splashPage": (context) => const SplashPage(),
+        "/launchPage": (context) => const LaunchPage(),
         "/loginPage": (context) => const LoginPage(),
         "/signupPage": (context) => const SignupPage(),
         "/otpPage": (context) => const OtpPage(),
         "/dashboardPage": (context) => LayoutPage(child: DashboardNewPage()),
         "/painters": (context) => LayoutPage(child: PainterPage()),
         "/qrScanner": (context) => const QrScanner(),
-        // '/': (context) => LayoutPage(child: DashboardNewPage(), title: 'Home'),
-        // '/profile': (context) => LayoutPage(child: ProfilePage(), title: 'Profile'),
-        // '/settings': (context) => LayoutPage(child: SettingsPage(), title: 'Settings'),
+        "/painterPopUpPage": (context) => const PainterPopUpPage(),
       },
     );
   }

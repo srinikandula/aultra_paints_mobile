@@ -261,6 +261,282 @@ class _OtpPageState extends State<OtpPage> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: SafeArea(
+        child: Scaffold(
+          resizeToAvoidBottomInset: true,
+          key: _scaffoldKey,
+          body: Container(
+            // Apply the gradient background
+            height: screenHeight, // 100% height
+            width: screenWidth,  // 100% width
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Color(0xFFFFF7AD),
+                  Color(0xFFFFA9F9),
+                ],
+              ),
+            ),
+            child: SafeArea(
+              child: Stack(
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Form(
+                    key: _formKey,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: screenWidth,
+                            child: Row(
+                              children: [
+                                InkWell(
+                                  onTap: () => Navigator.pop(context, true),
+                                  child: Container(
+                                    margin: EdgeInsets.symmetric(
+                                      horizontal: screenWidth * 0.02,
+                                      vertical: screenHeight * 0.02,
+                                    ),
+                                    child: Icon(Icons.keyboard_double_arrow_left_sharp,
+                                      color: const Color(0xFF7A0180),
+                                      size: screenWidth * 0.08,
+                                    ),
+                                  ),
+                                ),
+                                Text('OTP', style: TextStyle(
+                                    fontSize: unitHeightValue * 0.03,
+                                    color: const Color(0xFF7A0180),
+                                    fontWeight: FontWeight.bold
+                                ),)
+                              ]
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0,
+                              vertical: screenHeight * 0.04,
+                            ),
+                            height: screenHeight * 0.88,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: screenWidth * 0.5,
+                                  // height: getScreenWidth(40),
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                          height: screenHeight * 0.2,
+                                          child: Image.asset('assets/images/app_file_icon.png')),
+                                      SizedBox(
+                                          height: screenHeight * 0.14,
+                                          child: Image.asset('assets/images/app_name.png')),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.1,
+                                    vertical: screenHeight * 0,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text("Enter OTP", style: TextStyle(
+                                            color: const Color(0xFF7A0180),
+                                            fontSize: unitHeightValue * 0.03,
+                                            fontWeight: FontWeight.bold,
+                                          )),
+                                        ]
+                                      ),
+                                      Container(
+                                        alignment: Alignment.center,
+                                        margin: EdgeInsets.symmetric(
+                                          horizontal: screenWidth * 0,
+                                          vertical: screenHeight * 0.01,
+                                        ),
+                                        width: screenWidth * 1,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: List.generate(6, (index) {
+                                            return Container(
+                                              width: getScreenWidth(43),
+                                              decoration: BoxDecoration(
+                                                color: white,
+                                                borderRadius: BorderRadius.circular(20),
+                                                gradient: const LinearGradient(
+                                                  begin: Alignment.centerLeft,
+                                                  end: Alignment.centerRight,
+                                                  colors: [
+                                                    Color(0xFF000000),
+                                                    Color(0xFF3533CD),
+                                                  ],
+                                                ),
+                                              ),
+                                              child: TextField(
+                                                controller: controllers[index],
+                                                focusNode: focusNodes[index],
+                                                keyboardType: TextInputType.number,
+                                                textAlign: TextAlign.center,
+                                                maxLength: 1,
+                                                onTapOutside: (event) {
+                                                  FocusManager.instance.primaryFocus?.unfocus();
+                                                },
+                                                style: TextStyle(
+                                                  fontSize: getScreenWidth(24),
+                                                  fontFamily: ffGSemiBold,
+                                                  color: Colors.white,
+                                                ),
+                                                decoration: InputDecoration(
+                                                  fillColor: Colors.transparent, // Let the Container's background show
+                                                  counterText: "", // Hide the counter text (default "0/1")
+                                                  border: OutlineInputBorder(
+                                                    borderRadius: BorderRadius.circular(10), // Optional border
+                                                    borderSide: BorderSide.none,
+                                                  ),
+                                                  focusedBorder: OutlineInputBorder(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    borderSide: BorderSide.none,
+                                                  ),
+                                                  filled: true,
+                                                ),
+                                                onChanged: (value) {
+                                                  if (value.isNotEmpty) {
+                                                    if (index < focusNodes.length - 1) {
+                                                      FocusScope.of(context).requestFocus(focusNodes[index + 1]);
+                                                    } else {
+                                                      FocusScope.of(context).unfocus();
+                                                    }
+                                                  } else if (index > 0) {
+                                                    FocusScope.of(context).requestFocus(focusNodes[index - 1]);
+                                                  }
+                                                  setState(() {
+                                                    verificationCode = controllers.map((controller) => controller.text).join('');
+                                                  });
+                                                },
+                                                onSubmitted: (value) {
+                                                  if (index == focusNodes.length - 1) {
+                                                    FocusScope.of(context).unfocus();
+                                                  }
+                                                },
+                                              ),
+                                            );
+                                          }),
+                                        ),
+                                      ),
+                                      InkWell(
+                                        onTap: !isOTPButtonEnabled
+                                            ? null
+                                            : () {
+                                          Utils.clearToasts(context);
+                                          resendOTP();
+                                        },
+                                        child: Container(
+                                          alignment: Alignment.centerRight,
+                                          // margin: EdgeInsets.only(right: screenWidth * 0),
+                                          margin: EdgeInsets.symmetric(
+                                            horizontal: screenWidth * 0,
+                                            vertical: screenHeight * 0.01,
+                                          ),
+                                          child: Text(
+                                            isOTPButtonEnabled ? 'Resend OTP' : 'Resend OTP in $resendDelay s',
+                                            style: TextStyle(
+                                              decorationThickness: 1.5,
+                                              fontSize: getScreenHeight(14),
+                                              fontFamily: ffGMedium,
+                                              color:
+                                              isOTPButtonEnabled ? const Color(0xFF7A0180) : drawerSubListColor),
+                                          ),
+                                        ),
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+                                          if (verificationCode != null) {
+                                            if (verificationCode.length == 6) {
+                                              if (onlyNumberRegex.hasMatch(verificationCode)) {
+                                                onVerifyOTP(verificationCode);
+                                              } else {
+                                                _showSnackBar("Please enter only numbers", context, false);
+                                              }
+                                            } else {
+                                              _showSnackBar("Please enter 6 digit OTP", context, false);
+                                            }
+                                          } else {
+                                            _showSnackBar("Please enter OTP", context, false);
+                                          }
+                                        },
+                                        child: Container(
+                                          margin: EdgeInsets.symmetric(
+                                            horizontal: screenWidth * 0,
+                                            vertical: screenHeight * 0.03,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(20),
+                                            gradient: const LinearGradient(
+                                              begin: Alignment.centerLeft,
+                                              end: Alignment.centerRight,
+                                              colors: [
+                                                Color(0xFF000000),
+                                                Color(0xFF3533CD),
+                                              ],
+                                            ),
+                                          ),
+                                          alignment: Alignment.center,
+                                          height: screenHeight * 0.06,
+                                          child: Text(
+                                            "Login",
+                                            style: TextStyle(
+                                                fontSize: unitHeightValue * 0.02,
+                                                color: Colors.white, fontWeight: FontWeight.w300
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                      // FooterButton('Login', '', context, () => {
+                                      //   Utils.clearToasts(context),
+                                      //   if (verificationCode != null) {
+                                      //     if (verificationCode.length == 6) {
+                                      //       if (onlyNumberRegex.hasMatch(verificationCode)) {
+                                      //         onVerifyOTP(verificationCode)
+                                      //       } else {
+                                      //         _showSnackBar("Please enter only numbers", context, false)
+                                      //       }
+                                      //     } else {s
+                                      //       _showSnackBar("Please enter 6 digit OTP", context, false)
+                                      //     }
+                                      //   } else {
+                                      //     _showSnackBar("Please enter OTP", context, false)
+                                      //   }
+                                      // }),
+                                    ]
+                                  )
+                                )
+                              ]
+                            )
+                          )
+                        ],
+                      )
+                    )
+                  ),
+                ]
+              )
+            )
+          ),
+        )
+      )
+    );
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -300,18 +576,19 @@ class _OtpPageState extends State<OtpPage> {
   returnOTPsetup() {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
     return Column(
       children: [
         Container(
-          width: screenWidth * 0.8,
+          width: screenWidth * 0.5,
           // height: getScreenWidth(40),
-          child: Row(
+          child: Column(
             children: [
-              Container(
-                  height: getScreenWidth(40),
-                  child: Image.asset('assets/images/app_icon.png')),
-              Container(
-                  height: getScreenWidth(25),
+              SizedBox(
+                  height: screenHeight * 0.2,
+                  child: Image.asset('assets/images/app_file_icon.png')),
+              SizedBox(
+                  height: screenHeight * 0.14,
                   child: Image.asset('assets/images/app_name.png')),
             ],
           ),
