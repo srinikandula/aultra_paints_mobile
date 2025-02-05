@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'Colors.dart';
@@ -25,6 +26,13 @@ class SingleParamHeader extends StatelessWidget {
         backgroundColor: ColorCheck ? Colors.green : Colors.red,
         duration: Utils.returnStatusToastDuration(ColorCheck));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  clearStorage() async {
+    Utils.clearToasts(context);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+    Navigator.of(context).pushNamed('/splashPage');
   }
 
   @override
@@ -95,26 +103,12 @@ class SingleParamHeader extends StatelessWidget {
           !showQueryButton
               ? SizedBox.shrink()
               : InkWell(
-                  onTap: () async {
-                    var url =
-                        Uri.parse("https://logipace.mahindralogistics.com");
-                    try {
-                      if (await canLaunchUrl(url)) {
-                        Utils.openUrl(url);
-                      } else {
-                        _showSnackBar(
-                            "Could not open URL in browser.", context, false);
-                      }
-                    } catch (e) {
-                      _showSnackBar(
-                          "Failed to open URL in browser.", context, false);
-                    }
+                  onTap: () {
+                    clearStorage();
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                        horizontal: headerText == 'Pending Assignment'
-                            ? getScreenWidth(5)
-                            : getScreenWidth(5),
+                        horizontal: getScreenWidth(5),
                         vertical: getScreenHeight(8)),
                     decoration: BoxDecoration(
                       color: appDarkRed,
@@ -123,20 +117,11 @@ class SingleParamHeader extends StatelessWidget {
                     child: Row(
                       children: [
                         Text(
-                          'Raise a query',
+                          'Logout',
                           style: TextStyle(
-                            fontSize: getScreenWidth(10),
+                            fontSize: getScreenWidth(12),
                             fontFamily: ffGSemiBold,
                             color: white,
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Container(
-                          width: getScreenWidth(15),
-                          height: getScreenWidth(15),
-                          child: Image.asset(
-                            'assets/images/queryAsk.png',
-                            fit: BoxFit.cover,
                           ),
                         ),
                       ],

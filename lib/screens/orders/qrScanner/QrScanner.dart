@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:aultra_paints_mobile/utility/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../services/config.dart';
@@ -48,13 +49,19 @@ class _QrScannerState extends State<QrScanner> {
     Utils.clearToasts(context);
     Utils.returnScreenLoader(context);
     http.Response response;
-    var QRCodeId = scannedValue.split('tx=')[1];
-    var apiUrl = BASE_URL + GET_SCANNED_DATA + QRCodeId;
 
-    response = await http.patch(Uri.parse(apiUrl), headers: {
-      "Content-Type": "application/json",
-      "Authorization": accesstoken
-    });
+    // var QRCodeId = scannedValue.split('tx=')[1];
+    Map<String, String> requestBody = {"qrCodeUrl": scannedValue};
+    final body = json.encode(requestBody);
+
+    var apiUrl = BASE_URL + POST_SCANNED_DATA;
+
+    response = await http.post(Uri.parse(apiUrl),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": accesstoken
+        },
+        body: body);
     if (response.statusCode == 200) {
       Navigator.pop(context);
       var apiResp = json.decode(response.body);
@@ -62,8 +69,9 @@ class _QrScannerState extends State<QrScanner> {
       showApiResponsePopup(context, apiResp);
     } else {
       Navigator.pop(context);
+      var apiResp = json.decode(response.body);
       error_handling.errorValidation(
-          context, response.statusCode, response.body, false);
+          context, response.statusCode, apiResp['message'], false);
       setState(() {
         allowScanner = true;
       });
@@ -79,6 +87,11 @@ class _QrScannerState extends State<QrScanner> {
 
   Future<bool> _onWillPop() async {
     onBackPressed();
+    return false;
+  }
+
+  Future<bool> _onPopUpBack() async {
+    // onBackPressed();
     return false;
   }
 
@@ -159,12 +172,12 @@ class _QrScannerState extends State<QrScanner> {
 
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return WillPopScope(
-              onWillPop: _onWillPop,
+              onWillPop: _onPopUpBack,
               child: Dialog(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -172,13 +185,13 @@ class _QrScannerState extends State<QrScanner> {
                 elevation: 10,
                 child: Container(
                   width: screenWidth * 0.4,
-                  height: screenHeight * 0.25,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: screenWidth * 0.1,
-                    vertical: screenHeight * 0.01,
-                  ),
+                  height: screenHeight * 0.28,
+                  // padding: EdgeInsets.symmetric(
+                  //   horizontal: screenWidth * 0.1,
+                  //   vertical: screenHeight * 0.01,
+                  // ),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(getScreenWidth(20)),
                     gradient: const LinearGradient(
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
@@ -191,47 +204,59 @@ class _QrScannerState extends State<QrScanner> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Center(
-                        child: Text(
-                          rewardPoints.toString(),
-                          style: TextStyle(
-                            fontSize: unitHeightValue * 0.1,
-                            fontFamily: ffGSemiBold,
-                            color: const Color(0xFF3533CD),
-                          ),
+                      Text(
+                        rewardPoints.toString(),
+                        style: TextStyle(
+                          fontSize: unitHeightValue * 0.1,
+                          fontFamily: ffGSemiBold,
+                          color: const Color(0xFF3533CD),
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.02),
+                      Text(
+                        "Reward Points",
+                        style: TextStyle(
+                          fontSize: getScreenWidth(14),
+                          color: const Color(0xFF3533CD),
+                          fontFamily: ffGSemiBold,
+                        ),
+                      ),
+                      SizedBox(height: 3),
                       Center(
                         child: Text(
                           "With Coupon : $couponCode",
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: TextStyle(
+                            fontSize: getScreenWidth(16),
                             color: Color(0xFF3533CD),
                             fontFamily: ffGSemiBold,
                           ),
                         ),
                       ),
-                      // SizedBox(height: 2),
-                      // Text("Reward Points: ${data['rewardPoints'] ?? 0}", style: TextStyle(fontSize: 14, color: Colors.white, fontFamily: ffGSemiBold,),),
-                      // SizedBox(height: screenHeight * 0.02),
-                      // Align(
-                      //   alignment: Alignment.center,
-                      //   child: TextButton(
-                      //     onPressed: () {
-                      //       Navigator.pop(context, true);
-                      //       Navigator.pop(context, true);
-                      //     },
-                      //     child: const Text(
-                      //         "OK",
-                      //         style: TextStyle(
-                      //           fontSize: 14,
-                      //           color: Color(0xFF3533CD),
-                      //           fontFamily: ffGSemiBold,
-                      //         )
-                      //     ),
+                      SizedBox(height: getScreenHeight(2)),
+                      // Text(
+                      //   "Reward Points: ${data['rewardPoints'] ?? 0}",
+                      //   style: TextStyle(
+                      //     fontSize: getScreenWidth(14),
+                      //     color: Colors.white,
+                      //     fontFamily: ffGSemiBold,
                       //   ),
                       // ),
+                      // SizedBox(height: screenHeight * 0.02),
+                      Divider(thickness: 1),
+                      Align(
+                        alignment: Alignment.center,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pop(context, true);
+                            Navigator.pop(context, true);
+                          },
+                          child: Text("OK",
+                              style: TextStyle(
+                                fontSize: getScreenWidth(16),
+                                color: Color(0xFF3533CD),
+                                fontFamily: ffGSemiBold,
+                              )),
+                        ),
+                      ),
                     ],
                   ),
                 ),

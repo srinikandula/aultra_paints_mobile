@@ -172,7 +172,7 @@ class _PainterPopUpPageState extends State<PainterPopUpPage> {
         ),
         child: Column(
           children: [
-            SingleParamHeader('Enter\nPartner Details', '', context, false,
+            SingleParamHeader('Enter\nPartner Details', '', context, true,
                 () => Navigator.pop(context, true)),
             Expanded(
               child: SingleChildScrollView(

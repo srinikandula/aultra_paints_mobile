@@ -106,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       // Handle errors
-      print('Error: $e');
+      print('Error at catch: $e');
       Loader.hideLoader(context);
       _showSnackBar(
         "An error occurred: ${e.toString()}",
