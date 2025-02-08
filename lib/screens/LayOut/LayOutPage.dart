@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/UserViewModel.dart';
+import '../../services/WidgetScreens/DealerSearchDialog.dart';
+import '../../services/WidgetScreens/TransferPointsDialog.dart';
 import '../../services/config.dart';
 import '../../services/error_handling.dart';
 import '../../utility/Colors.dart';
@@ -267,8 +269,8 @@ class MyDrawer extends StatelessWidget {
   final String accountMobile;
   final String accountType;
   final VoidCallback onLogout;
-  final String parentDealerCode;
-  final String parentDealerName;
+  late final String parentDealerCode;
+  late final String parentDealerName;
 
   MyDrawer(
       {required this.accountName,
@@ -334,26 +336,48 @@ class MyDrawer extends StatelessWidget {
                         fontSize: unitHeightValue * 0.018,
                       )),
                   if (accountType == 'Painter')
-                    Container(
-                      // height: screenHeight * 0.2,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text('Dealer Name ',
-                              style: TextStyle(
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text('Dealer Name ',
+                            style: TextStyle(
+                              color: const Color(0xFF3533CD),
+                              fontFamily: ffGMedium,
+                              fontSize: unitHeightValue * 0.018,
+                            )),
+                        Text(parentDealerName,
+                            style: TextStyle(
                                 color: const Color(0xFF3533CD),
-                                fontFamily: ffGMedium,
+                                fontFamily: ffGBold,
                                 fontSize: unitHeightValue * 0.018,
-                              )),
-                          Text(parentDealerName,
-                              style: TextStyle(
-                                  color: const Color(0xFF3533CD),
-                                  fontFamily: ffGBold,
-                                  fontSize: unitHeightValue * 0.018,
-                                  fontWeight: FontWeight.bold)),
-                          // Icon(FontAwesomeIcons.circl, size: 10, color: drawerSubListColor,),
-                        ],
-                      ),
+                                fontWeight: FontWeight.bold)),
+                        IconButton(
+                          icon: Icon(
+                            FontAwesomeIcons.pencil,
+                            size: unitHeightValue * 0.018,
+                            color: const Color(0xFF3533CD),
+                          ),
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            // Navigator.pushNamed(context, '/painterPopUpPage');
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return DealerSearchDialog(
+                                  onDealerSelected: (String dealerCode, String dealerName) {
+                                     return {
+                                      parentDealerCode = dealerCode,
+                                      parentDealerName = dealerName,
+                                    };
+                                  }, onDealerComplete: () {
+                                    Navigator.pushNamed(context, '/dashboardPage');
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
                     ),
                 ],
               ),
@@ -397,6 +421,31 @@ class MyDrawer extends StatelessWidget {
                       ),
                       onTap: () {
                         Navigator.pushNamed(context, '/painters');
+                      },
+                    ),
+                  if (accountType == 'Painter')
+                    ListTile(
+                      title: Text(
+                        'Transfer Points',
+                        style: TextStyle(
+                          color: const Color(0xFF3533CD),
+                          fontFamily: ffGSemiBold,
+                          fontSize: unitHeightValue * 0.028,
+                        ),
+                      ),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return TransferPointsDialog(
+                              accountId: accountId,
+                              accountName: accountName,
+                              onTransferComplete: () {
+                                Navigator.pushNamed(context, '/dashboardPage');
+                              },
+                            );
+                          },
+                        );
                       },
                     ),
                 ],
