@@ -1,6 +1,12 @@
 // const BASE_URL = 'http://localhost:8080/api/'; //QA
+<<<<<<< HEAD
 // const BASE_URL = 'http://10.72.24.177:4300/api/'; //QA
 const BASE_URL = 'https://api.aultrapaints.com/api/'; //QA
+=======
+// const BASE_URL = 'http://192.168.1.4:4300/api/'; //QA
+// const BASE_URL = 'https://api.aultrapaints.com/api/'; //QA
+const BASE_URL = 'https://mapp.aultrapaints.com/api/';
+>>>>>>> 3d5e248 (Dealer Edit And Transfer Points Changes)
 
 const IOS_APP_VERSION = '1.0.0';
 
@@ -11,11 +17,15 @@ const REGISTER_USER = "auth/register"; //signup
 
 const GET_USER_DETAILS = "users/getUser/"; //dashboard
 
+const GET_DEALERS = "users/getDealers";
+
 const GET_USER_DEALER = "users/getUserDealer/";
 
 const GET_USER_PARENT_DEALER_CODE_DETAILS = "users/getParentDealerCodeUser";
 
 const VERIFY_OTP_UPDATE_USER = "users/verifyOtpUpdateUser";
+
+const TRANSFER_TO_DEALER = "transfer/toDealer";
 
 const CREATE_ORDER = "order/orders";
 
