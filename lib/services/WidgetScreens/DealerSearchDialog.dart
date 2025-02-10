@@ -59,7 +59,6 @@ class _DealerSearchDialogState extends State<DealerSearchDialog> {
       selectedDealer = null;
       return;
     }
-    print("${query}------------------------------------------------------------------------ ${accesstoken}");
 
     response = await http.post(
       Uri.parse(apiUrl),
@@ -71,7 +70,6 @@ class _DealerSearchDialogState extends State<DealerSearchDialog> {
     );
 
     final responseData = json.decode(response.body);
-    print("${responseData}>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     if (response.statusCode == 200) {// Navigator.pop(context);
       setState(() {
         dealerList = responseData['data'];

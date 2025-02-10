@@ -1,12 +1,7 @@
 // const BASE_URL = 'http://localhost:8080/api/'; //QA
-<<<<<<< HEAD
-// const BASE_URL = 'http://10.72.24.177:4300/api/'; //QA
-const BASE_URL = 'https://api.aultrapaints.com/api/'; //QA
-=======
 // const BASE_URL = 'http://192.168.1.4:4300/api/'; //QA
-// const BASE_URL = 'https://api.aultrapaints.com/api/'; //QA
-const BASE_URL = 'https://mapp.aultrapaints.com/api/';
->>>>>>> 3d5e248 (Dealer Edit And Transfer Points Changes)
+const BASE_URL = 'https://api.aultrapaints.com/api/';
+// const BASE_URL = 'https://mapp.aultrapaints.com/api/';
 
 const IOS_APP_VERSION = '1.0.0';
 

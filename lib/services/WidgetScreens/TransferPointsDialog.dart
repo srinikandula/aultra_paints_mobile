@@ -26,6 +26,11 @@ class TransferPointsDialog extends StatefulWidget {
 
 class _TransferPointsDialogState extends State<TransferPointsDialog> {
   var accesstoken;
+  TextEditingController pointsController = TextEditingController();
+  bool pointEnterErr = false;
+  TextEditingController otpController = TextEditingController();
+  bool otpSent = false;  // To track OTP state
+  String rewardBalance = "0";  // Fetch from API if needed
   @override
   void initState() {
     fetchLocalStorageData();
@@ -34,14 +39,8 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
   fetchLocalStorageData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     accesstoken = prefs.getString('accessToken');
-    getDashboardDetails();
+    await getDashboardDetails();
   }
-
-  TextEditingController pointsController = TextEditingController();
-  bool pointEnterErr = false;
-  TextEditingController otpController = TextEditingController();
-  bool otpSent = false;  // To track OTP state
-  String rewardBalance = "0";  // Fetch from API if needed
 
   Future getDashboardDetails() async {
     Utils.clearToasts(context);
@@ -58,12 +57,16 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
       Navigator.pop(context);
       var tempResp = json.decode(response.body);
       var apiResp = tempResp['data'];
-      rewardBalance = apiResp['rewardPoints'].toString();
+
+      setState(() {  // Update the UI when data is fetched
+        rewardBalance = apiResp['rewardPoints'].toString();
+      });
     } else {
       Navigator.pop(context);
       error_handling.errorValidation(context, response.statusCode, response.body, false);
     }
   }
+
 
   void _showSnackBar(String message, BuildContext context, ColorCheck) {
     final snackBar = SnackBar(
@@ -92,12 +95,8 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
     if (response.statusCode == 200) {
       Navigator.pop(context);
       var tempResp = json.decode(response.body);
-      print('${tempResp}');
-      print(tempResp);
-
       Navigator.pop(context, true);
       widget.onTransferComplete();
-      _showSnackBar("Details saved successfully.", context, true);
     } else {
       Navigator.pop(context);
       final tempResp = json.decode(response.body);
@@ -174,7 +173,7 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                       /// Row 1: Reward Point Balance
                       Container(
                         height: rowHeight, // Fixed row height
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           border: Border(
                             bottom: BorderSide(color: Colors.black, width: 1),
                           ),
@@ -197,7 +196,7 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                               child: Container(
                                 height: double.infinity,
                                 alignment: Alignment.center,
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   border: Border(
                                     left: BorderSide(color: Colors.black, width: 1),
                                   ),
@@ -237,7 +236,7 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                               child: Container(
                                 height: double.infinity,
                                 alignment: Alignment.center,
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   border: Border(
                                     left: BorderSide(color: Colors.black, width: 1),
                                   ),
@@ -287,7 +286,7 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                       if (pointEnterErr)
                         Container(
                           height: 30,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             border: Border(
                               top: BorderSide(color: Colors.black, width: 1),
                             ),
@@ -305,7 +304,7 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                     ],
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 if (!otpSent)
                   Align(
@@ -327,9 +326,8 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                           if (pointsController.text.isEmpty) {
                             pointEnterErr = true;
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Please enter points to transfer"))
+                              const SnackBar(content: Text("Please enter points to transfer"))
                             );
-                            print('${pointEnterErr}================================');
                             return;
                           }
                           pointEnterErr = false;

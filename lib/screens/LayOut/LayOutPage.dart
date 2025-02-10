@@ -305,33 +305,49 @@ class MyDrawer extends StatelessWidget {
         ),
         child: ListView(
           // padding: EdgeInsets.symmetric(vertical: screenHeight * 0.05, horizontal: 0),
-          padding: EdgeInsets.only(top: screenHeight * 0.05),
+          // padding: EdgeInsets.only(top: screenHeight * 0.05),
           children: <Widget>[
             Container(
               // height: screenHeight * 0.1,
               margin: EdgeInsets.symmetric(
-                  horizontal: getScreenWidth(20),
-                  vertical: getScreenHeight(10)),
+                  horizontal: screenWidth * 0.08,
+                  vertical: screenHeight * 0.01),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                Text(
                     accountName,
                     style: TextStyle(
-                      color: const Color(0xFF3533CD),
+                      color: accountType == 'Painter' ? const Color(0xFF3498db) :
+                             accountType == 'Dealer' ? const Color(0xFF2ecc71) :
+                             accountType == 'Contractor' ? const Color(0xFFe67e22) :
+                             accountType == 'SuperUser' ? const Color(0xFFe74c3c) :
+                             const Color(0xFF3533CD),
                       fontFamily: ffGBold,
                       fontSize: unitHeightValue * 0.03,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text(accountType,
-                      style: TextStyle(
-                        color: const Color(0xFF3533CD),
-                        fontFamily: ffGMedium,
-                        fontSize: unitHeightValue * 0.018,
-                      )),
+                  // Text(
+                  //   accountType,
+                  //   style: TextStyle(
+                  //     color: accountType == 'Painter' ? const Color(0xFF3498db) :
+                  //            accountType == 'Dealer' ? const Color(0xFF2ecc71) :
+                  //            accountType == 'Contractor' ? const Color(0xFFe67e22) :
+                  //            accountType == 'Superuser' ? const Color(0xFFe74c3c) :
+                  //            const Color(0xFF3533CD),
+                  //     fontFamily: ffGBold,
+                  //     fontSize: unitHeightValue * 0.018,
+                  //     fontWeight: FontWeight.bold,
+                  //   ),
+                  // ),
                   Text(accountMobile,
                       style: TextStyle(
-                        color: const Color(0xFF3533CD),
+                        color: accountType == 'Painter' ? const Color(0xFF3498db) :
+                        accountType == 'Dealer' ? const Color(0xFF2ecc71) :
+                        accountType == 'Contractor' ? const Color(0xFFe67e22) :
+                        accountType == 'SuperUser' ? const Color(0xFFe74c3c) :
+                        const Color(0xFF3533CD),
                         fontFamily: ffGMedium,
                         fontSize: unitHeightValue * 0.018,
                       )),
@@ -339,7 +355,7 @@ class MyDrawer extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text('Dealer Name ',
+                        Text('My Dealer ',
                             style: TextStyle(
                               color: const Color(0xFF3533CD),
                               fontFamily: ffGMedium,
@@ -440,8 +456,9 @@ class MyDrawer extends StatelessWidget {
                             return TransferPointsDialog(
                               accountId: accountId,
                               accountName: accountName,
-                              onTransferComplete: () {
-                                Navigator.pushNamed(context, '/dashboardPage');
+                              onTransferComplete: () async {
+                                // Show success popup
+                                showSuccessPopup(context);
                               },
                             );
                           },
@@ -474,5 +491,62 @@ class MyDrawer extends StatelessWidget {
         ),
       ),
     );
+  }
+
+void showSuccessPopup(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
+    showDialog(
+      context: context,
+      barrierDismissible: true, // Allows closing the popup by tapping outside
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async {
+            Navigator.pop(context); // Close the popup
+            Navigator.pushNamed(context, '/dashboardPage'); // Call callback function
+            return true; // Allow dismissal
+          },
+          child: AlertDialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            content: Container(
+              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.05, horizontal: screenWidth * 0.05),
+              width: screenWidth * 0.6,
+              height: screenHeight * 0.28,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: const LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Color(0xFFFFF7AD),
+                    Color(0xFFFFA9F9),
+                  ],
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.check_outlined,
+                    color: Colors.green,
+                    size: unitHeightValue * 0.08,
+                  ),
+                  SizedBox(height: screenHeight * 0.04),
+                  Text(
+                    "Success",
+                    style: TextStyle(fontSize: unitHeightValue * 0.04, fontWeight: FontWeight.w400, color: const Color(0xFF3533CD),),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    ).then((_) {
+      Navigator.pushNamed(context, '/dashboardPage'); // Ensure callback is always called
+    });
   }
 }
