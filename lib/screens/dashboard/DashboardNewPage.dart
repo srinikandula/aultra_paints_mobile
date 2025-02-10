@@ -124,14 +124,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       var tempResp = json.decode(response.body);
       var apiResp = tempResp['data'];
       dashBoardList = [
-<<<<<<< HEAD
         {
           "title": "Reward Points ",
           "count": apiResp['rewardPoints'].toString()
         },
-=======
-        {"title": "Reward Points ", "count": apiResp['rewardPoints'].toString()},
->>>>>>> origin/DPdev
       ];
 
       accountType = USER_ACCOUNT_TYPE;
@@ -449,12 +445,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                     child: Container(
                       width: screenWidth * 0.35,
                       margin: EdgeInsets.symmetric(
-<<<<<<< HEAD
                           horizontal: screenWidth * 0.028,
                           vertical: screenHeight * 0.01),
-=======
-                          horizontal: screenWidth * 0.028, vertical: screenHeight * 0.01),
->>>>>>> origin/DPdev
                       padding: EdgeInsets.only(top: getScreenHeight(4)),
                       decoration: BoxDecoration(
                         color: const Color(0x33800180),
@@ -481,12 +473,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                 placeholder: 'assets/images/app_file_icon.png',
                                 image: offer['productOfferImageUrl'] ?? '',
                                 fit: BoxFit.cover,
-<<<<<<< HEAD
                                 imageErrorBuilder: (context, error,
                                     stackTrace) {
-=======
-                                imageErrorBuilder: (context, error, stackTrace) {
->>>>>>> origin/DPdev
                                   return Image.asset(
                                     'assets/images/app_file_icon.png',
                                     fit: BoxFit.cover,
@@ -498,17 +486,11 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                           Container(
                             width: screenWidth,
                             margin: EdgeInsets.symmetric(
-<<<<<<< HEAD
                                 horizontal: screenWidth * 0.018,
                                 vertical: screenHeight * 0.01),
                             padding: EdgeInsets.symmetric(
                                 horizontal: screenWidth * 0.03,
                                 vertical: screenHeight * 0.01),
-=======
-                                horizontal: screenWidth * 0.018, vertical: screenHeight * 0.01),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.03, vertical: screenHeight * 0.01),
->>>>>>> origin/DPdev
                             decoration: BoxDecoration(
                               color: const Color(0x33800180),
                               borderRadius: BorderRadius.circular(20),
@@ -544,7 +526,6 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
   }
 
   returnShowModalBottomSheet(offer) {
-<<<<<<< HEAD
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     final double unitHeightValue = MediaQuery.of(context).size.height;
@@ -694,145 +675,6 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
         .of(context)
         .size
         .height;
-=======
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double unitHeightValue = MediaQuery.of(context).size.height;
-    return showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Container(
-          height: screenHeight * 0.7,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: const LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                Color(0xFFFFF7AD),
-                Color(0xFFFFA9F9),
-              ],
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: screenWidth,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    InkWell(
-                      onTap: () => Navigator.pop(context, true),
-                      child: Container(
-                        margin: EdgeInsets.symmetric(
-                          horizontal: screenWidth * 0.04,
-                          vertical: screenHeight * 0.02,
-                        ),
-                        child: Icon(
-                          Icons.clear_sharp,
-                          color: const Color(0xFF7A0180),
-                          size: screenWidth * 0.06,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded( // Allows scrolling inside the modal
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(getScreenWidth(20))),
-                        child: FadeInImage.assetNetwork(
-                          placeholder: 'assets/images/app_file_icon.png',
-                          image: offer['productOfferImageUrl'] ?? '',
-                          height: screenHeight * 0.38,
-                          width: screenWidth * 0.8,
-                          fit: BoxFit.cover,
-                          imageErrorBuilder: (context, error, stackTrace) {
-                            return Image.asset(
-                              'assets/images/app_file_icon.png',
-                              fit: BoxFit.cover,
-                            );
-                          },
-                        ),
-                      ),
-                      // Image.network(
-                      //   offer['productOfferImageUrl'] ?? '',
-                      //   height: screenHeight * 0.38,
-                      //   width: screenWidth * 0.8,
-                      //   fit: BoxFit.cover,
-                      //   errorBuilder: (context, error, stackTrace) =>
-                      //   const Icon(Icons.image),
-                      // ),
-                      const SizedBox(height: 20),
-                      Container(
-                        width: screenWidth,
-                        // height: screenHeight * 0.2,
-                        decoration: BoxDecoration(
-                          color: const Color(0x33800180),
-                          borderRadius: BorderRadius.circular(screenWidth * 0.05),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.1),
-                              spreadRadius: 2,
-                              blurRadius: screenWidth * 0.05,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        margin: EdgeInsets.symmetric(
-                          horizontal: screenWidth * 0.08,
-                          vertical: screenHeight * 0.01,
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth * 0.04,
-                          vertical: screenHeight * 0.02,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Text(
-                            //   offer['productOfferTitle'] ?? '',
-                            //   style: TextStyle(
-                            //     fontSize: screenHeight * 0.024,
-                            //     fontWeight: FontWeight.bold,
-                            //   ),
-                            // ),
-                            // const SizedBox(height: 15),
-                            Text(
-                              offer['productOfferDescription'] ?? '',
-                              style: TextStyle(
-                                fontSize: screenHeight * 0.018, color: Colors.white, fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  returnRewardsScroll() {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double unitHeightValue = MediaQuery.of(context).size.height;
->>>>>>> origin/DPdev
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -896,12 +738,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                 placeholder: 'assets/images/app_file_icon.png',
                                 image: item['rewardSchemeImageUrl'] ?? '',
                                 fit: BoxFit.cover,
-<<<<<<< HEAD
                                 imageErrorBuilder: (context, error,
                                     stackTrace) {
-=======
-                                imageErrorBuilder: (context, error, stackTrace) {
->>>>>>> origin/DPdev
                                   return Image.asset(
                                     'assets/images/app_file_icon.png',
                                     fit: BoxFit.cover,
@@ -923,7 +761,6 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     );
   }
 
-<<<<<<< HEAD
   RewardSchemeDetails(item) async {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -987,78 +824,9 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                 ],
               ),
             ],
-=======
-  RewardSchemeDetails(item) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double unitHeightValue = MediaQuery.of(context).size.height;
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Container(
-            width: screenWidth * 0.8,
-            height: screenHeight * 0.37,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: const LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  Color(0xFFFFF7AD),
-                  Color(0xFFFFA9F9),
-                ],
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Align(
-                //   alignment: Alignment.topRight,
-                //   child: IconButton(
-                //     icon: const Icon(Icons.clear_sharp, color: Color(0xFF7A0180)),
-                //     onPressed: () => Navigator.pop(context),
-                //   ),
-                // ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20), // Rounded corners
-                          child: FadeInImage.assetNetwork(
-                            placeholder: 'assets/images/app_file_icon.png',
-                            image: item['rewardSchemeImageUrl'] ?? '',
-                            height: screenHeight * 0.37,
-                            width: screenWidth * 0.8,
-                            fit: BoxFit.cover,
-                            imageErrorBuilder: (context, error, stackTrace) {
-                              return Image.asset(
-                                'assets/images/app_file_icon.png',
-                                fit: BoxFit.cover,
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
->>>>>>> origin/DPdev
           ),
         );
       },
     );
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/DPdev

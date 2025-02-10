@@ -470,11 +470,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
-<<<<<<< HEAD
 				CURRENT_PROJECT_VERSION = 12;
-=======
-				CURRENT_PROJECT_VERSION = 10;
->>>>>>> origin/DPdev
 				DEVELOPMENT_TEAM = 8KAXMV9U4S;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -484,11 +480,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-<<<<<<< HEAD
 				MARKETING_VERSION = 2.0.10;
-=======
-				MARKETING_VERSION = 2.0.8;
->>>>>>> origin/DPdev
 				PRODUCT_BUNDLE_IDENTIFIER = com.aultrapaints;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -669,11 +661,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
-<<<<<<< HEAD
 				CURRENT_PROJECT_VERSION = 12;
-=======
-				CURRENT_PROJECT_VERSION = 10;
->>>>>>> origin/DPdev
 				DEVELOPMENT_TEAM = 8KAXMV9U4S;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -683,11 +671,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-<<<<<<< HEAD
 				MARKETING_VERSION = 2.0.10;
-=======
-				MARKETING_VERSION = 2.0.8;
->>>>>>> origin/DPdev
 				PRODUCT_BUNDLE_IDENTIFIER = com.aultrapaints;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -708,11 +692,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
-<<<<<<< HEAD
 				CURRENT_PROJECT_VERSION = 12;
-=======
-				CURRENT_PROJECT_VERSION = 10;
->>>>>>> origin/DPdev
 				DEVELOPMENT_TEAM = 8KAXMV9U4S;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -722,11 +702,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-<<<<<<< HEAD
 				MARKETING_VERSION = 2.0.10;
-=======
-				MARKETING_VERSION = 2.0.8;
->>>>>>> origin/DPdev
 				PRODUCT_BUNDLE_IDENTIFIER = com.aultrapaints;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

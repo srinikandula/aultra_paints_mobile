@@ -26,14 +26,11 @@ class TransferPointsDialog extends StatefulWidget {
 
 class _TransferPointsDialogState extends State<TransferPointsDialog> {
   var accesstoken;
-<<<<<<< HEAD
   TextEditingController pointsController = TextEditingController();
   bool pointEnterErr = false;
   TextEditingController otpController = TextEditingController();
   bool otpSent = false;  // To track OTP state
   String rewardBalance = "0";  // Fetch from API if needed
-=======
->>>>>>> origin/DPdev
   @override
   void initState() {
     fetchLocalStorageData();
@@ -42,21 +39,9 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
   fetchLocalStorageData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     accesstoken = prefs.getString('accessToken');
-<<<<<<< HEAD
     await getDashboardDetails();
   }
 
-=======
-    getDashboardDetails();
-  }
-
-  TextEditingController pointsController = TextEditingController();
-  bool pointEnterErr = false;
-  TextEditingController otpController = TextEditingController();
-  bool otpSent = false;  // To track OTP state
-  String rewardBalance = "0";  // Fetch from API if needed
-
->>>>>>> origin/DPdev
   Future getDashboardDetails() async {
     Utils.clearToasts(context);
     Utils.returnScreenLoader(context);
@@ -72,24 +57,17 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
       Navigator.pop(context);
       var tempResp = json.decode(response.body);
       var apiResp = tempResp['data'];
-<<<<<<< HEAD
 
       setState(() {  // Update the UI when data is fetched
         rewardBalance = apiResp['rewardPoints'].toString();
       });
-=======
-      rewardBalance = apiResp['rewardPoints'].toString();
->>>>>>> origin/DPdev
     } else {
       Navigator.pop(context);
       error_handling.errorValidation(context, response.statusCode, response.body, false);
     }
   }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/DPdev
   void _showSnackBar(String message, BuildContext context, ColorCheck) {
     final snackBar = SnackBar(
         content: Text(message),
@@ -117,17 +95,8 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
     if (response.statusCode == 200) {
       Navigator.pop(context);
       var tempResp = json.decode(response.body);
-<<<<<<< HEAD
       Navigator.pop(context, true);
       widget.onTransferComplete();
-=======
-      print('${tempResp}');
-      print(tempResp);
-
-      Navigator.pop(context, true);
-      widget.onTransferComplete();
-      _showSnackBar("Details saved successfully.", context, true);
->>>>>>> origin/DPdev
     } else {
       Navigator.pop(context);
       final tempResp = json.decode(response.body);
@@ -204,11 +173,7 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                       /// Row 1: Reward Point Balance
                       Container(
                         height: rowHeight, // Fixed row height
-<<<<<<< HEAD
                         decoration: const BoxDecoration(
-=======
-                        decoration: BoxDecoration(
->>>>>>> origin/DPdev
                           border: Border(
                             bottom: BorderSide(color: Colors.black, width: 1),
                           ),
@@ -231,11 +196,7 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                               child: Container(
                                 height: double.infinity,
                                 alignment: Alignment.center,
-<<<<<<< HEAD
                                 decoration: const BoxDecoration(
-=======
-                                decoration: BoxDecoration(
->>>>>>> origin/DPdev
                                   border: Border(
                                     left: BorderSide(color: Colors.black, width: 1),
                                   ),
@@ -275,11 +236,7 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                               child: Container(
                                 height: double.infinity,
                                 alignment: Alignment.center,
-<<<<<<< HEAD
                                 decoration: const BoxDecoration(
-=======
-                                decoration: BoxDecoration(
->>>>>>> origin/DPdev
                                   border: Border(
                                     left: BorderSide(color: Colors.black, width: 1),
                                   ),
@@ -289,9 +246,9 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                                   keyboardType: TextInputType.number,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontSize: unitHeightValue * 0.02,
-                                    color: const Color(0xFF3533CD),
-                                    fontWeight: FontWeight.bold
+                                      fontSize: unitHeightValue * 0.02,
+                                      color: const Color(0xFF3533CD),
+                                      fontWeight: FontWeight.bold
                                   ),
                                   decoration: const InputDecoration(
                                     border: InputBorder.none, // Avoid double borders
@@ -306,13 +263,13 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                                           pointsController.clear();
                                           pointEnterErr = true;
                                           ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text("Points must be greater than 0"))
+                                              SnackBar(content: Text("Points must be greater than 0"))
                                           );
                                         } else if (points > int.parse(rewardBalance)) {
                                           pointsController.clear();
                                           pointEnterErr = true;
                                           ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text("Points cannot exceed balance of $rewardBalance"))
+                                              SnackBar(content: Text("Points cannot exceed balance of $rewardBalance"))
                                           );
                                         }
                                       }
@@ -329,11 +286,7 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                       if (pointEnterErr)
                         Container(
                           height: 30,
-<<<<<<< HEAD
                           decoration: const BoxDecoration(
-=======
-                          decoration: BoxDecoration(
->>>>>>> origin/DPdev
                             border: Border(
                               top: BorderSide(color: Colors.black, width: 1),
                             ),
@@ -351,11 +304,7 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                     ],
                   ),
                 ),
-<<<<<<< HEAD
                 const SizedBox(height: 20),
-=======
-                SizedBox(height: 20),
->>>>>>> origin/DPdev
 
                 if (!otpSent)
                   Align(
@@ -377,14 +326,8 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                           if (pointsController.text.isEmpty) {
                             pointEnterErr = true;
                             ScaffoldMessenger.of(context).showSnackBar(
-<<<<<<< HEAD
-                              const SnackBar(content: Text("Please enter points to transfer"))
+                                const SnackBar(content: Text("Please enter points to transfer"))
                             );
-=======
-                              SnackBar(content: Text("Please enter points to transfer"))
-                            );
-                            print('${pointEnterErr}================================');
->>>>>>> origin/DPdev
                             return;
                           }
                           pointEnterErr = false;
@@ -397,9 +340,9 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                         ),
                         child: Text("Transfer",
                           style: TextStyle(
-                            fontSize: unitHeightValue * 0.02,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w300
+                              fontSize: unitHeightValue * 0.02,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w300
                           ),
                         ),
                       ),

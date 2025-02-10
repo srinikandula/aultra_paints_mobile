@@ -274,12 +274,12 @@ class MyDrawer extends StatelessWidget {
 
   MyDrawer(
       {required this.accountName,
-      required this.accountId,
-      required this.accountMobile,
-      required this.accountType,
-      required this.onLogout,
-      required this.parentDealerCode,
-      required this.parentDealerName});
+        required this.accountId,
+        required this.accountMobile,
+        required this.accountType,
+        required this.onLogout,
+        required this.parentDealerCode,
+        required this.parentDealerName});
 
   @override
   Widget build(BuildContext context) {
@@ -315,14 +315,14 @@ class MyDrawer extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                Text(
+                  Text(
                     accountName,
                     style: TextStyle(
                       color: accountType == 'Painter' ? const Color(0xFF3498db) :
-                             accountType == 'Dealer' ? const Color(0xFF2ecc71) :
-                             accountType == 'Contractor' ? const Color(0xFFe67e22) :
-                             accountType == 'SuperUser' ? const Color(0xFFe74c3c) :
-                             const Color(0xFF3533CD),
+                      accountType == 'Dealer' ? const Color(0xFF2ecc71) :
+                      accountType == 'Contractor' ? const Color(0xFFe67e22) :
+                      accountType == 'SuperUser' ? const Color(0xFFe74c3c) :
+                      const Color(0xFF3533CD),
                       fontFamily: ffGBold,
                       fontSize: unitHeightValue * 0.03,
                       fontWeight: FontWeight.bold,
@@ -355,11 +355,7 @@ class MyDrawer extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-<<<<<<< HEAD
                         Text('My Dealer ',
-=======
-                        Text('Dealer Name ',
->>>>>>> origin/DPdev
                             style: TextStyle(
                               color: const Color(0xFF3533CD),
                               fontFamily: ffGMedium,
@@ -385,13 +381,13 @@ class MyDrawer extends StatelessWidget {
                               builder: (BuildContext context) {
                                 return DealerSearchDialog(
                                   onDealerSelected: (String dealerCode, String dealerName) {
-                                     return {
+                                    return {
                                       parentDealerCode = dealerCode,
                                       parentDealerName = dealerName,
                                     };
                                   }, onDealerComplete: () {
-                                    Navigator.pushNamed(context, '/dashboardPage');
-                                  },
+                                  Navigator.pushNamed(context, '/dashboardPage');
+                                },
                                 );
                               },
                             );
@@ -460,14 +456,9 @@ class MyDrawer extends StatelessWidget {
                             return TransferPointsDialog(
                               accountId: accountId,
                               accountName: accountName,
-<<<<<<< HEAD
                               onTransferComplete: () async {
                                 // Show success popup
                                 showSuccessPopup(context);
-=======
-                              onTransferComplete: () {
-                                Navigator.pushNamed(context, '/dashboardPage');
->>>>>>> origin/DPdev
                               },
                             );
                           },
@@ -502,7 +493,7 @@ class MyDrawer extends StatelessWidget {
     );
   }
 
-void showSuccessPopup(BuildContext context) {
+  void showSuccessPopup(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
     final double unitHeightValue = MediaQuery.of(context).size.height;
