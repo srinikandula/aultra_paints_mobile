@@ -274,12 +274,12 @@ class MyDrawer extends StatelessWidget {
 
   MyDrawer(
       {required this.accountName,
-        required this.accountId,
-        required this.accountMobile,
-        required this.accountType,
-        required this.onLogout,
-        required this.parentDealerCode,
-        required this.parentDealerName});
+      required this.accountId,
+      required this.accountMobile,
+      required this.accountType,
+      required this.onLogout,
+      required this.parentDealerCode,
+      required this.parentDealerName});
 
   @override
   Widget build(BuildContext context) {
@@ -288,7 +288,7 @@ class MyDrawer extends StatelessWidget {
     final double unitHeightValue = MediaQuery.of(context).size.height;
     return Drawer(
       // width: getScreenWidth(getTabletCheck() ? 200 : 260),
-      width: screenWidth * 0.7,
+      width: screenWidth * 0.75,   //0.7 old
       backgroundColor: Colors.transparent,
       child: Container(
         decoration: const BoxDecoration(
@@ -318,11 +318,15 @@ class MyDrawer extends StatelessWidget {
                   Text(
                     accountName,
                     style: TextStyle(
-                      color: accountType == 'Painter' ? const Color(0xFF3498db) :
-                      accountType == 'Dealer' ? const Color(0xFF2ecc71) :
-                      accountType == 'Contractor' ? const Color(0xFFe67e22) :
-                      accountType == 'SuperUser' ? const Color(0xFFe74c3c) :
-                      const Color(0xFF3533CD),
+                      color: accountType == 'Painter'
+                          ? const Color(0xFF3498db)
+                          : accountType == 'Dealer'
+                              ? const Color(0xFF2ecc71)
+                              : accountType == 'Contractor'
+                                  ? const Color(0xFFe67e22)
+                                  : accountType == 'SuperUser'
+                                      ? const Color(0xFFe74c3c)
+                                      : const Color(0xFF3533CD),
                       fontFamily: ffGBold,
                       fontSize: unitHeightValue * 0.03,
                       fontWeight: FontWeight.bold,
@@ -343,11 +347,15 @@ class MyDrawer extends StatelessWidget {
                   // ),
                   Text(accountMobile,
                       style: TextStyle(
-                        color: accountType == 'Painter' ? const Color(0xFF3498db) :
-                        accountType == 'Dealer' ? const Color(0xFF2ecc71) :
-                        accountType == 'Contractor' ? const Color(0xFFe67e22) :
-                        accountType == 'SuperUser' ? const Color(0xFFe74c3c) :
-                        const Color(0xFF3533CD),
+                        color: accountType == 'Painter'
+                            ? const Color(0xFF3498db)
+                            : accountType == 'Dealer'
+                                ? const Color(0xFF2ecc71)
+                                : accountType == 'Contractor'
+                                    ? const Color(0xFFe67e22)
+                                    : accountType == 'SuperUser'
+                                        ? const Color(0xFFe74c3c)
+                                        : const Color(0xFF3533CD),
                         fontFamily: ffGMedium,
                         fontSize: unitHeightValue * 0.018,
                       )),
@@ -380,14 +388,17 @@ class MyDrawer extends StatelessWidget {
                               context: context,
                               builder: (BuildContext context) {
                                 return DealerSearchDialog(
-                                  onDealerSelected: (String dealerCode, String dealerName) {
+                                  onDealerSelected:
+                                      (String dealerCode, String dealerName) {
                                     return {
                                       parentDealerCode = dealerCode,
                                       parentDealerName = dealerName,
                                     };
-                                  }, onDealerComplete: () {
-                                  Navigator.pushNamed(context, '/dashboardPage');
-                                },
+                                  },
+                                  onDealerComplete: () {
+                                    Navigator.pushNamed(
+                                        context, '/dashboardPage');
+                                  },
                                 );
                               },
                             );
@@ -504,15 +515,19 @@ class MyDrawer extends StatelessWidget {
         return WillPopScope(
           onWillPop: () async {
             Navigator.pop(context); // Close the popup
-            Navigator.pushNamed(context, '/dashboardPage'); // Call callback function
+            Navigator.pushNamed(
+                context, '/dashboardPage'); // Call callback function
             return true; // Allow dismissal
           },
           child: AlertDialog(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             content: Container(
-              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.05, horizontal: screenWidth * 0.05),
+              padding: EdgeInsets.symmetric(
+                  vertical: screenHeight * 0.05,
+                  horizontal: screenWidth * 0.05),
               width: screenWidth * 0.6,
               height: screenHeight * 0.28,
               decoration: BoxDecoration(
@@ -537,7 +552,11 @@ class MyDrawer extends StatelessWidget {
                   SizedBox(height: screenHeight * 0.04),
                   Text(
                     "Success",
-                    style: TextStyle(fontSize: unitHeightValue * 0.04, fontWeight: FontWeight.w400, color: const Color(0xFF3533CD),),
+                    style: TextStyle(
+                      fontSize: unitHeightValue * 0.04,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF3533CD),
+                    ),
                   ),
                 ],
               ),
@@ -546,7 +565,8 @@ class MyDrawer extends StatelessWidget {
         );
       },
     ).then((_) {
-      Navigator.pushNamed(context, '/dashboardPage'); // Ensure callback is always called
+      Navigator.pushNamed(
+          context, '/dashboardPage'); // Ensure callback is always called
     });
   }
 }

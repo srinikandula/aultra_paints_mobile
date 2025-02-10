@@ -1,7 +1,8 @@
 // const BASE_URL = 'http://localhost:8080/api/'; //QA
 // const BASE_URL = 'http://192.168.1.4:4300/api/'; //QA
-// const BASE_URL = 'https://api.aultrapaints.com/api/';
-const BASE_URL = 'https://mapp.aultrapaints.com/api/';
+
+const BASE_URL = 'https://api.aultrapaints.com/api/'; //Admin
+// const BASE_URL = 'https://mapp.aultrapaints.com/api/'; //QA
 
 const IOS_APP_VERSION = '1.0.0';
 
