@@ -355,7 +355,11 @@ class MyDrawer extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
+<<<<<<< HEAD
                         Text('My Dealer ',
+=======
+                        Text('Dealer Name ',
+>>>>>>> origin/DPdev
                             style: TextStyle(
                               color: const Color(0xFF3533CD),
                               fontFamily: ffGMedium,
@@ -456,9 +460,14 @@ class MyDrawer extends StatelessWidget {
                             return TransferPointsDialog(
                               accountId: accountId,
                               accountName: accountName,
+<<<<<<< HEAD
                               onTransferComplete: () async {
                                 // Show success popup
                                 showSuccessPopup(context);
+=======
+                              onTransferComplete: () {
+                                Navigator.pushNamed(context, '/dashboardPage');
+>>>>>>> origin/DPdev
                               },
                             );
                           },
