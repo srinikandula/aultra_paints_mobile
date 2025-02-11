@@ -464,8 +464,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(
-                            width: screenWidth * 0.35,
-                            height: screenWidth * 0.35,
+                            // width: screenWidth * 0.38,
+                            height: screenHeight * 0.18,
                             child: ClipRRect(
                               borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(getScreenWidth(20))),
@@ -585,8 +585,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                         child: FadeInImage.assetNetwork(
                           placeholder: 'assets/images/app_file_icon.png',
                           image: offer['productOfferImageUrl'] ?? '',
-                          height: screenHeight * 0.38,
-                          width: screenWidth * 0.8,
+                          height: screenHeight * 0.5,
+                          // width: screenWidth * 0.8,
                           fit: BoxFit.cover,
                           imageErrorBuilder: (context, error, stackTrace) {
                             return Image.asset(
@@ -793,17 +793,39 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              SizedBox(
+                width: screenWidth,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    InkWell(
+                      onTap: () => Navigator.pop(context, true),
+                      child: Container(
+                        margin: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.04,
+                          vertical: screenHeight * 0.02,
+                        ),
+                        child: Icon(
+                          Icons.clear_sharp,
+                          color: const Color(0xFF7A0180),
+                          size: screenWidth * 0.06,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(20),
-                    ),
+                    // borderRadius: const BorderRadius.vertical(
+                    //   top: Radius.circular(20),
+                    // ),
                     child: FadeInImage.assetNetwork(
                       placeholder: 'assets/images/app_file_icon.png',
                       image: item['rewardSchemeImageUrl'] ?? '',
-                      height: screenHeight * 0.46,
-                      width: screenWidth,
+                      // height: screenHeight * 0.45,
+                      // width: screenWidth,
                       fit: BoxFit.cover,
                       imageErrorBuilder: (context, error, stackTrace) {
                         return Image.asset(
@@ -813,14 +835,14 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                       },
                     ),
                   ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: IconButton(
-                      icon: const Icon(Icons.clear_sharp, color: Color(0xFF7A0180)),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
+                  // Positioned(
+                  //   top: 0,
+                  //   right: 0,
+                  //   child: IconButton(
+                  //     icon: const Icon(Icons.clear_sharp, color: Color(0xFF7A0180)),
+                  //     onPressed: () => Navigator.pop(context),
+                  //   ),
+                  // ),
                 ],
               ),
             ],

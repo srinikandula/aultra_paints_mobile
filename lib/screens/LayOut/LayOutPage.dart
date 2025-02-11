@@ -145,6 +145,78 @@ class _LayoutPageState extends State<LayoutPage> {
     clearStorage();
   }
 
+  Future deleteUserAccount() async {
+    Utils.clearToasts(context);
+    Utils.returnScreenLoader(context);
+    http.Response response;
+    var apiUrl = BASE_URL + DELETE_USER_ACCOUNT + USER_ID;
+
+    // print('delete apiturl====>${apiUrl}');
+
+    response = await http.put(
+      Uri.parse(apiUrl),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": accesstoken
+      },
+      body: jsonEncode({}),
+    );
+
+    // print('error====>${response.body}======>${response.statusCode}');
+
+    if (response.statusCode == 200) {
+      Navigator.pop(context);
+      Navigator.pop(context);
+      _showSnackBar('Account deleted successfully.', context, true);
+      clearStorage();
+    } else {
+      Navigator.pop(context);
+      error_handling.errorValidation(
+          context, response.body, response.body, false);
+    }
+  }
+
+  void showAccountDeletionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Delete Account',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'Are you sure you want to delete your account? This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                // backgroundColor: Colors.red,
+              ),
+              onPressed: () {
+                // Add your account deletion logic here
+                // Navigator.of(context).pop();
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   SnackBar(
+                //     content: Text('Account deleted successfully.'),
+                //   ),
+                // );
+                deleteUserAccount();
+              },
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -258,6 +330,7 @@ class _LayoutPageState extends State<LayoutPage> {
             : userViewModel.parentDealerCode,
         parentDealerName: parentDealerName,
         onLogout: () => {logOut(context)},
+        onAccountDelete: () => {showAccountDeletionDialog(context)},
       ),
     );
   }
@@ -271,29 +344,31 @@ class MyDrawer extends StatelessWidget {
   final VoidCallback onLogout;
   late final String parentDealerCode;
   late final String parentDealerName;
+  final VoidCallback onAccountDelete;
 
-  MyDrawer(
-      {required this.accountName,
-        required this.accountId,
-        required this.accountMobile,
-        required this.accountType,
-        required this.onLogout,
-        required this.parentDealerCode,
-        required this.parentDealerName});
+  MyDrawer({
+    required this.accountName,
+    required this.accountId,
+    required this.accountMobile,
+    required this.accountType,
+    required this.onLogout,
+    required this.parentDealerCode,
+    required this.parentDealerName,
+    required this.onAccountDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double unitHeightValue = MediaQuery.of(context).size.height;
+    final double unitHeightValue = screenHeight * 0.01;
+
     return Drawer(
-      // width: getScreenWidth(getTabletCheck() ? 200 : 260),
       width: screenWidth * 0.7,
       backgroundColor: Colors.transparent,
       child: Container(
         decoration: const BoxDecoration(
           color: white,
-          // borderRadius: BorderRadius.circular(20),
           gradient: LinearGradient(
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
@@ -303,15 +378,18 @@ class MyDrawer extends StatelessWidget {
             ],
           ),
         ),
-        child: ListView(
-          // padding: EdgeInsets.symmetric(vertical: screenHeight * 0.05, horizontal: 0),
-          // padding: EdgeInsets.only(top: screenHeight * 0.05),
-          children: <Widget>[
+        child: Column(
+          children: [
+            // **User Details Section (Stays at the Top)**
             Container(
-              // height: screenHeight * 0.1,
-              margin: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.08,
-                  vertical: screenHeight * 0.01),
+              margin: EdgeInsets.only(
+                  top: screenHeight * 0.06,
+                  bottom: screenHeight * 0,
+                  left: screenWidth * 0.08,
+                  right: screenWidth * 0.08),
+              // margin: EdgeInsets.symmetric(
+              //     horizontal: screenWidth * 0.08,
+              //     vertical: screenHeight * 0.01),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -324,33 +402,22 @@ class MyDrawer extends StatelessWidget {
                       accountType == 'SuperUser' ? const Color(0xFFe74c3c) :
                       const Color(0xFF3533CD),
                       fontFamily: ffGBold,
-                      fontSize: unitHeightValue * 0.03,
+                      fontSize: unitHeightValue * 3,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  // Text(
-                  //   accountType,
-                  //   style: TextStyle(
-                  //     color: accountType == 'Painter' ? const Color(0xFF3498db) :
-                  //            accountType == 'Dealer' ? const Color(0xFF2ecc71) :
-                  //            accountType == 'Contractor' ? const Color(0xFFe67e22) :
-                  //            accountType == 'Superuser' ? const Color(0xFFe74c3c) :
-                  //            const Color(0xFF3533CD),
-                  //     fontFamily: ffGBold,
-                  //     fontSize: unitHeightValue * 0.018,
-                  //     fontWeight: FontWeight.bold,
-                  //   ),
-                  // ),
-                  Text(accountMobile,
-                      style: TextStyle(
-                        color: accountType == 'Painter' ? const Color(0xFF3498db) :
-                        accountType == 'Dealer' ? const Color(0xFF2ecc71) :
-                        accountType == 'Contractor' ? const Color(0xFFe67e22) :
-                        accountType == 'SuperUser' ? const Color(0xFFe74c3c) :
-                        const Color(0xFF3533CD),
-                        fontFamily: ffGMedium,
-                        fontSize: unitHeightValue * 0.018,
-                      )),
+                  Text(
+                    accountMobile,
+                    style: TextStyle(
+                      color: accountType == 'Painter' ? const Color(0xFF3498db) :
+                      accountType == 'Dealer' ? const Color(0xFF2ecc71) :
+                      accountType == 'Contractor' ? const Color(0xFFe67e22) :
+                      accountType == 'SuperUser' ? const Color(0xFFe74c3c) :
+                      const Color(0xFF3533CD),
+                      fontFamily: ffGMedium,
+                      fontSize: unitHeightValue * 1.8,
+                    ),
+                  ),
                   if (accountType == 'Painter')
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -359,35 +426,33 @@ class MyDrawer extends StatelessWidget {
                             style: TextStyle(
                               color: const Color(0xFF3533CD),
                               fontFamily: ffGMedium,
-                              fontSize: unitHeightValue * 0.018,
+                              fontSize: unitHeightValue * 1.8,
                             )),
                         Text(parentDealerName,
                             style: TextStyle(
                                 color: const Color(0xFF3533CD),
                                 fontFamily: ffGBold,
-                                fontSize: unitHeightValue * 0.018,
+                                fontSize: unitHeightValue * 1.8,
                                 fontWeight: FontWeight.bold)),
                         IconButton(
                           icon: Icon(
                             FontAwesomeIcons.pencil,
-                            size: unitHeightValue * 0.018,
+                            size: unitHeightValue * 1.8,
                             color: const Color(0xFF3533CD),
                           ),
                           padding: EdgeInsets.zero,
                           onPressed: () {
-                            // Navigator.pushNamed(context, '/painterPopUpPage');
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
                                 return DealerSearchDialog(
                                   onDealerSelected: (String dealerCode, String dealerName) {
-                                    return {
-                                      parentDealerCode = dealerCode,
-                                      parentDealerName = dealerName,
-                                    };
-                                  }, onDealerComplete: () {
-                                  Navigator.pushNamed(context, '/dashboardPage');
-                                },
+                                    parentDealerCode = dealerCode;
+                                    parentDealerName = dealerName;
+                                  },
+                                  onDealerComplete: () {
+                                    Navigator.pushNamed(context, '/dashboardPage');
+                                  },
                                 );
                               },
                             );
@@ -398,94 +463,111 @@ class MyDrawer extends StatelessWidget {
                 ],
               ),
             ),
-            // Text(accountMobile, style: TextStyle(color: drawerTitleColor, fontFamily: ffGMedium, fontSize: 14,),),
+
             Divider(thickness: 1),
-            // SizedBox(height: 15), // Consistent spacing before the ListTile items
-            Container(
-              margin: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.05,
-                vertical: screenHeight * 0,
-              ),
-              height: screenHeight * 0.71,
-              // margin: EdgeInsets.symmetric(
-              //     horizontal: getScreenWidth(30), vertical: getScreenWidth(10)),
-              // height: getScreenHeight(getTabletCheck() ? 400 : 530),
-              child: Column(
-                children: [
-                  ListTile(
-                    title: Text(
-                      'Home',
-                      style: TextStyle(
-                        color: const Color(0xFF3533CD),
-                        fontFamily: ffGSemiBold,
-                        fontSize: unitHeightValue * 0.028,
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.pushNamed(context, '/dashboardPage');
-                    },
-                  ),
-                  if (accountType == 'Dealer')
+
+            // **Scrollable Menu Section**
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
                     ListTile(
                       title: Text(
-                        'My Partners',
+                        'Home',
                         style: TextStyle(
                           color: const Color(0xFF3533CD),
                           fontFamily: ffGSemiBold,
-                          fontSize: unitHeightValue * 0.028,
+                          fontSize: unitHeightValue * 2.8,
                         ),
                       ),
                       onTap: () {
-                        Navigator.pushNamed(context, '/painters');
+                        Navigator.pushNamed(context, '/dashboardPage');
                       },
                     ),
-                  if (accountType == 'Painter')
-                    ListTile(
-                      title: Text(
-                        'Transfer Points',
-                        style: TextStyle(
-                          color: const Color(0xFF3533CD),
-                          fontFamily: ffGSemiBold,
-                          fontSize: unitHeightValue * 0.028,
+                    if (accountType == 'Dealer')
+                      ListTile(
+                        title: Text(
+                          'My Partners',
+                          style: TextStyle(
+                            color: const Color(0xFF3533CD),
+                            fontFamily: ffGSemiBold,
+                            fontSize: unitHeightValue * 2.8,
+                          ),
                         ),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/painters');
+                        },
                       ),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return TransferPointsDialog(
-                              accountId: accountId,
-                              accountName: accountName,
-                              onTransferComplete: () async {
-                                // Show success popup
-                                showSuccessPopup(context);
-                              },
-                            );
-                          },
-                        );
-                      },
-                    ),
-                ],
+                    if (accountType == 'Painter')
+                      ListTile(
+                        title: Text(
+                          'Transfer Points',
+                          style: TextStyle(
+                            color: const Color(0xFF3533CD),
+                            fontFamily: ffGSemiBold,
+                            fontSize: unitHeightValue * 2.8,
+                          ),
+                        ),
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return TransferPointsDialog(
+                                accountId: accountId,
+                                accountName: accountName,
+                                onTransferComplete: () async {
+                                  showSuccessPopup(context);
+                                },
+                              );
+                            },
+                          );
+                        },
+                      ),
+                  ],
+                ),
               ),
             ),
-            Divider(thickness: 1),
-            InkWell(
-              onTap: () {
-                // Navigator.pop(context);
-                onLogout();
-              },
-              child: ListTile(
-                title: Center(
-                  child: Text(
-                    'Logout',
-                    style: TextStyle(
-                      color: const Color(0xFF3533CD),
-                      fontFamily: ffGMedium,
-                      fontSize: unitHeightValue * 0.028,
+
+            // **Fixed Bottom Buttons**
+            Column(
+              children: [
+                Divider(thickness: 1),
+                InkWell(
+                  onTap: () {
+                    onAccountDelete();
+                  },
+                  child: ListTile(
+                    title: Center(
+                      child: Text(
+                        'Delete Account',
+                        style: TextStyle(
+                          color: const Color(0xFF3533CD),
+                          fontFamily: ffGMedium,
+                          fontSize: unitHeightValue * 2.8,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+                Divider(thickness: 1),
+                InkWell(
+                  onTap: () {
+                    onLogout();
+                  },
+                  child: ListTile(
+                    title: Center(
+                      child: Text(
+                        'Logout',
+                        style: TextStyle(
+                          color: const Color(0xFF3533CD),
+                          fontFamily: ffGMedium,
+                          fontSize: unitHeightValue * 2.8,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
