@@ -183,6 +183,7 @@ class _LayoutPageState extends State<LayoutPage> {
         return AlertDialog(
           title: Text(
             'Delete Account',
+
             style: TextStyle(
                 fontWeight: FontWeight.bold, fontSize: getScreenWidth(18)),
           ),
@@ -195,6 +196,7 @@ class _LayoutPageState extends State<LayoutPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
+
               child: Text('Cancel',
                   style: TextStyle(
                       color: Colors.grey, fontSize: getScreenWidth(14))),
@@ -361,6 +363,7 @@ class MyDrawer extends StatelessWidget {
     required this.parentDealerName,
     required this.onAccountDelete,
   });
+
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -461,10 +464,8 @@ class MyDrawer extends StatelessWidget {
                                 return DealerSearchDialog(
                                   onDealerSelected:
                                       (String dealerCode, String dealerName) {
-                                    return {
-                                      parentDealerCode = dealerCode,
-                                      parentDealerName = dealerName,
-                                    };
+                                    parentDealerCode = dealerCode;
+                                    parentDealerName = dealerName;
                                   },
                                   onDealerComplete: () {
                                     Navigator.pushNamed(

@@ -457,8 +457,6 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                           SizedBox(
                             // width: screenWidth * 0.38,
                             height: screenHeight * 0.18,
-                            // width: screenWidth * 0.33,  //0.35 old
-                            // height: screenWidth * 0.33,  //0.35 old
                             child: ClipRRect(
                               borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(getScreenWidth(20))),
