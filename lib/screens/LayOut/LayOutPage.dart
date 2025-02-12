@@ -430,6 +430,7 @@ class MyDrawer extends StatelessWidget {
                       fontSize: unitHeightValue * 1.8,
                     ),
                   ),
+
                   if (accountType == 'Painter')
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
