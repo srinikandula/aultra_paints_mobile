@@ -156,7 +156,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       //  getRewardSchemes();
       _scrollController.addListener(() {
         if (_scrollController.position.pixels ==
-            _scrollController.position.maxScrollExtent &&
+                _scrollController.position.maxScrollExtent &&
             !isLoading &&
             hasMore) {
           getProductOffers(''); // Load more data when scrolled to bottom
@@ -270,18 +270,9 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     //   }
     // });
 
-    final double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final double screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
-    final double unitHeightValue = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
     double cardWidth = screenWidth * 0.9; // 80% of the screen width
     // Fixed height for the cards
 
@@ -293,30 +284,30 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
           // backgroundColor: Colors.white54,
           key: _scaffoldKey,
           body: SingleChildScrollView(
-            // Add SingleChildScrollView
+              // Add SingleChildScrollView
               child: Container(
-                height: screenHeight,
-                decoration: const BoxDecoration(
-                  color: white,
-                  // borderRadius: BorderRadius.circular(20),
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      Color(0xFFFFF7AD),
-                      Color(0xFFFFA9F9),
-                    ],
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    returnNameRewards(),
-                    returnProductsScroll(),
-                    returnRewardsScroll()
-                  ],
-                ),
-              )),
+            height: screenHeight,
+            decoration: const BoxDecoration(
+              color: white,
+              // borderRadius: BorderRadius.circular(20),
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Color(0xFFFFF7AD),
+                  Color(0xFFFFA9F9),
+                ],
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                returnNameRewards(),
+                returnProductsScroll(),
+                returnRewardsScroll()
+              ],
+            ),
+          )),
         ));
   }
 
@@ -428,7 +419,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
           ),
         ),
         SizedBox(
-          height: screenHeight * 0.29,
+          height: screenHeight * 0.36, //0.29 old
           child: Container(
             margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
             child: PageView.builder(
@@ -466,6 +457,9 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                           SizedBox(
                             // width: screenWidth * 0.38,
                             height: screenHeight * 0.18,
+
+                            // width: screenWidth * 0.33,  //0.35 old
+                            // height: screenWidth * 0.33,  //0.35 old
                             child: ClipRRect(
                               borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(getScreenWidth(20))),
@@ -473,8 +467,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                 placeholder: 'assets/images/app_file_icon.png',
                                 image: offer['productOfferImageUrl'] ?? '',
                                 fit: BoxFit.cover,
-                                imageErrorBuilder: (context, error,
-                                    stackTrace) {
+                                imageErrorBuilder:
+                                    (context, error, stackTrace) {
                                   return Image.asset(
                                     'assets/images/app_file_icon.png',
                                     fit: BoxFit.cover,
@@ -574,7 +568,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                   ],
                 ),
               ),
-              Expanded( // Allows scrolling inside the modal
+              Expanded(
+                // Allows scrolling inside the modal
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -610,8 +605,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                         // height: screenHeight * 0.2,
                         decoration: BoxDecoration(
                           color: const Color(0x33800180),
-                          borderRadius: BorderRadius.circular(
-                              screenWidth * 0.05),
+                          borderRadius:
+                              BorderRadius.circular(screenWidth * 0.05),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.grey.withOpacity(0.1),
@@ -663,18 +658,9 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
   }
 
   returnRewardsScroll() {
-    final double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final double screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
-    final double unitHeightValue = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -697,65 +683,67 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
           child: rewardSchemes.isEmpty
               ? Center(child: CircularProgressIndicator())
               : ListView.builder(
-            itemCount: rewardSchemes.length,
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) {
-              final item = rewardSchemes[index];
-              double scale = 0.9;
-              if (_currentPage != null) {
-                scale = index == _currentPage!.round() ? 1.0 : 0.9;
-              }
+                  itemCount: rewardSchemes.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    final item = rewardSchemes[index];
+                    double scale = 0.9;
+                    if (_currentPage != null) {
+                      scale = index == _currentPage!.round() ? 1.0 : 0.9;
+                    }
 
-              return GestureDetector(
-                onTap: () {
-                  RewardSchemeDetails(item);
-                },
-                child: Transform.scale(
-                  scale: scale,
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(getScreenWidth(20)),
-                        color: const Color(0x33800180),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            spreadRadius: 2,
-                            blurRadius: 20,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            height: screenHeight * 0.28,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: FadeInImage.assetNetwork(
-                                placeholder: 'assets/images/app_file_icon.png',
-                                image: item['rewardSchemeImageUrl'] ?? '',
-                                fit: BoxFit.cover,
-                                imageErrorBuilder: (context, error,
-                                    stackTrace) {
-                                  return Image.asset(
-                                    'assets/images/app_file_icon.png',
-                                    fit: BoxFit.cover,
-                                  );
-                                },
-                              ),
+                    return GestureDetector(
+                      onTap: () {
+                        RewardSchemeDetails(item);
+                      },
+                      child: Transform.scale(
+                        scale: scale,
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.circular(getScreenWidth(20)),
+                              color: const Color(0x33800180),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  spreadRadius: 2,
+                                  blurRadius: 20,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: screenHeight * 0.28,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: FadeInImage.assetNetwork(
+                                      placeholder:
+                                          'assets/images/app_file_icon.png',
+                                      image: item['rewardSchemeImageUrl'] ?? '',
+                                      fit: BoxFit.cover,
+                                      imageErrorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Image.asset(
+                                          'assets/images/app_file_icon.png',
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
         ),
       ],
     );
@@ -835,14 +823,15 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                       },
                     ),
                   ),
-                  // Positioned(
-                  //   top: 0,
-                  //   right: 0,
-                  //   child: IconButton(
-                  //     icon: const Icon(Icons.clear_sharp, color: Color(0xFF7A0180)),
-                  //     onPressed: () => Navigator.pop(context),
-                  //   ),
-                  // ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: IconButton(
+                      icon: const Icon(Icons.clear_sharp,
+                          color: Color(0xFF7A0180)),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
                 ],
               ),
             ],

@@ -34,7 +34,7 @@ class _PainterPageState extends State<PainterPage> {
     fetchLocalStorageData();
     _scrollmyPainterListController.addListener(() {
       if (_scrollmyPainterListController.position.pixels ==
-          _scrollmyPainterListController.position.maxScrollExtent &&
+              _scrollmyPainterListController.position.maxScrollExtent &&
           !isLoading &&
           hasMore) {
         getMyPainterList();
@@ -80,10 +80,12 @@ class _PainterPageState extends State<PainterPage> {
           });
         }
       } else {
-        error_handling.errorValidation(context, response.body, response.body, false);
+        error_handling.errorValidation(
+            context, response.body, response.body, false);
       }
     } catch (error) {
-      error_handling.errorValidation(context, error.toString(), error.toString(), false);
+      error_handling.errorValidation(
+          context, error.toString(), error.toString(), false);
     } finally {
       setState(() => isLoading = false);
     }
@@ -108,166 +110,174 @@ class _PainterPageState extends State<PainterPage> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        key: _scaffoldKey,
-        body: SingleChildScrollView(
-          child: Container(
-            height: screenHeight,
-            width: screenWidth,
-            decoration: const BoxDecoration(
-              // borderRadius: BorderRadius.circular(20),
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  Color(0xFFFFF7AD),
-                  Color(0xFFFFA9F9),
-                ],
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    margin: EdgeInsets.symmetric(
-                      horizontal: screenWidth * 0.04,
-                      vertical: screenHeight * 0,
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          'My Partners',
-                          style: TextStyle(
-                            fontSize: unitHeightValue * 0.02,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF3533CD),
-                          ),
+          key: _scaffoldKey,
+          body: SingleChildScrollView(
+            child: Container(
+                height: screenHeight,
+                width: screenWidth,
+                decoration: const BoxDecoration(
+                  // borderRadius: BorderRadius.circular(20),
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Color(0xFFFFF7AD),
+                      Color(0xFFFFA9F9),
+                    ],
+                  ),
+                ),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.04,
+                          vertical: screenHeight * 0,
                         ),
-                      ],
-                    ),
-                  ),
-                  myPainterList.isEmpty
-                      ? Center(
-                    child: Text(
-                      hasMore && isLoading
-                          ? "Loading..."
-                          : "No data available",
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  )
-                      : SingleChildScrollView(
-                    controller: _scrollmyPainterListController,
-                    child: Container(
-                      // margin: const EdgeInsets.all(16.0), // Add margin around the table
-                      margin: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.02,
-                        vertical: screenHeight * 0.01,
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.018,
-                        vertical: screenHeight * 0.01,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0x33800180),
-                        borderRadius: BorderRadius.circular(12.0), // Add radius to table
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            blurRadius: 8,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Table(
-                        columnWidths: {
-                          0: FixedColumnWidth(screenWidth * 0.3),
-                          1: FixedColumnWidth(screenWidth * 0.3),
-                          2: FixedColumnWidth(screenWidth * 0.3),
-                        },
-                        children: [
-                          // Header Row
-                          const TableRow(
-                            // decoration: BoxDecoration(
-                            //   color: Colors.blueAccent,
-                            // ),
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  'Name',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: const Color(0xFF3533CD),
-                                  ),
-                                ),
+                        child: Row(
+                          children: [
+                            Text(
+                              'My Partners',
+                              style: TextStyle(
+                                fontSize: unitHeightValue * 0.02,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF3533CD),
                               ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  'Mobile',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: const Color(0xFF3533CD),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  'Reward Points',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: const Color(0xFF3533CD),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          // Dynamic Rows
-                          ...myPainterList.map((painter) {
-                            return TableRow(
-                              // decoration: const BoxDecoration(
-                              //   color: Color(0x33800180),
-                              // ),
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(painter['name'] ?? 'NA', ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(painter['mobile'] ?? 'NA'),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(painter['rewardPoints'] > 0 ? painter['rewardPoints'].toString() : '0'),
-                                ),
-                              ],
-                            );
-                          }).toList(),
-                          // Loading Indicator Row (optional)
-                          if (hasMore && isLoading)
-                            const TableRow(
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.all(16.0),
-                                  child: Center(child: CircularProgressIndicator()),
-                                ),
-                                SizedBox.shrink(),
-                                SizedBox.shrink(),
-                              ],
                             ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
-                ]
-            )
-          ),
-        )
-      ),
+                      myPainterList.isEmpty
+                          ? Center(
+                              child: Text(
+                                hasMore && isLoading
+                                    ? "Loading..."
+                                    : "No data available",
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            )
+                          : SingleChildScrollView(
+                              controller: _scrollmyPainterListController,
+                              child: Container(
+                                // margin: const EdgeInsets.all(16.0), // Add margin around the table
+                                margin: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.02,
+                                  vertical: screenHeight * 0.01,
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.018,
+                                  vertical: screenHeight * 0.01,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0x33800180),
+                                  borderRadius: BorderRadius.circular(
+                                      12.0), // Add radius to table
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      blurRadius: 8,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Table(
+                                  columnWidths: {
+                                    0: FixedColumnWidth(screenWidth * 0.3),
+                                    1: FixedColumnWidth(screenWidth * 0.3),
+                                    2: FixedColumnWidth(screenWidth * 0.3),
+                                  },
+                                  children: [
+                                    // Header Row
+                                    const TableRow(
+                                      // decoration: BoxDecoration(
+                                      //   color: Colors.blueAccent,
+                                      // ),
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Name',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color: const Color(0xFF3533CD),
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Mobile',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color: const Color(0xFF3533CD),
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Reward Points',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color: const Color(0xFF3533CD),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    // Dynamic Rows
+                                    ...myPainterList.map((painter) {
+                                      return TableRow(
+                                        // decoration: const BoxDecoration(
+                                        //   color: Color(0x33800180),
+                                        // ),
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              painter['name'] ?? 'NA',
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child:
+                                                Text(painter['mobile'] ?? 'NA'),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                                painter['rewardPoints'] > 0
+                                                    ? painter['rewardPoints']
+                                                        .toString()
+                                                    : '0'),
+                                          ),
+                                        ],
+                                      );
+                                    }).toList(),
+                                    // Loading Indicator Row (optional)
+                                    if (hasMore && isLoading)
+                                      const TableRow(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.all(16.0),
+                                            child: Center(
+                                                child:
+                                                    CircularProgressIndicator()),
+                                          ),
+                                          SizedBox.shrink(),
+                                          SizedBox.shrink(),
+                                        ],
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                    ])),
+          )),
     );
   }
 }

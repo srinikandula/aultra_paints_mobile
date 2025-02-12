@@ -183,22 +183,26 @@ class _LayoutPageState extends State<LayoutPage> {
         return AlertDialog(
           title: Text(
             'Delete Account',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+                fontWeight: FontWeight.bold, fontSize: getScreenWidth(18)),
           ),
           content: Text(
             'Are you sure you want to delete your account? This action cannot be undone.',
+            style: TextStyle(fontSize: getScreenWidth(16)),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel', style: TextStyle(color: Colors.grey)),
+              child: Text('Cancel',
+                  style: TextStyle(
+                      color: Colors.grey, fontSize: getScreenWidth(14))),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                // backgroundColor: Colors.red,
-              ),
+                  // backgroundColor: Colors.red,
+                  ),
               onPressed: () {
                 // Add your account deletion logic here
                 // Navigator.of(context).pop();
@@ -209,7 +213,8 @@ class _LayoutPageState extends State<LayoutPage> {
                 // );
                 deleteUserAccount();
               },
-              child: Text('Delete'),
+              child: Text('Delete',
+                  style: TextStyle(fontSize: getScreenWidth(14))),
             ),
           ],
         );
@@ -356,7 +361,6 @@ class MyDrawer extends StatelessWidget {
     required this.parentDealerName,
     required this.onAccountDelete,
   });
-
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -396,11 +400,15 @@ class MyDrawer extends StatelessWidget {
                   Text(
                     accountName,
                     style: TextStyle(
-                      color: accountType == 'Painter' ? const Color(0xFF3498db) :
-                      accountType == 'Dealer' ? const Color(0xFF2ecc71) :
-                      accountType == 'Contractor' ? const Color(0xFFe67e22) :
-                      accountType == 'SuperUser' ? const Color(0xFFe74c3c) :
-                      const Color(0xFF3533CD),
+                      color: accountType == 'Painter'
+                          ? const Color(0xFF3498db)
+                          : accountType == 'Dealer'
+                              ? const Color(0xFF2ecc71)
+                              : accountType == 'Contractor'
+                                  ? const Color(0xFFe67e22)
+                                  : accountType == 'SuperUser'
+                                      ? const Color(0xFFe74c3c)
+                                      : const Color(0xFF3533CD),
                       fontFamily: ffGBold,
                       fontSize: unitHeightValue * 3,
                       fontWeight: FontWeight.bold,
@@ -409,11 +417,15 @@ class MyDrawer extends StatelessWidget {
                   Text(
                     accountMobile,
                     style: TextStyle(
-                      color: accountType == 'Painter' ? const Color(0xFF3498db) :
-                      accountType == 'Dealer' ? const Color(0xFF2ecc71) :
-                      accountType == 'Contractor' ? const Color(0xFFe67e22) :
-                      accountType == 'SuperUser' ? const Color(0xFFe74c3c) :
-                      const Color(0xFF3533CD),
+                      color: accountType == 'Painter'
+                          ? const Color(0xFF3498db)
+                          : accountType == 'Dealer'
+                              ? const Color(0xFF2ecc71)
+                              : accountType == 'Contractor'
+                                  ? const Color(0xFFe67e22)
+                                  : accountType == 'SuperUser'
+                                      ? const Color(0xFFe74c3c)
+                                      : const Color(0xFF3533CD),
                       fontFamily: ffGMedium,
                       fontSize: unitHeightValue * 1.8,
                     ),
@@ -446,12 +458,16 @@ class MyDrawer extends StatelessWidget {
                               context: context,
                               builder: (BuildContext context) {
                                 return DealerSearchDialog(
-                                  onDealerSelected: (String dealerCode, String dealerName) {
-                                    parentDealerCode = dealerCode;
-                                    parentDealerName = dealerName;
+                                  onDealerSelected:
+                                      (String dealerCode, String dealerName) {
+                                    return {
+                                      parentDealerCode = dealerCode,
+                                      parentDealerName = dealerName,
+                                    };
                                   },
                                   onDealerComplete: () {
-                                    Navigator.pushNamed(context, '/dashboardPage');
+                                    Navigator.pushNamed(
+                                        context, '/dashboardPage');
                                   },
                                 );
                               },
@@ -586,15 +602,19 @@ class MyDrawer extends StatelessWidget {
         return WillPopScope(
           onWillPop: () async {
             Navigator.pop(context); // Close the popup
-            Navigator.pushNamed(context, '/dashboardPage'); // Call callback function
+            Navigator.pushNamed(
+                context, '/dashboardPage'); // Call callback function
             return true; // Allow dismissal
           },
           child: AlertDialog(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             content: Container(
-              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.05, horizontal: screenWidth * 0.05),
+              padding: EdgeInsets.symmetric(
+                  vertical: screenHeight * 0.05,
+                  horizontal: screenWidth * 0.05),
               width: screenWidth * 0.6,
               height: screenHeight * 0.28,
               decoration: BoxDecoration(
@@ -619,7 +639,11 @@ class MyDrawer extends StatelessWidget {
                   SizedBox(height: screenHeight * 0.04),
                   Text(
                     "Success",
-                    style: TextStyle(fontSize: unitHeightValue * 0.04, fontWeight: FontWeight.w400, color: const Color(0xFF3533CD),),
+                    style: TextStyle(
+                      fontSize: unitHeightValue * 0.04,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF3533CD),
+                    ),
                   ),
                 ],
               ),
@@ -628,7 +652,8 @@ class MyDrawer extends StatelessWidget {
         );
       },
     ).then((_) {
-      Navigator.pushNamed(context, '/dashboardPage'); // Ensure callback is always called
+      Navigator.pushNamed(
+          context, '/dashboardPage'); // Ensure callback is always called
     });
   }
 }

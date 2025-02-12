@@ -406,7 +406,9 @@ class _PainterPopUpPageState extends State<PainterPopUpPage> {
                                       dealerCodeController.text, otp);
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("Please enter a valid 6-digit OTP.")),
+                                    SnackBar(
+                                        content: Text(
+                                            "Please enter a valid 6-digit OTP.")),
                                   );
                                 }
                               },
