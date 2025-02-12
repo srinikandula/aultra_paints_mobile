@@ -183,17 +183,23 @@ class _LayoutPageState extends State<LayoutPage> {
         return AlertDialog(
           title: Text(
             'Delete Account',
-            style: TextStyle(fontWeight: FontWeight.bold),
+
+            style: TextStyle(
+                fontWeight: FontWeight.bold, fontSize: getScreenWidth(18)),
           ),
           content: Text(
             'Are you sure you want to delete your account? This action cannot be undone.',
+            style: TextStyle(fontSize: getScreenWidth(16)),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel', style: TextStyle(color: Colors.grey)),
+
+              child: Text('Cancel',
+                  style: TextStyle(
+                      color: Colors.grey, fontSize: getScreenWidth(14))),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -209,7 +215,8 @@ class _LayoutPageState extends State<LayoutPage> {
                 // );
                 deleteUserAccount();
               },
-              child: Text('Delete'),
+              child: Text('Delete',
+                  style: TextStyle(fontSize: getScreenWidth(14))),
             ),
           ],
         );
@@ -426,6 +433,7 @@ class MyDrawer extends StatelessWidget {
                       fontSize: unitHeightValue * 1.8,
                     ),
                   ),
+
                   if (accountType == 'Painter')
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
