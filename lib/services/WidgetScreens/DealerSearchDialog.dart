@@ -278,7 +278,7 @@ class _DealerSearchDialogState extends State<DealerSearchDialog> {
                                     margin: EdgeInsets.symmetric(vertical: screenHeight * 0.001),
                                     child: ListTile(
                                       title: Text(
-                                        option['name'],
+                                       '${option['name']} - ${option['mobile']}',
                                         style: const TextStyle(color: Colors.white),
                                       ),
                                       onTap: () {
