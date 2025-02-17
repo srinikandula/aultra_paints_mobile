@@ -242,7 +242,6 @@ class _LayoutPageState extends State<LayoutPage> {
         child: Container(
           decoration: const BoxDecoration(
             color: white,
-            // borderRadius: BorderRadius.circular(20),
             gradient: LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
@@ -252,18 +251,10 @@ class _LayoutPageState extends State<LayoutPage> {
               ],
             ),
           ),
-          // padding: EdgeInsets.symmetric(
-          //   horizontal: screenWidth * 0.05,
-          //   vertical: screenHeight * 0.04,
-          // ),
           padding: EdgeInsets.only(
               left: screenWidth * 0.05,
               right: screenWidth * 0.05,
-              top: screenHeight * 0.03),
-          // padding: EdgeInsets.only(
-          //     left: getScreenWidth(10),
-          //     right: getScreenWidth(10),
-          //     top: getScreenHeight(40)),
+              top: screenHeight * 0.02),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -273,12 +264,14 @@ class _LayoutPageState extends State<LayoutPage> {
                 },
                 child: Container(
                   child: Padding(
-                    padding: const EdgeInsets.all(6.0),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.02,
+                      vertical: screenHeight * 0.02,
+                    ),
                     child: Center(
                       child: Icon(
                         FontAwesomeIcons.bars,
                         size: unitHeightValue * .028,
-                        // color: Colors.white,
                         color: appThemeColor,
                       ),
                     ),
@@ -310,7 +303,11 @@ class _LayoutPageState extends State<LayoutPage> {
                 },
                 child: Container(
                   child: Padding(
-                    padding: const EdgeInsets.all(6.0),
+                    // padding: const EdgeInsets.all(6.0),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.02,
+                      vertical: screenHeight * 0.02,
+                    ),
                     child: Center(
                       child: Icon(
                         FontAwesomeIcons.qrcode,
@@ -368,7 +365,7 @@ class MyDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double unitHeightValue = screenHeight * 0.01;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
 
     return Drawer(
       width: screenWidth * 0.7,
@@ -386,18 +383,21 @@ class MyDrawer extends StatelessWidget {
           ),
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // **User Details Section (Stays at the Top)**
             Container(
               margin: EdgeInsets.only(
                   top: screenHeight * 0.06,
                   bottom: screenHeight * 0,
-                  left: screenWidth * 0.08,
-                  right: screenWidth * 0.08),
+                  left: screenWidth * 0.04,
+                  right: screenWidth * 0.04),
               // margin: EdgeInsets.symmetric(
               //     horizontal: screenWidth * 0.08,
               //     vertical: screenHeight * 0.01),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -413,7 +413,7 @@ class MyDrawer extends StatelessWidget {
                                       ? const Color(0xFFe74c3c)
                                       : const Color(0xFF3533CD),
                       fontFamily: ffGBold,
-                      fontSize: unitHeightValue * 3,
+                      fontSize: unitHeightValue * 0.028,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -430,7 +430,7 @@ class MyDrawer extends StatelessWidget {
                                       ? const Color(0xFFe74c3c)
                                       : const Color(0xFF3533CD),
                       fontFamily: ffGMedium,
-                      fontSize: unitHeightValue * 1.8,
+                      fontSize: unitHeightValue * 0.020,
                     ),
                   ),
 
@@ -442,18 +442,18 @@ class MyDrawer extends StatelessWidget {
                             style: TextStyle(
                               color: const Color(0xFF3533CD),
                               fontFamily: ffGMedium,
-                              fontSize: unitHeightValue * 1.8,
+                              fontSize: unitHeightValue * 0.016,
                             )),
                         Text(parentDealerName,
                             style: TextStyle(
                                 color: const Color(0xFF3533CD),
                                 fontFamily: ffGBold,
-                                fontSize: unitHeightValue * 1.8,
+                                fontSize: unitHeightValue * 0.016,
                                 fontWeight: FontWeight.bold)),
                         IconButton(
                           icon: Icon(
                             FontAwesomeIcons.pencil,
-                            size: unitHeightValue * 1.8,
+                            size: unitHeightValue * 0.016,
                             color: const Color(0xFF3533CD),
                           ),
                           padding: EdgeInsets.zero,
@@ -495,7 +495,7 @@ class MyDrawer extends StatelessWidget {
                         style: TextStyle(
                           color: const Color(0xFF3533CD),
                           fontFamily: ffGSemiBold,
-                          fontSize: unitHeightValue * 2.8,
+                          fontSize: unitHeightValue * 0.022,
                         ),
                       ),
                       onTap: () {
@@ -509,7 +509,7 @@ class MyDrawer extends StatelessWidget {
                           style: TextStyle(
                             color: const Color(0xFF3533CD),
                             fontFamily: ffGSemiBold,
-                            fontSize: unitHeightValue * 2.8,
+                            fontSize: unitHeightValue * 0.022,
                           ),
                         ),
                         onTap: () {
@@ -523,7 +523,7 @@ class MyDrawer extends StatelessWidget {
                           style: TextStyle(
                             color: const Color(0xFF3533CD),
                             fontFamily: ffGSemiBold,
-                            fontSize: unitHeightValue * 2.8,
+                            fontSize: unitHeightValue * 0.022,
                           ),
                         ),
                         onTap: () {
@@ -541,6 +541,19 @@ class MyDrawer extends StatelessWidget {
                           );
                         },
                       ),
+                    ListTile(
+                      title: Text(
+                        'Points Ledger',
+                        style: TextStyle(
+                          color: const Color(0xFF3533CD),
+                          fontFamily: ffGSemiBold,
+                          fontSize: unitHeightValue * 0.022,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/pointsLedgerPage');
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -561,7 +574,7 @@ class MyDrawer extends StatelessWidget {
                         style: TextStyle(
                           color: const Color(0xFF3533CD),
                           fontFamily: ffGMedium,
-                          fontSize: unitHeightValue * 2.8,
+                          fontSize: unitHeightValue * 0.022,
                         ),
                       ),
                     ),
@@ -579,7 +592,7 @@ class MyDrawer extends StatelessWidget {
                         style: TextStyle(
                           color: const Color(0xFF3533CD),
                           fontFamily: ffGMedium,
-                          fontSize: unitHeightValue * 2.8,
+                          fontSize: unitHeightValue * 0.022,
                         ),
                       ),
                     ),

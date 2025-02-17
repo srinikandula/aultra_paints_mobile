@@ -36,6 +36,8 @@ const GET_PRODUCT_OFFERS = "productOffers/getProductOffers";
 
 const GET_MY_PAINTERS = "users/getMyPainters";
 
+const GET_TRANSACTION_LEDGER = "transactionLedger/getTransactions";
+
 const GET_REWARDS_SCHEMES = "rewardSchemes/getRewardSchemes";
 
 const API_LOGOUT = "login/logout";
