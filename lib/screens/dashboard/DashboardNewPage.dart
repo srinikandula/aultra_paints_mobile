@@ -419,7 +419,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
           ),
         ),
         SizedBox(
-          height: screenHeight * 0.36, //0.29 old
+          height: screenHeight * 0.30, //0.29 old
           child: Container(
             margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
             child: PageView.builder(
@@ -820,15 +820,15 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                       },
                     ),
                   ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: IconButton(
-                      icon: const Icon(Icons.clear_sharp,
-                          color: Color(0xFF7A0180)),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
+                  // Positioned(
+                  //   top: 0,
+                  //   right: 0,
+                  //   child: IconButton(
+                  //     icon: const Icon(Icons.clear_sharp,
+                  //         color: Color(0xFF7A0180)),
+                  //     onPressed: () => Navigator.pop(context),
+                  //   ),
+                  // ),
                 ],
               ),
             ],
