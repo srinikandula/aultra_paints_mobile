@@ -329,9 +329,8 @@ class _DealerSearchDialogState extends State<DealerSearchDialog> {
                                         vertical: screenHeight * 0.001),
                                     child: ListTile(
                                       title: Text(
-                                        option['name'],
-                                        style: const TextStyle(
-                                            color: Colors.white),
+                                       '${option['name']} - ${option['mobile']}',
+                                        style: const TextStyle(color: Colors.white),
                                       ),
                                       onTap: () {
                                         onSelected(option);
