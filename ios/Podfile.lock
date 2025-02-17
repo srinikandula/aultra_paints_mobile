@@ -55,7 +55,7 @@ PODS:
   - nanopb/encode (2.30910.0)
   - native_device_orientation (0.0.1):
     - Flutter
-  - permission_handler_apple (9.1.1):
+  - permission_handler_apple (9.3.0):
     - Flutter
   - PromisesObjC (2.4.0)
   - qr_mobile_vision (0.0.1):
@@ -126,7 +126,7 @@ SPEC CHECKSUMS:
   MLKitVision: e858c5f125ecc288e4a31127928301eaba9ae0c1
   nanopb: 438bc412db1928dac798aa6fd75726007be04262
   native_device_orientation: 348b10c346a60ebbc62fb235a4fdb5d1b61a8f55
-  permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
+  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   qr_mobile_vision: de2dbc8122cf2e0d15af3d777f6969e2d65876f6
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
