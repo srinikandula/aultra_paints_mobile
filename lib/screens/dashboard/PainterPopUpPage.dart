@@ -46,6 +46,10 @@ class _PainterPopUpPageState extends State<PainterPopUpPage> {
   bool isOtpVisible = false;
   bool isLoading = false;
 
+  List<dynamic> dealerList = [];
+  Map<String, dynamic>? selectedDealer;
+  bool isOtpSent = false;
+
   @override
   void initState() {
     fetchLocalStorageDate();
@@ -57,6 +61,45 @@ class _PainterPopUpPageState extends State<PainterPopUpPage> {
     accesstoken = prefs.getString('accessToken');
     USER_MOBILE_NUMBER = prefs.getString('USER_MOBILE_NUMBER');
     userParentDealerName = prefs.getString('userParentDealerName');
+  }
+
+  Future<void> searchDealer(String query) async {
+    // Utils.clearToasts(context);
+    // Utils.returnScreenLoader(context);
+    http.Response response;
+    var apiUrl = BASE_URL + GET_DEALERS;
+    if (query.isEmpty) {
+      selectedDealer = null;
+      return;
+    }
+
+    response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": accesstoken
+      },
+      body: json.encode({'searchQuery': query}),
+    );
+
+    final responseData = json.decode(response.body);
+    if (response.statusCode == 200) {
+      // Navigator.pop(context);
+      setState(() {
+        dealerList = responseData['data'];
+      });
+      // setState(() => isLoading = false);
+      // return true;
+    } else {
+      error_handling.errorValidation(
+          context, response.statusCode, response.body, false);
+    }
+
+    // if (response.statusCode == 200) {
+    //   setState(() {
+    //     dealerList = json.decode(response.body)['data'];
+    //   });
+    // }
   }
 
   void _showSnackBar(String message, BuildContext context, ColorCheck) {
@@ -88,6 +131,7 @@ class _PainterPopUpPageState extends State<PainterPopUpPage> {
       Navigator.pop(context);
       setState(() {
         isOtpVisible = true;
+        isOtpSent = true;
         userParentDealerMobile = responseData["data"]['mobile'];
         userParentDealerName = responseData["data"]['name'];
       });
@@ -95,6 +139,7 @@ class _PainterPopUpPageState extends State<PainterPopUpPage> {
       Navigator.pop(context);
       setState(() {
         isOtpVisible = false;
+        isOtpSent = false;
       });
       final tempResp = json.decode(response.body);
       error_handling.errorValidation(
@@ -127,7 +172,8 @@ class _PainterPopUpPageState extends State<PainterPopUpPage> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('USER_PARENT_DEALER_CODE',
           tempResp['data']?['parentDealerCode'] ?? '');
-      Navigator.pop(context, true);
+      // Navigator.pop(context, true);
+      Navigator.pushNamed(context, '/dashboardPage');
       _showSnackBar("Details saved successfully.", context, true);
     } else {
       Navigator.pop(context);
@@ -190,67 +236,191 @@ class _PainterPopUpPageState extends State<PainterPopUpPage> {
                             fontSize: getScreenWidth(16),
                             fontWeight: FontWeight.bold),
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: white,
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: const LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              Color(0xFF000000),
-                              Color(0xFF3533CD),
-                            ],
-                          ),
-                        ),
-                        child: SizedBox(
-                          height: screenHeight * 0.06,
-                          child: TextField(
-                            // keyboardType: TextInputType.number,
-                            controller: dealerCodeController,
-                            keyboardType: TextInputType.text,
-                            onTapOutside: (event) {
-                              FocusManager.instance.primaryFocus?.unfocus();
-                            },
-                            style: TextStyle(
-                              fontSize: getScreenWidth(18),
-                              color: Colors.white,
-                              fontFamily: ffGMedium,
-                            ),
-                            decoration: InputDecoration(
-                              // labelText: '',
-                              labelStyle: TextStyle(
-                                fontFamily: ffGMedium,
-                                fontSize: getScreenWidth(18),
-                                color: textInputPlaceholderColor,
+                      // Container(
+                      //   decoration: BoxDecoration(
+                      //     color: white,
+                      //     borderRadius: BorderRadius.circular(20),
+                      //     gradient: const LinearGradient(
+                      //       begin: Alignment.centerLeft,
+                      //       end: Alignment.centerRight,
+                      //       colors: [
+                      //         Color(0xFF000000),
+                      //         Color(0xFF3533CD),
+                      //       ],
+                      //     ),
+                      //   ),
+                      //   child: SizedBox(
+                      //     height: screenHeight * 0.06,
+                      //     child: TextField(
+                      //       // keyboardType: TextInputType.number,
+                      //       controller: dealerCodeController,
+                      //       keyboardType: TextInputType.text,
+                      //       onTapOutside: (event) {
+                      //         FocusManager.instance.primaryFocus?.unfocus();
+                      //       },
+                      //       style: TextStyle(
+                      //         fontSize: getScreenWidth(18),
+                      //         color: Colors.white,
+                      //         fontFamily: ffGMedium,
+                      //       ),
+                      //       decoration: InputDecoration(
+                      //         // labelText: '',
+                      //         labelStyle: TextStyle(
+                      //           fontFamily: ffGMedium,
+                      //           fontSize: getScreenWidth(18),
+                      //           color: textInputPlaceholderColor,
+                      //         ),
+                      //         hintText: 'Enter Dealer Code', // Placeholder text
+                      //         hintStyle: TextStyle(
+                      //           fontSize: getScreenWidth(14),
+                      //           color:
+                      //               textInputPlaceholderColor.withOpacity(0.7),
+                      //           fontFamily: ffGMedium,
+                      //         ),
+                      //         floatingLabelBehavior: FloatingLabelBehavior
+                      //             .auto, // Default behavior
+                      //         contentPadding: EdgeInsets.symmetric(
+                      //           horizontal: screenWidth * 0.1,
+                      //           // vertical: screenHeight * 0.02,
+                      //         ),
+                      //         border: OutlineInputBorder(
+                      //           borderRadius: BorderRadius.circular(
+                      //               10), // Optional border
+                      //           borderSide: BorderSide.none,
+                      //         ),
+                      //         filled: true, // Optional for a filled background
+                      //         fillColor: Colors.grey.withOpacity(
+                      //             0.1), // Optional background color
+                      //       ),
+                      //       // onChanged: (value) {
+                      //       //   _loginRequest.phoneNumber = value.trim();
+                      //       // },
+                      //     ),
+                      //   ),
+                      // ),
+                      Autocomplete<Map<String, dynamic>>(
+                        optionsBuilder: (TextEditingValue textEditingValue) async {
+                          if (textEditingValue.text.isEmpty) {
+                            setState(() {
+                              selectedDealer = null;
+                            });
+                            return const Iterable<Map<String, dynamic>>.empty();
+                          }
+                          await searchDealer(textEditingValue.text);
+                          return dealerList.cast<Map<String, dynamic>>();
+                        },
+                        displayStringForOption: (Map<String, dynamic> option) =>
+                        option['name'],
+                        onSelected: (Map<String, dynamic> selection) {
+                          setState(() {
+                            selectedDealer = selection;
+                          });
+                        },
+                        optionsViewBuilder: (context, onSelected, options) {
+                          return Align(
+                            alignment: Alignment.topLeft,
+                            child: Material(
+                              elevation: 4.0,
+                              borderRadius: BorderRadius.circular(20),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxHeight: screenHeight *
+                                      0.3, // Limits max height but allows auto expansion
+                                ),
+                                child: Container(
+                                  width: screenWidth * 0.7,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    gradient: const LinearGradient(
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                      colors: [
+                                        Color(0xFF000000),
+                                        Color(0xFF3533CD),
+                                      ],
+                                    ),
+                                  ),
+                                  child: ListView.builder(
+                                    shrinkWrap: true, // Auto height adjustment
+                                    itemCount: options.length,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      final option = options.elementAt(index);
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                              screenWidth * 0.2),
+                                        ),
+                                        margin: EdgeInsets.symmetric(
+                                            vertical: screenHeight * 0.001),
+                                        child: ListTile(
+                                          title: Text(
+                                            '${option['name']} - ${option['mobile']}',
+                                            style: const TextStyle(color: Colors.white),
+                                          ),
+                                          onTap: () {
+                                            onSelected(option);
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
                               ),
-                              hintText: 'Enter Dealer Code', // Placeholder text
-                              hintStyle: TextStyle(
-                                fontSize: getScreenWidth(14),
-                                color:
+                            ),
+                          );
+                        },
+                        fieldViewBuilder: (context, textEditingController,
+                            focusNode, onFieldSubmitted) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              gradient: const LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Color(0xFF000000),
+                                  Color(0xFF3533CD),
+                                ],
+                              ),
+                            ),
+                            child: SizedBox(
+                              height: screenHeight * 0.06,
+                              child: TextField(
+                                controller: textEditingController,
+                                focusNode: focusNode,
+                                enabled: !isOtpSent,
+                                style: TextStyle(
+                                  fontSize: unitHeightValue * 0.02,
+                                  color: Colors.white,
+                                  fontFamily: ffGMedium,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: 'Enter Dealer Name & Mobile',
+                                  hintStyle: TextStyle(
+                                    fontSize: unitHeightValue * 0.02,
+                                    color:
                                     textInputPlaceholderColor.withOpacity(0.7),
-                                fontFamily: ffGMedium,
+                                    fontFamily: ffGMedium,
+                                  ),
+                                  floatingLabelBehavior: FloatingLabelBehavior.auto,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.05,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.grey.withOpacity(0.1),
+                                  suffixIcon: const Icon(
+                                    Icons.search,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
-                              floatingLabelBehavior: FloatingLabelBehavior
-                                  .auto, // Default behavior
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.1,
-                                // vertical: screenHeight * 0.02,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(
-                                    10), // Optional border
-                                borderSide: BorderSide.none,
-                              ),
-                              filled: true, // Optional for a filled background
-                              fillColor: Colors.grey.withOpacity(
-                                  0.1), // Optional background color
                             ),
-                            // onChanged: (value) {
-                            //   _loginRequest.phoneNumber = value.trim();
-                            // },
-                          ),
-                        ),
+                          );
+                        },
                       ),
                       !isOtpVisible
                           ? SizedBox.shrink()
@@ -362,12 +532,7 @@ class _PainterPopUpPageState extends State<PainterPopUpPage> {
                           if (!isOtpVisible)
                             TextButton(
                               onPressed: () async {
-                                if (dealerCodeController.text.isEmpty) {
-                                  error_handling.errorValidation(context, '',
-                                      'Please enter Dealer Code.', false);
-                                } else {
-                                  fetchOtp(dealerCodeController.text);
-                                }
+                                fetchOtp(selectedDealer?['dealerCode'].trim());
                               },
                               child: Container(
                                 padding: EdgeInsets.symmetric(
@@ -403,7 +568,7 @@ class _PainterPopUpPageState extends State<PainterPopUpPage> {
                                     otpControllers.map((e) => e.text).join();
                                 if (otp.length == 6) {
                                   saveDealerDetails(
-                                      dealerCodeController.text, otp);
+                                      selectedDealer?['dealerCode'].trim(), otp);
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
