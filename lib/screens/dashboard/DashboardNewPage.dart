@@ -60,6 +60,15 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
   final PageController _pageController = PageController();
   double? _currentPage;
 
+    final Color primaryColor = Color(0xFF6A1B9A); // Deep Purple
+  final Color secondaryColor = Color(0xFFE91E63); // Pink
+  final Color accentColor = Color(0xFFFFC107); // Amber
+
+  // Font families
+  static const String regular = 'Roboto';
+  static const String medium = 'Roboto';
+  static const String bold = 'Roboto';
+
   @override
   void initState() {
     fetchLocalStorageData();
@@ -191,9 +200,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     );
     final responseData = json.decode(response.body);
     if (response.statusCode == 200) {
-      List<dynamic> newOffers = responseData;
+      // List<dynamic> newOffers = responseData;
+      // print('responseData====>${responseData}');
       setState(() {
-        productOffers = responseData;
+        productOffers = responseData['data'];
         // currentPage++;
         // productOffers.addAll(newOffers);
         // if (newOffers.length < 4) {
@@ -303,8 +313,9 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 returnNameRewards(),
-                returnProductsScroll(),
-                returnRewardsScroll()
+                // returnProductsScroll(),
+                returnNewProductsScroll(),
+                // returnRewardsScroll()
               ],
             ),
           )),
@@ -380,6 +391,235 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     );
   }
 
+  returnNewProductsScroll() {
+    return Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await getDashboardDetails();
+                },
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  physics: AlwaysScrollableScrollPhysics(),
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Ongoing Offers',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontFamily: bold,
+                            color: primaryColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                        Container(
+                          height: getScreenHeight(300),
+                          child: productOffers.isEmpty
+                              ? Center(
+                                  child: Text(
+                                    'No offers available',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 16,
+                                      fontFamily: regular,
+                                    ),
+                                  ),
+                                )
+                              : ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: productOffers.length,
+                                  itemBuilder: (context, index) {
+                                    final offer = productOffers[index];
+                                    return Container(
+                                      width: 220,
+                                      margin: EdgeInsets.only(right: 16),
+                                      child: Card(
+                                        elevation: 4,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(16),
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                primaryColor.withOpacity(0.05),
+                                                secondaryColor.withOpacity(0.05),
+                                              ],
+                                            ),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                // width: screenWidth * 0.38,
+                                                height: getScreenHeight(180),
+                                                child: Center(
+                                                  child: ClipRRect(
+                                                    borderRadius: BorderRadius.vertical(
+                                                      top: Radius.circular(getScreenWidth(20)),
+                                                    ),
+                                                    child: FadeInImage.assetNetwork(
+                                                      placeholder: 'assets/images/app_file_icon.png',
+                                                      image: offer['productOfferImageUrl'] ?? '',
+                                                      fit: BoxFit.cover,
+                                                      imageErrorBuilder: (context, error, stackTrace) {
+                                                        return Image.asset(
+                                                          'assets/images/app_file_icon.png',
+                                                          fit: BoxFit.cover,
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.all(12),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      offer['productOfferDescription'] ?? '',
+                                                      maxLines: 2,
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontFamily: medium,
+                                                        color: Colors.black87,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 8),
+                                                    // if (offer['productPrice'] != null)
+                                                     
+                                                      Container(
+                                                        padding: EdgeInsets.symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 4,
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                          color: accentColor.withOpacity(0.2),
+                                                          borderRadius: BorderRadius.circular(8),
+                                                        ),
+                                                        child: Text(
+                                                          // 'Price: ₹${offer['productPrice']}',
+                                                          'Price: ₹ 980',
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            fontFamily: bold,
+                                                            color: primaryColor,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                        ),
+                        SizedBox(height: 24),
+                        Text(
+                          'Reward Schemes',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontFamily: bold,
+                            color: primaryColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                        Container(
+                          height: 200,
+                          child: rewardSchemes.isEmpty
+                              ? Center(
+                                  child: Text(
+                                    'No reward schemes available',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 16,
+                                      fontFamily: regular,
+                                    ),
+                                  ),
+                                )
+                              : PageView.builder(
+                                  controller: _pageController,
+                                  itemCount: rewardSchemes.length,
+                                  itemBuilder: (context, index) {
+                                    final scheme = rewardSchemes[index];
+                                    return Container(
+                                      margin: EdgeInsets.symmetric(horizontal: 8),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                          colors: [
+                                            primaryColor.withOpacity(0.1),
+                                            secondaryColor.withOpacity(0.1),
+                                          ],
+                                        ),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: Stack(
+                                          fit: StackFit.expand,
+                                          children: [
+                                            Image.network(
+                                              scheme['rewardSchemeImageUrl'] ?? '',
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return Container(
+                                                  color: Colors.grey[200],
+                                                  child: Icon(
+                                                    Icons.card_giftcard,
+                                                    size: 48,
+                                                    color: Colors.grey[400],
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                            // Add a subtle gradient overlay for better text visibility if needed
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                  colors: [
+                                                    Colors.transparent,
+                                                    Colors.black.withOpacity(0.3),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                        ),
+                        if (isLoading)
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Center(child: CircularProgressIndicator()),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+  }
+
   returnProductsScroll() {
     PageController _pageController = PageController(viewportFraction: 0.5);
 
@@ -419,7 +659,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
           ),
         ),
         SizedBox(
-          height: screenHeight * 0.30, //0.29 old
+          height: screenHeight * 0.31, //0.29 old
           child: Container(
             margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
             child: PageView.builder(
@@ -474,11 +714,25 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                               ),
                             ),
                           ),
+                          offer['productPrice'] != null
+                              ? Text(
+                                  'Price: ${offer['productPrice']}',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: unitHeightValue * 0.014,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                )
+                              : const SizedBox.shrink(),
                           Container(
                             width: screenWidth,
-                            margin: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.018,
-                                vertical: screenHeight * 0.01),
+                            margin: EdgeInsets.only(
+                                left: screenWidth * 0.018,
+                                right: screenWidth * 0.018,
+                                // top: screenHeight * 0.01,
+                                bottom: screenHeight * 0.01),
                             padding: EdgeInsets.symmetric(
                                 horizontal: screenWidth * 0.03,
                                 vertical: screenHeight * 0.01),
@@ -498,7 +752,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                   textAlign: TextAlign.center,
-                                ),
+                                ), 
                               ],
                             ),
                           ),
