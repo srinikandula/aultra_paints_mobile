@@ -206,14 +206,35 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
         // Ensure each offer has a valid ID
         var data = responseData['data'] as List;
         productOffers = data.map((offer) {
+          String id;
           if (offer['id'] == null || offer['id'].toString().isEmpty) {
-            // Generate a unique ID using product code or any other unique identifier
-            offer['id'] = offer['productCode']?.toString() ?? 
-                         offer['productId']?.toString() ?? 
-                         DateTime.now().millisecondsSinceEpoch.toString();
+            // Use productCode as primary identifier, fallback to productId, then to timestamp
+            String? productCode = offer['productCode']?.toString();
+            if (productCode != null && productCode.isNotEmpty) {
+              id = productCode;
+            } else {
+              String? productId = offer['productId']?.toString();
+              if (productId != null && productId.isNotEmpty) {
+                id = productId;
+              } else {
+                // Use index-based ID to ensure uniqueness
+                id = 'product_${DateTime.now().millisecondsSinceEpoch}_${data.indexOf(offer)}';
+              }
+            }
+            offer['id'] = id;
+            // print('Generated ID for offer: $id'); // Debug log
+          } else {
+            id = offer['id'].toString();
+            // print('Existing ID for offer: $id'); // Debug log
           }
           return offer;
         }).toList();
+        
+        // Debug log all offer IDs
+        // print('All offer IDs:');
+        for (var offer in productOffers) {
+          // print('Offer ID: ${offer['id']}, Product: ${offer['productOfferDescription']}');
+        }
       });
       setState(() => isLoading = false);
       return true;
@@ -388,13 +409,12 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     final double screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: screenWidth * 0.04,
-        vertical: screenHeight * 0.02,
+      margin: EdgeInsets.only(
+        bottom: getScreenHeight(16)
       ),
       padding: EdgeInsets.symmetric(
-        horizontal: screenWidth * 0.04,
-        vertical: screenHeight * 0.02,
+        horizontal: getScreenWidth(16),
+        vertical: getScreenHeight(8),
       ),
       decoration: BoxDecoration(
         color: const Color(0x33800180),
@@ -425,7 +445,9 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
               ),
             ],
           ),
-          Consumer<CartProvider>(
+          Visibility(
+            visible: USER_ACCOUNT_TYPE == 'Dealer',
+            child: Consumer<CartProvider>(
             builder: (ctx, cart, _) => Stack(
               clipBehavior: Clip.none,
               children: [
@@ -467,6 +489,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
               ],
             ),
           ),
+          )
         ],
       ),
     );
@@ -494,7 +517,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
               ),
               SizedBox(height: getScreenHeight(16)),
               SizedBox(
-                height: getScreenHeight(280),
+                height: getScreenHeight(USER_ACCOUNT_TYPE == 'Dealer' ? 280 : 250),
                 child: productOffers.isEmpty
                     ? Center(
                         child: Text(
@@ -535,7 +558,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     SizedBox(
-                                      height: getScreenHeight(160),
+                                      height: getScreenHeight(USER_ACCOUNT_TYPE == 'Dealer' ? 160 : 180),
                                       child: Center(
                                         child: ClipRRect(
                                           borderRadius: BorderRadius.vertical(
@@ -576,8 +599,10 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                                 ),
                                               ),
                                             ),
-                                            SizedBox(height: getScreenHeight(4)),
-                                            Row(
+                                            // SizedBox(height: getScreenHeight(4)),
+                                           Visibility(
+                                            visible: USER_ACCOUNT_TYPE == 'Dealer',
+                                            child: Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Container(
@@ -678,6 +703,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                                 ),
                                               ],
                                             ),
+                                           )
                                           ],
                                         ),
                                       ),

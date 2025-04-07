@@ -36,7 +36,11 @@ class CartProvider with ChangeNotifier {
   }
 
   void addItem(String productId, String name, double price, String imageUrl) {
-    if (productId.isEmpty) return;
+    if (productId.isEmpty) {
+      print('Warning: Attempted to add item with empty ID'); // Debug log
+      return;
+    }
+    print('Adding item with ID: $productId'); // Debug log
     
     if (_items.containsKey(productId)) {
       _items.update(
@@ -60,18 +64,30 @@ class CartProvider with ChangeNotifier {
         ),
       );
     }
+    print('Cart items after add:'); // Debug log
+    _items.forEach((key, item) => print('ID: $key, Quantity: ${item.quantity}')); // Debug log
     notifyListeners();
   }
 
   void removeItem(String productId) {
-    if (productId.isEmpty) return;
+    if (productId.isEmpty) {
+      print('Warning: Attempted to remove item with empty ID'); // Debug log
+      return;
+    }
+    print('Removing item with ID: $productId'); // Debug log
     
     _items.remove(productId);
+    print('Cart items after remove:'); // Debug log
+    _items.forEach((key, item) => print('ID: $key, Quantity: ${item.quantity}')); // Debug log
     notifyListeners();
   }
 
   void incrementQuantity(String productId) {
-    if (productId.isEmpty) return;
+    if (productId.isEmpty) {
+      print('Warning: Attempted to increment quantity with empty ID'); // Debug log
+      return;
+    }
+    print('Incrementing quantity for ID: $productId'); // Debug log
     
     if (_items.containsKey(productId)) {
       _items.update(
@@ -84,12 +100,18 @@ class CartProvider with ChangeNotifier {
           quantity: existingCartItem.quantity + 1,
         ),
       );
+      print('Cart items after increment:'); // Debug log
+      _items.forEach((key, item) => print('ID: $key, Quantity: ${item.quantity}')); // Debug log
       notifyListeners();
     }
   }
 
   void decrementQuantity(String productId) {
-    if (productId.isEmpty) return;
+    if (productId.isEmpty) {
+      print('Warning: Attempted to decrement quantity with empty ID'); // Debug log
+      return;
+    }
+    print('Decrementing quantity for ID: $productId'); // Debug log
     
     if (_items.containsKey(productId)) {
       if (_items[productId]!.quantity > 1) {
@@ -106,13 +128,20 @@ class CartProvider with ChangeNotifier {
       } else {
         _items.remove(productId);
       }
+      print('Cart items after decrement:'); // Debug log
+      _items.forEach((key, item) => print('ID: $key, Quantity: ${item.quantity}')); // Debug log
       notifyListeners();
     }
   }
 
   int getQuantity(String productId) {
-    if (productId.isEmpty) return 0;
-    return _items[productId]?.quantity ?? 0;
+    if (productId.isEmpty) {
+      print('Warning: Attempted to get quantity with empty ID'); // Debug log
+      return 0;
+    }
+    final quantity = _items[productId]?.quantity ?? 0;
+    print('Getting quantity for ID: $productId, Value: $quantity'); // Debug log
+    return quantity;
   }
 
   void clear() {
