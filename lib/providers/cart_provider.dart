@@ -36,6 +36,8 @@ class CartProvider with ChangeNotifier {
   }
 
   void addItem(String productId, String name, double price, String imageUrl) {
+    if (productId.isEmpty) return;
+    
     if (_items.containsKey(productId)) {
       _items.update(
         productId,
@@ -62,11 +64,15 @@ class CartProvider with ChangeNotifier {
   }
 
   void removeItem(String productId) {
+    if (productId.isEmpty) return;
+    
     _items.remove(productId);
     notifyListeners();
   }
 
   void incrementQuantity(String productId) {
+    if (productId.isEmpty) return;
+    
     if (_items.containsKey(productId)) {
       _items.update(
         productId,
@@ -83,6 +89,8 @@ class CartProvider with ChangeNotifier {
   }
 
   void decrementQuantity(String productId) {
+    if (productId.isEmpty) return;
+    
     if (_items.containsKey(productId)) {
       if (_items[productId]!.quantity > 1) {
         _items.update(
@@ -103,6 +111,7 @@ class CartProvider with ChangeNotifier {
   }
 
   int getQuantity(String productId) {
+    if (productId.isEmpty) return 0;
     return _items[productId]?.quantity ?? 0;
   }
 

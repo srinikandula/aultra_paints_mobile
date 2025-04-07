@@ -202,15 +202,18 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     );
     final responseData = json.decode(response.body);
     if (response.statusCode == 200) {
-      // List<dynamic> newOffers = responseData;
-      // print('responseData====>${responseData}');
       setState(() {
-        productOffers = responseData['data'];
-        // currentPage++;
-        // productOffers.addAll(newOffers);
-        // if (newOffers.length < 4) {
-        //   hasMore = false; // No more data to load
-        // }
+        // Ensure each offer has a valid ID
+        var data = responseData['data'] as List;
+        productOffers = data.map((offer) {
+          if (offer['id'] == null || offer['id'].toString().isEmpty) {
+            // Generate a unique ID using product code or any other unique identifier
+            offer['id'] = offer['productCode']?.toString() ?? 
+                         offer['productId']?.toString() ?? 
+                         DateTime.now().millisecondsSinceEpoch.toString();
+          }
+          return offer;
+        }).toList();
       });
       setState(() => isLoading = false);
       return true;
@@ -490,8 +493,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                 ),
               ),
               SizedBox(height: getScreenHeight(16)),
-              Container(
-                height: getScreenHeight(300),
+              SizedBox(
+                height: getScreenHeight(280),
                 child: productOffers.isEmpty
                     ? Center(
                         child: Text(
@@ -532,7 +535,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     SizedBox(
-                                      height: getScreenHeight(180),
+                                      height: getScreenHeight(160),
                                       child: Center(
                                         child: ClipRRect(
                                           borderRadius: BorderRadius.vertical(
@@ -552,124 +555,131 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                         ),
                                       ),
                                     ),
-                                    Padding(
-                                      padding: EdgeInsets.all(getScreenWidth(12)),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            offer['productOfferDescription'] ?? '',
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize: getScreenWidth(16),
-                                              fontFamily: medium,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          SizedBox(height: getScreenHeight(8)),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: getScreenWidth(8),
-                                                  vertical: getScreenHeight(4),
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: accentColor.withOpacity(0.7),
-                                                  borderRadius: BorderRadius.circular(getScreenWidth(8)),
-                                                ),
-                                                child: Text(
-                                                  'Price: ₹${offer['productPrice'] ?? '980'}',
-                                                  style: TextStyle(
-                                                    fontSize: getScreenWidth(12),
-                                                    fontFamily: bold,
-                                                    color: Colors.white,
-                                                  ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: getScreenWidth(12),
+                                          vertical: getScreenHeight(8),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                offer['productOfferDescription'] ?? '',
+                                                maxLines: 3,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: getScreenWidth(14),
+                                                  fontFamily: medium,
+                                                  color: Colors.black,
                                                 ),
                                               ),
-                                              Consumer<CartProvider>(
-                                                builder: (ctx, cart, _) {
-                                                  final quantity = cart.getQuantity(offer['id'] ?? '');
-                                                  return Row(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: [
-                                                      if (quantity > 0) ...[
-                                                        IconButton(
-                                                          icon: Icon(Icons.remove, size: getScreenWidth(20)),
-                                                          onPressed: () {
-                                                            cart.decrementQuantity(offer['id'] ?? '');
-                                                          },
-                                                          style: IconButton.styleFrom(
-                                                            backgroundColor: primaryColor.withOpacity(0.1),
-                                                            padding: EdgeInsets.all(getScreenWidth(4)),
-                                                          ),
-                                                        ),
-                                                          // SizedBox(width: getScreenWidth(4)),
-                                                        Text(
-                                                          '$quantity',
-                                                          style: TextStyle(
-                                                            fontSize: getScreenWidth(12),
-                                                            fontFamily: medium,
-                                                          ),
-                                                        ),
-                                                        // SizedBox(width: getScreenWidth(4)),
-                                                        IconButton(
-                                                          icon: Icon(Icons.add, size: getScreenWidth(20)),
-                                                          onPressed: () {
-                                                            cart.incrementQuantity(offer['id'] ?? '');
-                                                          },
-                                                          style: IconButton.styleFrom(
-                                                            backgroundColor: primaryColor.withOpacity(0.1),
-                                                            padding: EdgeInsets.all(getScreenWidth(4)),
-                                                          ),
-                                                        ),
-                                                      ] else
-                                                        ElevatedButton(
-                                                          onPressed: () {
-                                                            cart.addItem(
-                                                              offer['id'] ?? '',
-                                                              offer['productOfferDescription'] ?? '',
-                                                              double.parse(offer['productPrice']?.toString() ?? '980'),
-                                                              offer['productOfferImageUrl'] ?? '',
-                                                            );
-                                                            // ScaffoldMessenger.of(context).showSnackBar(
-                                                            //   SnackBar(
-                                                            //     content: const Text('Added to cart'),
-                                                            //     duration: const Duration(seconds: 2),
-                                                            //     action: SnackBarAction(
-                                                            //       label: 'View Cart',
-                                                            //       onPressed: () {
-                                                            //         Navigator.pushNamed(context, '/cart');
-                                                            //       },
-                                                            //     ),
-                                                            //   ),
-                                                            // );
-                                                          },
-                                                          style: ElevatedButton.styleFrom(
-                                                            backgroundColor: primaryColor,
-                                                            shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.circular(getScreenWidth(8)),
+                                            ),
+                                            SizedBox(height: getScreenHeight(4)),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: getScreenWidth(8),
+                                                    vertical: getScreenHeight(4),
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: accentColor.withOpacity(0.7),
+                                                    borderRadius: BorderRadius.circular(getScreenWidth(8)),
+                                                  ),
+                                                  child: Text(
+                                                    'Price: ₹${offer['productPrice'] ?? '980'}',
+                                                    style: TextStyle(
+                                                      fontSize: getScreenWidth(12),
+                                                      fontFamily: bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Consumer<CartProvider>(
+                                                  builder: (ctx, cart, _) {
+                                                    final quantity = cart.getQuantity(offer['id'] ?? '');
+                                                    return Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        if (quantity > 0) ...[
+                                                          IconButton(
+                                                            icon: Icon(Icons.remove, size: getScreenWidth(20)),
+                                                            onPressed: () {
+                                                              cart.decrementQuantity(offer['id'] ?? '');
+                                                            },
+                                                            style: IconButton.styleFrom(
+                                                              backgroundColor: primaryColor.withOpacity(0.1),
+                                                              padding: EdgeInsets.all(getScreenWidth(4)),
                                                             ),
-                                                            padding: EdgeInsets.symmetric(horizontal: getScreenWidth(12), vertical: getScreenHeight(4)),
                                                           ),
-                                                          child: Text(
-                                                            'Add',
+                                                          // SizedBox(width: getScreenWidth(4)),
+                                                          Text(
+                                                            '$quantity',
                                                             style: TextStyle(
-                                                              color: Colors.white,
                                                               fontSize: getScreenWidth(12),
                                                               fontFamily: medium,
                                                             ),
                                                           ),
-                                                        ),
-                                                    ],
-                                                  );
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                                          // SizedBox(width: getScreenWidth(4)),
+                                                          IconButton(
+                                                            icon: Icon(Icons.add, size: getScreenWidth(20)),
+                                                            onPressed: () {
+                                                              cart.incrementQuantity(offer['id'] ?? '');
+                                                            },
+                                                            style: IconButton.styleFrom(
+                                                              backgroundColor: primaryColor.withOpacity(0.1),
+                                                              padding: EdgeInsets.all(getScreenWidth(4)),
+                                                            ),
+                                                          ),
+                                                        ] else
+                                                          ElevatedButton(
+                                                            onPressed: () {
+                                                              cart.addItem(
+                                                                offer['id'] ?? '',
+                                                                offer['productOfferDescription'] ?? '',
+                                                                double.parse(offer['productPrice']?.toString() ?? '980'),
+                                                                offer['productOfferImageUrl'] ?? '',
+                                                              );
+                                                              // ScaffoldMessenger.of(context).showSnackBar(
+                                                              //   SnackBar(
+                                                              //     content: const Text('Added to cart'),
+                                                              //     duration: const Duration(seconds: 2),
+                                                              //     action: SnackBarAction(
+                                                              //       label: 'View Cart',
+                                                              //       onPressed: () {
+                                                              //         Navigator.pushNamed(context, '/cart');
+                                                              //       },
+                                                              //     ),
+                                                              //   ),
+                                                              // );
+                                                            },
+                                                            style: ElevatedButton.styleFrom(
+                                                              backgroundColor: primaryColor,
+                                                              shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.circular(getScreenWidth(8)),
+                                                              ),
+                                                              padding: EdgeInsets.symmetric(horizontal: getScreenWidth(12), vertical: getScreenHeight(4)),
+                                                            ),
+                                                            child: Text(
+                                                              'Add',
+                                                              style: TextStyle(
+                                                                color: Colors.white,
+                                                                fontSize: getScreenWidth(12),
+                                                                fontFamily: medium,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                      ],
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -681,8 +691,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                       ),
               ),
               if (isLoading)
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
+                 Padding(
+                  padding: EdgeInsets.symmetric(horizontal: getScreenWidth(8.0), vertical: getScreenHeight(8.0)),
                   child: Center(child: CircularProgressIndicator()),
                 ),
             ],
