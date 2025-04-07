@@ -245,8 +245,14 @@ class _LoginPageState extends State<LoginPage> {
                                       child: SizedBox(
                                         height: screenHeight * 0.06,
                                         child: TextField(
-                                          // keyboardType: TextInputType.number,
-                                          keyboardType: TextInputType.text,
+                                          keyboardType: TextInputType.number,
+                                          // keyboardType: TextInputType.text,
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter
+                                                .digitsOnly,
+                                            LengthLimitingTextInputFormatter(
+                                                10),
+                                          ],
                                           onTapOutside: (event) {
                                             FocusManager.instance.primaryFocus
                                                 ?.unfocus();
