@@ -7,6 +7,8 @@ import 'package:aultra_paints_mobile/screens/launch/launchPage.dart';
 import 'package:aultra_paints_mobile/screens/painter/PainterPage.dart';
 import 'package:aultra_paints_mobile/screens/pointsLedger/pointsLedgerPage.dart';
 import 'package:aultra_paints_mobile/services/UserViewModel.dart';
+import 'package:aultra_paints_mobile/screens/cart/CartScreen.dart';
+import 'package:aultra_paints_mobile/providers/cart_provider.dart';
 
 import '/screens/authentication/otp/OtpPage.dart';
 import 'screens/orders/createOrder/CreateOrders.dart';
@@ -34,6 +36,9 @@ Future<void> main() async {
       ),
       ChangeNotifierProvider<UserViewModel>(
         create: (context) => UserViewModel(),
+      ),
+      ChangeNotifierProvider<CartProvider>(
+        create: (context) => CartProvider(),
       ),
     ],
     child: MyApp(),
@@ -98,6 +103,7 @@ class MyAppState extends State<MyApp> {
         "/qrScanner": (context) => const QrScanner(),
         "/painterPopUpPage": (context) => const PainterPopUpPage(),
         "/pointsLedgerPage": (context) => LayoutPage(child: PointsLedgerPage()),
+        "/cart": (context) => const CartScreen(),
       },
     );
   }
