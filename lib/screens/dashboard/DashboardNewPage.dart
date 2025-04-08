@@ -9,7 +9,6 @@ import 'package:http/http.dart' as http;
 import '../../providers/cart_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/error_handling.dart';
-import '../../utility/Colors.dart';
 import '../../utility/Fonts.dart';
 import '../../utility/Utils.dart';
 import '../../services/config.dart';
@@ -324,6 +323,337 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     return false;
   }
 
+  void _showOfferBottomSheet(BuildContext context, Map<String, dynamic> offer) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                Color(0xFFFFF7AD),
+                Color(0xFFFFA9F9),
+              ],
+            ),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[600],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: getScreenWidth(16),
+                        vertical: getScreenHeight(16)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.cancel,
+                                color: Colors.grey[800],
+                                size: getScreenWidth(28),
+                              ),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          width: double.infinity,
+                          margin: EdgeInsets.only(bottom: getScreenHeight(16)),
+                          child: ClipRRect(
+                            borderRadius:
+                                BorderRadius.circular(getScreenWidth(12)),
+                            child: FadeInImage.assetNetwork(
+                              placeholder: 'assets/images/app_file_icon.png',
+                              image: offer['productOfferImageUrl'] ?? '',
+                              fit: BoxFit.cover,
+                              imageErrorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  'assets/images/app_file_icon.png',
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        if (offer['productOfferDescription'] != null)
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(getScreenWidth(12)),
+                            margin:
+                                EdgeInsets.only(bottom: getScreenHeight(16)),
+                            child: Text(
+                              offer['productOfferDescription'] ?? '',
+                              style: TextStyle(
+                                fontSize: getScreenWidth(16),
+                                color: Colors.black87,
+                                height: getScreenHeight(1.5),
+                                fontFamily: bold,
+                              ),
+                            ),
+                          ),
+                        if (USER_ACCOUNT_TYPE == 'Dealer') ...[
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: getScreenWidth(8),
+                              vertical: getScreenHeight(4),
+                            ),
+                            decoration: BoxDecoration(
+                              color: accentColor.withOpacity(0.7),
+                              borderRadius:
+                                  BorderRadius.circular(getScreenWidth(8)),
+                            ),
+                            child: Text(
+                              'Price: ₹${offer['productPrice'] ?? '0'}',
+                              style: TextStyle(
+                                fontSize: getScreenWidth(14),
+                                fontFamily: bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: getScreenHeight(16)),
+                          Consumer<CartProvider>(
+                            builder: (context, cart, child) {
+                              int quantity =
+                                  cart.getQuantity(offer['id'] ?? '');
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.remove),
+                                    onPressed: () {
+                                      if (quantity > 0) {
+                                        cart.decrementQuantity(
+                                            offer['id'] ?? '');
+                                      }
+                                    },
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: quantity > 0
+                                          ? primaryColor.withOpacity(0.1)
+                                          : Colors.grey.withOpacity(0.1),
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                  ),
+                                  SizedBox(width: getScreenWidth(16)),
+                                  Text(
+                                    quantity.toString(),
+                                    style: TextStyle(
+                                      fontSize: getScreenWidth(18),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(width: getScreenWidth(16)),
+                                  IconButton(
+                                    icon: Icon(Icons.add),
+                                    onPressed: () {
+                                      if (quantity < CartProvider.maxQuantity) {
+                                        if (quantity == 0) {
+                                          cart.addItem(
+                                            offer['id'] ?? '',
+                                            offer['productOfferDescription'] ??
+                                                '',
+                                            double.parse(offer['productPrice']
+                                                    ?.toString() ??
+                                                '0'),
+                                            offer['productOfferImageUrl'] ?? '',
+                                          );
+                                        } else {
+                                          cart.incrementQuantity(
+                                              offer['id'] ?? '');
+                                        }
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                'Maximum quantity reached'),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    style: IconButton.styleFrom(
+                                      backgroundColor:
+                                          quantity < CartProvider.maxQuantity
+                                              ? primaryColor.withOpacity(0.1)
+                                              : Colors.grey.withOpacity(0.1),
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                          SizedBox(height: getScreenHeight(16)),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showRewardSchemeBottomSheet(
+      BuildContext context, Map<String, dynamic> scheme) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                Color(0xFFFFF7AD),
+                Color(0xFFFFA9F9),
+              ],
+            ),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[600],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: getScreenWidth(16),
+                        vertical: getScreenHeight(16)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.cancel,
+                                color: Colors.grey[800],
+                                size: getScreenWidth(28),
+                              ),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          constraints: BoxConstraints(
+                            maxHeight: MediaQuery.of(context).size.height * 0.6,
+                            minHeight: MediaQuery.of(context).size.height * 0.3,
+                          ),
+                          width: double.infinity,
+                          margin: EdgeInsets.only(bottom: getScreenHeight(16)),
+                          child: ClipRRect(
+                            borderRadius:
+                                BorderRadius.circular(getScreenWidth(12)),
+                            child: FadeInImage.assetNetwork(
+                              placeholder: 'assets/images/app_file_icon.png',
+                              image: scheme['rewardSchemeImageUrl'] ?? '',
+                              width: double.infinity,
+                              height: MediaQuery.of(context).size.height * 0.4,
+                              fit: BoxFit.contain,
+                              imageErrorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  width: double.infinity,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.4,
+                                  color: Colors.grey[100],
+                                  child: Image.asset(
+                                    'assets/images/app_file_icon.png',
+                                    fit: BoxFit.contain,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        if (scheme['rewardSchemeDescription'] != null)
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(getScreenWidth(12)),
+                            margin:
+                                EdgeInsets.only(bottom: getScreenHeight(16)),
+                            child: Text(
+                              scheme['rewardSchemeDescription'] ?? '',
+                              style: TextStyle(
+                                fontSize: getScreenWidth(16),
+                                color: Colors.black87,
+                                height: getScreenHeight(1.5),
+                                fontFamily: bold,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -352,88 +682,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                 children: [
                   returnNameRewards(),
                   returnNewProductsScroll(),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Reward Schemes',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontFamily: bold,
-                      color: const Color(0xFF3533CD),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    height: 200,
-                    child: rewardSchemes.isEmpty
-                        ? Center(
-                            child: Text(
-                              'No reward schemes available',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontFamily: regular,
-                              ),
-                            ),
-                          )
-                        : PageView.builder(
-                            controller: _pageController,
-                            itemCount: rewardSchemes.length,
-                            itemBuilder: (context, index) {
-                              final scheme = rewardSchemes[index];
-                              return Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      primaryColor.withOpacity(0.1),
-                                      secondaryColor.withOpacity(0.1),
-                                    ],
-                                  ),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: Stack(
-                                    fit: StackFit.expand,
-                                    children: [
-                                      Image.network(
-                                        scheme['rewardSchemeImageUrl'] ?? '',
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Container(
-                                            color: Colors.grey[200],
-                                            child: Icon(
-                                              Icons.card_giftcard,
-                                              size: 48,
-                                              color: Colors.grey[400],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                            colors: [
-                                              Colors.transparent,
-                                              Colors.black.withOpacity(0.3),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                  ),
+                  returnRewardsScroll(),
                 ],
               ),
             ),
@@ -572,261 +821,279 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                         itemCount: productOffers.length,
                         itemBuilder: (context, index) {
                           final offer = productOffers[index];
-                          return Container(
-                            width: getScreenWidth(215),
-                            margin: EdgeInsets.only(right: getScreenWidth(5)),
-                            child: Card(
-                              elevation: 4,
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(getScreenWidth(16)),
-                              ),
-                              child: Container(
-                                decoration: BoxDecoration(
+                          return GestureDetector(
+                            onTap: () {
+                              _showOfferBottomSheet(context, offer);
+                            },
+                            child: Container(
+                              width: getScreenWidth(215),
+                              margin: EdgeInsets.only(right: getScreenWidth(5)),
+                              child: Card(
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.circular(getScreenWidth(16)),
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      primaryColor.withOpacity(0.05),
-                                      secondaryColor.withOpacity(0.05),
-                                    ],
-                                  ),
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      height: getScreenHeight(
-                                          USER_ACCOUNT_TYPE == 'Dealer'
-                                              ? 160
-                                              : 180),
-                                      child: Center(
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(
-                                                getScreenWidth(20)),
-                                          ),
-                                          child: FadeInImage.assetNetwork(
-                                            placeholder:
-                                                'assets/images/app_file_icon.png',
-                                            image:
-                                                offer['productOfferImageUrl'] ??
-                                                    '',
-                                            fit: BoxFit.cover,
-                                            imageErrorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Image.asset(
-                                                'assets/images/app_file_icon.png',
-                                                fit: BoxFit.cover,
-                                              );
-                                            },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                        getScreenWidth(16)),
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        primaryColor.withOpacity(0.05),
+                                        secondaryColor.withOpacity(0.05),
+                                      ],
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: getScreenHeight(
+                                            USER_ACCOUNT_TYPE == 'Dealer'
+                                                ? 160
+                                                : 180),
+                                        child: Center(
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(
+                                                  getScreenWidth(20)),
+                                            ),
+                                            child: FadeInImage.assetNetwork(
+                                              placeholder:
+                                                  'assets/images/app_file_icon.png',
+                                              image: offer[
+                                                      'productOfferImageUrl'] ??
+                                                  '',
+                                              height: getScreenHeight(
+                                                  USER_ACCOUNT_TYPE == 'Dealer'
+                                                      ? 160
+                                                      : 180),
+                                              fit: BoxFit.cover,
+                                              imageErrorBuilder:
+                                                  (context, error, stackTrace) {
+                                                return Image.asset(
+                                                  'assets/images/app_file_icon.png',
+                                                  height: getScreenHeight(
+                                                      USER_ACCOUNT_TYPE ==
+                                                              'Dealer'
+                                                          ? 160
+                                                          : 180),
+                                                  fit: BoxFit.cover,
+                                                );
+                                              },
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    Expanded(
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: getScreenWidth(12),
-                                          vertical: getScreenHeight(8),
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                offer['productOfferDescription'] ??
-                                                    '',
-                                                maxLines: 3,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  fontSize: getScreenWidth(14),
-                                                  fontFamily: medium,
-                                                  color: Colors.black,
+                                      Expanded(
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: getScreenWidth(12),
+                                            vertical: getScreenHeight(8),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  offer['productOfferDescription'] ??
+                                                      '',
+                                                  maxLines: 3,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    fontSize:
+                                                        getScreenWidth(14),
+                                                    fontFamily: medium,
+                                                    color: Colors.black,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            // SizedBox(height: getScreenHeight(4)),
-                                            Visibility(
-                                              visible:
-                                                  USER_ACCOUNT_TYPE == 'Dealer',
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                      horizontal:
-                                                          getScreenWidth(8),
-                                                      vertical:
-                                                          getScreenHeight(4),
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                      color: accentColor
-                                                          .withOpacity(0.7),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
+                                              Visibility(
+                                                visible: USER_ACCOUNT_TYPE ==
+                                                    'Dealer',
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Container(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                        horizontal:
+                                                            getScreenWidth(8),
+                                                        vertical:
+                                                            getScreenHeight(4),
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                        color: accentColor
+                                                            .withOpacity(0.7),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                getScreenWidth(
+                                                                    8)),
+                                                      ),
+                                                      child: Text(
+                                                        'Price: ₹${offer['productPrice'] ?? '0'}',
+                                                        style: TextStyle(
+                                                          fontSize:
                                                               getScreenWidth(
-                                                                  8)),
-                                                    ),
-                                                    child: Text(
-                                                      'Price: ₹${offer['productPrice'] ?? '0'}',
-                                                      style: TextStyle(
-                                                        fontSize:
-                                                            getScreenWidth(12),
-                                                        fontFamily: bold,
-                                                        color: Colors.white,
+                                                                  12),
+                                                          fontFamily: bold,
+                                                          color: Colors.white,
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  Consumer<CartProvider>(
-                                                    builder: (ctx, cart, _) {
-                                                      final quantity =
-                                                          cart.getQuantity(
-                                                              offer['id'] ??
-                                                                  '');
-                                                      return Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          SizedBox(
-                                                            width:
-                                                                getScreenWidth(
-                                                                    28),
-                                                            height:
-                                                                getScreenWidth(
-                                                                    28),
-                                                            child: IconButton(
-                                                              icon: Icon(
-                                                                  Icons.remove,
-                                                                  size:
-                                                                      getScreenWidth(
-                                                                          16)),
-                                                              onPressed:
-                                                                  quantity > 0
-                                                                      ? () {
-                                                                          cart.decrementQuantity(offer['id'] ??
-                                                                              '');
-                                                                        }
-                                                                      : null,
-                                                              style: IconButton
-                                                                  .styleFrom(
-                                                                backgroundColor: quantity >
-                                                                        0
-                                                                    ? primaryColor
-                                                                        .withOpacity(
-                                                                            0.1)
-                                                                    : Colors
-                                                                        .grey
-                                                                        .withOpacity(
-                                                                            0.1),
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .zero,
+                                                    Consumer<CartProvider>(
+                                                      builder: (ctx, cart, _) {
+                                                        final quantity =
+                                                            cart.getQuantity(
+                                                                offer['id'] ??
+                                                                    '');
+                                                        return Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            SizedBox(
+                                                              width:
+                                                                  getScreenWidth(
+                                                                      28),
+                                                              height:
+                                                                  getScreenWidth(
+                                                                      28),
+                                                              child: IconButton(
+                                                                icon: Icon(
+                                                                    Icons
+                                                                        .remove,
+                                                                    size:
+                                                                        getScreenWidth(
+                                                                            16)),
+                                                                onPressed:
+                                                                    quantity > 0
+                                                                        ? () {
+                                                                            cart.decrementQuantity(offer['id'] ??
+                                                                                '');
+                                                                          }
+                                                                        : null,
+                                                                style: IconButton
+                                                                    .styleFrom(
+                                                                  backgroundColor: quantity >
+                                                                          0
+                                                                      ? primaryColor
+                                                                          .withOpacity(
+                                                                              0.1)
+                                                                      : Colors
+                                                                          .grey
+                                                                          .withOpacity(
+                                                                              0.1),
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .zero,
+                                                                ),
                                                               ),
                                                             ),
-                                                          ),
-                                                          Container(
-                                                            width:
-                                                                getScreenWidth(
-                                                                    24),
-                                                            alignment: Alignment
-                                                                .center,
-                                                            child: Text(
-                                                              '$quantity',
-                                                              style: TextStyle(
-                                                                fontSize:
-                                                                    getScreenWidth(
-                                                                        13),
-                                                                fontFamily:
-                                                                    medium,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                            Container(
+                                                              width:
+                                                                  getScreenWidth(
+                                                                      24),
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              child: Text(
+                                                                '$quantity',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize:
+                                                                      getScreenWidth(
+                                                                          13),
+                                                                  fontFamily:
+                                                                      medium,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
                                                               ),
                                                             ),
-                                                          ),
-                                                          SizedBox(
-                                                            width:
-                                                                getScreenWidth(
-                                                                    28),
-                                                            height:
-                                                                getScreenWidth(
-                                                                    28),
-                                                            child: IconButton(
-                                                              icon: Icon(
-                                                                  Icons.add,
-                                                                  size:
-                                                                      getScreenWidth(
-                                                                          16)),
-                                                              onPressed: () {
-                                                                if (quantity <
-                                                                    CartProvider
-                                                                        .maxQuantity) {
-                                                                  if (quantity ==
-                                                                      0) {
-                                                                    cart.addItem(
-                                                                      offer['id'] ??
-                                                                          '',
-                                                                      offer['productOfferDescription'] ??
-                                                                          '',
-                                                                      double.parse(
-                                                                          offer['productPrice']?.toString() ??
+                                                            SizedBox(
+                                                              width:
+                                                                  getScreenWidth(
+                                                                      28),
+                                                              height:
+                                                                  getScreenWidth(
+                                                                      28),
+                                                              child: IconButton(
+                                                                icon: Icon(
+                                                                    Icons.add,
+                                                                    size:
+                                                                        getScreenWidth(
+                                                                            16)),
+                                                                onPressed: () {
+                                                                  if (quantity <
+                                                                      CartProvider
+                                                                          .maxQuantity) {
+                                                                    if (quantity ==
+                                                                        0) {
+                                                                      cart.addItem(
+                                                                          offer['id'] ??
+                                                                              '',
+                                                                          offer['productOfferDescription'] ??
+                                                                              '',
+                                                                          double.parse(offer['productPrice']?.toString() ??
                                                                               '0'),
-                                                                      offer['productOfferImageUrl'] ??
-                                                                          '',
-                                                                    );
+                                                                          offer['productOfferImageUrl'] ??
+                                                                              '');
+                                                                    } else {
+                                                                      cart.incrementQuantity(
+                                                                          offer['id'] ??
+                                                                              '');
+                                                                    }
                                                                   } else {
-                                                                    cart.incrementQuantity(
-                                                                        offer['id'] ??
-                                                                            '');
+                                                                    ScaffoldMessenger.of(
+                                                                            context)
+                                                                        .showSnackBar(
+                                                                      SnackBar(
+                                                                        content:
+                                                                            Text('Maximum quantity reached'),
+                                                                      ),
+                                                                    );
                                                                   }
-                                                                } else {
-                                                                  ScaffoldMessenger.of(
-                                                                          context)
-                                                                      .showSnackBar(
-                                                                    SnackBar(
-                                                                      content: Text(
-                                                                          'Maximum quantity reached'),
-                                                                    ),
-                                                                  );
-                                                                }
-                                                              },
-                                                              style: IconButton
-                                                                  .styleFrom(
-                                                                backgroundColor: quantity <
-                                                                        CartProvider
-                                                                            .maxQuantity
-                                                                    ? primaryColor
-                                                                        .withOpacity(
-                                                                            0.1)
-                                                                    : Colors
-                                                                        .grey
-                                                                        .withOpacity(
-                                                                            0.1),
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .zero,
+                                                                },
+                                                                style: IconButton
+                                                                    .styleFrom(
+                                                                  backgroundColor: quantity <
+                                                                          CartProvider
+                                                                              .maxQuantity
+                                                                      ? primaryColor
+                                                                          .withOpacity(
+                                                                              0.1)
+                                                                      : Colors
+                                                                          .grey
+                                                                          .withOpacity(
+                                                                              0.1),
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .zero,
+                                                                ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
-                                                      );
-                                                    },
-                                                  ),
-                                                ],
+                                                          ],
+                                                        );
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                            )
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -845,6 +1112,95 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
           ),
         ),
       ),
+    );
+  }
+
+  returnRewardsScroll() {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double unitHeightValue = MediaQuery.of(context).size.height;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
+          child: Text(
+            'Reward Schemes',
+            style: TextStyle(
+                decorationThickness: 1.5,
+                fontSize: unitHeightValue * 0.03,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF3533CD)),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SizedBox(
+          height: getScreenHeight(230),
+          child: rewardSchemes.isEmpty
+              ? Center(child: CircularProgressIndicator())
+              : ListView.builder(
+                  itemCount: rewardSchemes.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    final item = rewardSchemes[index];
+                    double scale = 0.9;
+                    if (_currentPage != null) {
+                      scale = index == _currentPage!.round() ? 1.0 : 0.9;
+                    }
+                    final scheme = rewardSchemes[index];
+                    return GestureDetector(
+                      onTap: () =>
+                          _showRewardSchemeBottomSheet(context, scheme),
+                      child: Transform.scale(
+                        scale: scale,
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.circular(getScreenWidth(20)),
+                              color: const Color(0x33800180),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  spreadRadius: 2,
+                                  blurRadius: 20,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: screenHeight * 0.28,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: FadeInImage.assetNetwork(
+                                      placeholder:
+                                          'assets/images/app_file_icon.png',
+                                      image: item['rewardSchemeImageUrl'] ?? '',
+                                      fit: BoxFit.cover,
+                                      imageErrorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Image.asset(
+                                          'assets/images/app_file_icon.png',
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
     );
   }
 }
