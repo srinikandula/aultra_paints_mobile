@@ -115,8 +115,7 @@ class _OtpPageState extends State<OtpPage> {
       print('otp resp ==== $mapResponse');
       Navigator.pop(context);
       _showSnackBar(mapResponse['message'], context, true);
-      var userData = mapResponse;
-      onSuccess(userData);
+      onSuccess(mapResponse);
     } else {
       _showSnackBar(mapResponse['message'], context, false);
       Navigator.pop(context);
@@ -124,32 +123,30 @@ class _OtpPageState extends State<OtpPage> {
   }
 
   onSuccess(userData) async {
-    print('userdata====>${userData}');
+    print('userdata structure====>${json.encode(userData)}');
     FocusScope.of(context).unfocus();
 
-    // First clear any existing cart data
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
-    await cartProvider.setUserId(null);
-
-    // Save user data
+    // Save user data first
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var tempToken = "Bearer" + ' ' + userData['token'];
-    await prefs.setString('accessToken', tempToken);
-    await prefs.setString('USER_FULL_NAME', userData['fullName']);
+    var tempToken = "Bearer " + userData['token'];
+    await prefs.setString('accessToken', tempToken);  
     await prefs.setString('USER_ID', userData['id']);
+    await prefs.setString('USER_FULL_NAME', userData['fullName']);  
     await prefs.setString('USER_MOBILE_NUMBER', userData['mobile']);
     await prefs.setString('USER_ACCOUNT_TYPE', userData['accountType']);
-    await prefs.setString(
-        'USER_PARENT_DEALER_CODE', userData['parentDealerCode'] ?? '');
 
-    // Initialize cart with new user ID and wait for it to load
-    print('Setting cart user ID after login: ${userData['id']}');
+    // Optional fields - set empty string if null
+    await prefs.setString('USER_EMAIL', '');  
+    await prefs.setString('USER_PARENT_DEALER_CODE', userData['parentDealerCode'] ?? '');
+    await prefs.setString('userParentDealerMobile', '');  
+    await prefs.setString('userParentDealerName', '');    
+
+    // Set the user ID in CartProvider to load their cart data
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
     await cartProvider.setUserId(userData['id']);
-    final cartItems = cartProvider.items;
-    print('Cart initialized with ${cartItems.length} items for user: ${userData['id']}');
 
-    // Navigate to next screen
-    Navigator.pushNamed(context, '/dashboardPage', arguments: {});
+    Navigator.pushNamedAndRemoveUntil(
+        context, '/dashboardPage', (Route<dynamic> route) => false);
   }
 
   Widget returnOTPfields() {

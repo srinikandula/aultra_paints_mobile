@@ -70,59 +70,23 @@ class _LayoutPageState extends State<LayoutPage> {
 
   Future<void> fetchLocalStorageData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    accesstoken = prefs.getString('accessToken');
-    USER_ID = prefs.getString('USER_ID');
-    USER_FULL_NAME = prefs.getString('USER_FULL_NAME');
-    USER_MOBILE_NUMBER = prefs.getString('USER_MOBILE_NUMBER');
-    USER_ACCOUNT_TYPE = prefs.getString('USER_ACCOUNT_TYPE');
+    accesstoken = prefs.getString('accesstoken') ?? '';
+    USER_ID = prefs.getString('USER_ID') ?? '';
+    USER_FULL_NAME = prefs.getString('userName') ?? '';
+    USER_MOBILE_NUMBER = prefs.getString('USER_MOBILE_NUMBER') ?? '';
+    USER_ACCOUNT_TYPE = prefs.getString('USER_ACCOUNT_TYPE') ?? '';
 
-    // Don't initialize cart here since it's already done in OtpPage
-    // This prevents double initialization
-    getDashboardCounts();
-  }
-
-  Future<void> clearStorage() async {
-    Utils.clearToasts(context);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    
-    // Get the current user ID before clearing
-    final userId = prefs.getString('USER_ID');
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
-    
-    // Save cart data if we have a user ID
-    if (userId != null && cartProvider.itemCount > 0) {
-      print('Saving cart for user before logout: $userId with ${cartProvider.itemCount} items');
-      await cartProvider.saveCart();
-      print('Cart saved successfully');
+    // Only call getDashboardCounts if we have a valid user
+    if (USER_ID != null && USER_ID.isNotEmpty) {
+      getDashboardCounts();
     }
-    
-    // Clear shared preferences
-    await prefs.clear();
-    
-    // Set cart provider user ID to null to clear current cart
-    await cartProvider.setUserId(null);
-    print('Cart cleared after logout');
-    
-    Navigator.of(context).pushNamed('/splashPage');
   }
 
-  Future logOut(context) async {
-    // Save cart data before clearing storage
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('USER_ID');
-
-    if (userId != null && cartProvider.itemCount > 0) {
-      print('Saving cart for user during logout: $userId');
-      await cartProvider.saveCart();
-      print('Cart saved successfully');
+  Future<void> getDashboardCounts() async {
+    if (USER_ID == null || USER_ID.isEmpty) {
+      print('No user ID available for dashboard counts');
+      return;
     }
-
-    // Clear storage and navigate to splash page
-    await clearStorage();
-  }
-
-  Future getDashboardCounts() async {
     Utils.clearToasts(context);
     // Utils.returnScreenLoader(context);
     http.Response response;
@@ -254,13 +218,53 @@ class _LayoutPageState extends State<LayoutPage> {
     );
   }
 
+  Future<void> clearStorage() async {
+    Utils.clearToasts(context);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Get the current user ID before clearing
+    final userId = prefs.getString('USER_ID');
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
+    // Save cart data if we have a user ID
+    if (userId != null && cartProvider.itemCount > 0) {
+      print(
+          'Saving cart for user before logout: $userId with ${cartProvider.itemCount} items');
+      await cartProvider.saveCart();
+      print('Cart saved successfully');
+    }
+
+    // Clear shared preferences
+    await prefs.clear();
+
+    // Set cart provider user ID to null to clear current cart
+    await cartProvider.setUserId(null);
+    print('Cart cleared after logout');
+
+    Navigator.of(context).pushNamed('/splashPage');
+  }
+
+  Future<void> logOut(BuildContext context) async {
+    // Save cart data before clearing storage
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('USER_ID');
+
+    if (userId != null && cartProvider.itemCount > 0) {
+      print('Saving cart for user during logout: $userId');
+      await cartProvider.saveCart();
+      print('Cart saved successfully');
+    }
+
+    // Clear storage and navigate to splash page
+    await clearStorage();
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double unitHeightValue = MediaQuery.of(context).size.height;
-    double appBarHeight = screenHeight * 0.09; // 15% of screen height
-
+    final double appBarHeight = screenHeight * 0.09; // 9% of screen height
     final userViewModel = Provider.of<UserViewModel>(context);
 
     SizeConfig().init(context);
@@ -301,7 +305,7 @@ class _LayoutPageState extends State<LayoutPage> {
                     child: Center(
                       child: Icon(
                         FontAwesomeIcons.bars,
-                        size: unitHeightValue * .028,
+                        size: screenHeight * 0.028,
                         color: appThemeColor,
                       ),
                     ),
@@ -341,7 +345,7 @@ class _LayoutPageState extends State<LayoutPage> {
                     child: Center(
                       child: Icon(
                         FontAwesomeIcons.qrcode,
-                        size: unitHeightValue * .028,
+                        size: screenHeight * 0.028,
                         // color: Colors.white,
                         color: appThemeColor,
                       ),
@@ -395,7 +399,6 @@ class MyDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double unitHeightValue = MediaQuery.of(context).size.height;
     return Drawer(
       width: screenWidth * 0.7,
       backgroundColor: Colors.transparent,
@@ -442,7 +445,7 @@ class MyDrawer extends StatelessWidget {
                                       ? const Color(0xFFe74c3c)
                                       : const Color(0xFF3533CD),
                       fontFamily: ffGBold,
-                      fontSize: unitHeightValue * 0.028,
+                      fontSize: screenHeight * 0.028,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -459,7 +462,7 @@ class MyDrawer extends StatelessWidget {
                                       ? const Color(0xFFe74c3c)
                                       : const Color(0xFF3533CD),
                       fontFamily: ffGMedium,
-                      fontSize: unitHeightValue * 0.020,
+                      fontSize: screenHeight * 0.020,
                     ),
                   ),
                   if (accountType == 'Painter')
@@ -470,18 +473,18 @@ class MyDrawer extends StatelessWidget {
                             style: TextStyle(
                               color: const Color(0xFF3533CD),
                               fontFamily: ffGMedium,
-                              fontSize: unitHeightValue * 0.016,
+                              fontSize: screenHeight * 0.016,
                             )),
                         Text(parentDealerName,
                             style: TextStyle(
                                 color: const Color(0xFF3533CD),
                                 fontFamily: ffGBold,
-                                fontSize: unitHeightValue * 0.016,
+                                fontSize: screenHeight * 0.016,
                                 fontWeight: FontWeight.bold)),
                         IconButton(
                           icon: Icon(
                             FontAwesomeIcons.pencil,
-                            size: unitHeightValue * 0.016,
+                            size: screenHeight * 0.016,
                             color: const Color(0xFF3533CD),
                           ),
                           padding: EdgeInsets.zero,
@@ -523,7 +526,7 @@ class MyDrawer extends StatelessWidget {
                         style: TextStyle(
                           color: const Color(0xFF3533CD),
                           fontFamily: ffGSemiBold,
-                          fontSize: unitHeightValue * 0.022,
+                          fontSize: screenHeight * 0.022,
                         ),
                       ),
                       onTap: () {
@@ -537,7 +540,7 @@ class MyDrawer extends StatelessWidget {
                           style: TextStyle(
                             color: const Color(0xFF3533CD),
                             fontFamily: ffGSemiBold,
-                            fontSize: unitHeightValue * 0.022,
+                            fontSize: screenHeight * 0.022,
                           ),
                         ),
                         onTap: () {
@@ -551,7 +554,7 @@ class MyDrawer extends StatelessWidget {
                           style: TextStyle(
                             color: const Color(0xFF3533CD),
                             fontFamily: ffGSemiBold,
-                            fontSize: unitHeightValue * 0.022,
+                            fontSize: screenHeight * 0.022,
                           ),
                         ),
                         onTap: () {
@@ -575,7 +578,7 @@ class MyDrawer extends StatelessWidget {
                         style: TextStyle(
                           color: const Color(0xFF3533CD),
                           fontFamily: ffGSemiBold,
-                          fontSize: unitHeightValue * 0.022,
+                          fontSize: screenHeight * 0.022,
                         ),
                       ),
                       onTap: () {
@@ -602,7 +605,7 @@ class MyDrawer extends StatelessWidget {
                         style: TextStyle(
                           color: const Color(0xFF3533CD),
                           fontFamily: ffGMedium,
-                          fontSize: unitHeightValue * 0.022,
+                          fontSize: screenHeight * 0.022,
                         ),
                       ),
                     ),
@@ -620,7 +623,7 @@ class MyDrawer extends StatelessWidget {
                         style: TextStyle(
                           color: const Color(0xFF3533CD),
                           fontFamily: ffGMedium,
-                          fontSize: unitHeightValue * 0.022,
+                          fontSize: screenHeight * 0.022,
                         ),
                       ),
                     ),
@@ -637,7 +640,6 @@ class MyDrawer extends StatelessWidget {
   void showSuccessPopup(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double unitHeightValue = MediaQuery.of(context).size.height;
     showDialog(
       context: context,
       barrierDismissible: true, // Allows closing the popup by tapping outside
@@ -677,13 +679,13 @@ class MyDrawer extends StatelessWidget {
                   Icon(
                     Icons.check_outlined,
                     color: Colors.green,
-                    size: unitHeightValue * 0.08,
+                    size: screenHeight * 0.08,
                   ),
                   SizedBox(height: screenHeight * 0.04),
                   Text(
                     "Success",
                     style: TextStyle(
-                      fontSize: unitHeightValue * 0.04,
+                      fontSize: screenHeight * 0.04,
                       fontWeight: FontWeight.w400,
                       color: const Color(0xFF3533CD),
                     ),

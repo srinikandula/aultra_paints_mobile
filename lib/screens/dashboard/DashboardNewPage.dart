@@ -31,9 +31,9 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  var accesstoken;
+  var accessToken;
   var USER_ID;
-  var userName;
+  var USER_FULL_NAME;
   var USER_EMAIL;
   var USER_MOBILE_NUMBER;
   var USER_ACCOUNT_TYPE;
@@ -100,83 +100,101 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  fetchLocalStorageData() async {
+  Future<void> fetchLocalStorageData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    accesstoken = prefs.getString('accessToken');
-    userName = prefs.getString('USER_FULL_NAME');
-    USER_ID = prefs.getString('USER_ID');
-    USER_EMAIL = prefs.getString('USER_EMAIL');
-    USER_MOBILE_NUMBER = prefs.getString('USER_MOBILE_NUMBER');
-    USER_ACCOUNT_TYPE = prefs.getString('USER_ACCOUNT_TYPE');
+    accessToken = prefs.getString('accessToken') ?? '';
+    USER_ID = prefs.getString('USER_ID') ?? '';
+    USER_FULL_NAME = prefs.getString('USER_FULL_NAME') ?? '';
+    USER_EMAIL = prefs.getString('USER_EMAIL') ?? '';
+    USER_MOBILE_NUMBER = prefs.getString('USER_MOBILE_NUMBER') ?? '';
+    USER_ACCOUNT_TYPE = prefs.getString('USER_ACCOUNT_TYPE') ?? '';
 
-    // Set the user ID in CartProvider to load their cart data
-    if (USER_ID != null) {
-      await Provider.of<CartProvider>(context, listen: false).setUserId(USER_ID);
+    if (USER_ID != null && USER_ID.isNotEmpty) {
+      await Provider.of<CartProvider>(context, listen: false)
+          .setUserId(USER_ID);
     }
 
-    if (accesstoken != null) {
+    if (accessToken != null &&
+        accessToken.isNotEmpty &&
+        USER_ID != null &&
+        USER_ID.isNotEmpty) {
       getDashboardDetails();
     }
   }
 
-  Future getDashboardDetails() async {
+  Future<void> getDashboardDetails() async {
+    if (USER_ID == null ||
+        USER_ID.isEmpty ||
+        accessToken == null ||
+        accessToken.isEmpty) {
+      print('Missing user ID or access token for dashboard details');
+      return;
+    }
+
     Utils.clearToasts(context);
     Utils.returnScreenLoader(context);
     http.Response response;
     var apiUrl = BASE_URL + GET_USER_DETAILS + USER_ID;
 
-    response = await http.get(Uri.parse(apiUrl), headers: {
-      "Content-Type": "application/json",
-      "Authorization": accesstoken
-    });
+    try {
+      response = await http.get(Uri.parse(apiUrl), headers: {
+        "Content-Type": "application/json",
+        "Authorization": accessToken
+      });
 
-    if (response.statusCode == 200) {
-      Navigator.pop(context);
-      var tempResp = json.decode(response.body);
-      var apiResp = tempResp['data'];
-      dashBoardList = [
-        {
-          "title": "Reward Points ",
-          "count": apiResp['rewardPoints'].toString()
-        },
-      ];
+      if (response.statusCode == 200) {
+        Navigator.pop(context);
+        var tempResp = json.decode(response.body);
+        var apiResp = tempResp['data'];
+        dashBoardList = [
+          {
+            "title": "Reward Points ",
+            "count": apiResp['rewardPoints'].toString()
+          },
+        ];
 
-      accountType = USER_ACCOUNT_TYPE;
-      parentDealerCode = apiResp['parentDealerCode'] ?? '';
-      if (parentDealerCode.isEmpty && accountType == 'Painter') {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString(
-            'userParentDealerName', userParentDealerName.toString());
-        await prefs.setString('parentDealerCode', parentDealerCode.toString());
-        Navigator.pushNamed(context, '/painterPopUpPage', arguments: {})
-            .then((result) {
-          if (result == true) {
-            getDashboardDetails();
-            // getProductOffers('first');
-            setState(() {});
+        accountType = USER_ACCOUNT_TYPE;
+        parentDealerCode = apiResp['parentDealerCode'] ?? '';
+        if (parentDealerCode.isEmpty && accountType == 'Painter') {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString(
+              'userParentDealerName', userParentDealerName.toString());
+          await prefs.setString(
+              'parentDealerCode', parentDealerCode.toString());
+          Navigator.pushNamed(context, '/painterPopUpPage', arguments: {})
+              .then((result) {
+            if (result == true) {
+              getDashboardDetails();
+              // getProductOffers('first');
+              setState(() {});
+            }
+          });
+          setState(() {
+            dashBoardList;
+            accountType;
+            parentDealerCode;
+          });
+        } else {
+          getProductOffers('first');
+        }
+        //  getRewardSchemes();
+        _scrollController.addListener(() {
+          if (_scrollController.position.pixels ==
+                  _scrollController.position.maxScrollExtent &&
+              !isLoading &&
+              hasMore) {
+            getProductOffers(''); // Load more data when scrolled to bottom
           }
         });
-        setState(() {
-          dashBoardList;
-          accountType;
-          parentDealerCode;
-        });
       } else {
-        getProductOffers('first');
+        Navigator.pop(context);
+        error_handling.errorValidation(
+            context, response.statusCode, response.body, false);
       }
-      //  getRewardSchemes();
-      _scrollController.addListener(() {
-        if (_scrollController.position.pixels ==
-                _scrollController.position.maxScrollExtent &&
-            !isLoading &&
-            hasMore) {
-          getProductOffers(''); // Load more data when scrolled to bottom
-        }
-      });
-    } else {
+    } catch (e) {
       Navigator.pop(context);
-      error_handling.errorValidation(
-          context, response.statusCode, response.body, false);
+      error_handling.errorValidation(context, 500,
+          'An error occurred while fetching dashboard details', false);
     }
   }
 
@@ -192,56 +210,61 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     http.Response response;
     var apiUrl = BASE_URL + GET_PRODUCT_OFFERS;
     print(apiUrl);
-    response = await http.post(
-      Uri.parse(apiUrl),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": accesstoken
-      },
-      body: json.encode({'page': currentPage, 'limit': 100}),
-    );
-    final responseData = json.decode(response.body);
-    if (response.statusCode == 200) {
-      setState(() {
-        // Ensure each offer has a valid ID
-        var data = responseData['data'] as List;
-        productOffers = data.map((offer) {
-          String id;
-          if (offer['id'] == null || offer['id'].toString().isEmpty) {
-            // Use productCode as primary identifier, fallback to productId, then to timestamp
-            String? productCode = offer['productCode']?.toString();
-            if (productCode != null && productCode.isNotEmpty) {
-              id = productCode;
-            } else {
-              String? productId = offer['productId']?.toString();
-              if (productId != null && productId.isNotEmpty) {
-                id = productId;
+    try {
+      response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": accessToken
+        },
+        body: json.encode({'page': currentPage, 'limit': 100}),
+      );
+      final responseData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        setState(() {
+          // Ensure each offer has a valid ID
+          var data = responseData['data'] as List;
+          productOffers = data.map((offer) {
+            String id;
+            if (offer['id'] == null || offer['id'].toString().isEmpty) {
+              // Use productCode as primary identifier, fallback to productId, then to timestamp
+              String? productCode = offer['productCode']?.toString();
+              if (productCode != null && productCode.isNotEmpty) {
+                id = productCode;
               } else {
-                // Use index-based ID to ensure uniqueness
-                id =
-                    'product_${DateTime.now().millisecondsSinceEpoch}_${data.indexOf(offer)}';
+                String? productId = offer['productId']?.toString();
+                if (productId != null && productId.isNotEmpty) {
+                  id = productId;
+                } else {
+                  // Use index-based ID to ensure uniqueness
+                  id =
+                      'product_${DateTime.now().millisecondsSinceEpoch}_${data.indexOf(offer)}';
+                }
               }
+              offer['id'] = id;
+              // print('Generated ID for offer: $id'); // Debug log
+            } else {
+              id = offer['id'].toString();
+              // print('Existing ID for offer: $id'); // Debug log
             }
-            offer['id'] = id;
-            // print('Generated ID for offer: $id'); // Debug log
-          } else {
-            id = offer['id'].toString();
-            // print('Existing ID for offer: $id'); // Debug log
-          }
-          return offer;
-        }).toList();
+            return offer;
+          }).toList();
 
-        // Debug log all offer IDs
-        // print('All offer IDs:');
-        for (var offer in productOffers) {
-          // print('Offer ID: ${offer['id']}, Product: ${offer['productOfferDescription']}');
-        }
-      });
-      setState(() => isLoading = false);
-      return true;
-    } else {
-      error_handling.errorValidation(
-          context, response.statusCode, response.body, false);
+          // Debug log all offer IDs
+          // print('All offer IDs:');
+          for (var offer in productOffers) {
+            // print('Offer ID: ${offer['id']}, Product: ${offer['productOfferDescription']}');
+          }
+        });
+        setState(() => isLoading = false);
+        return true;
+      } else {
+        error_handling.errorValidation(
+            context, response.statusCode, response.body, false);
+      }
+    } catch (e) {
+      error_handling.errorValidation(context, 500,
+          'An error occurred while fetching product offers', false);
     }
   }
 
@@ -252,24 +275,29 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     var apiUrl = BASE_URL + GET_REWARDS_SCHEMES;
     print(apiUrl);
 
-    response = await http.get(
-      Uri.parse(apiUrl),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": accesstoken
-      },
-      // body: json.encode({'dealerCode': dealerCode}),
-    );
-    if (response.statusCode == 200) {
-      // Navigator.pop(context);
-      final responseData = json.decode(response.body);
+    try {
+      response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": accessToken
+        },
+        // body: json.encode({'dealerCode': dealerCode}),
+      );
+      if (response.statusCode == 200) {
+        // Navigator.pop(context);
+        final responseData = json.decode(response.body);
 
-      setState(() {
-        rewardSchemes = responseData;
-      });
-    } else {
-      error_handling.errorValidation(
-          context, response.statusCode, response.body, false);
+        setState(() {
+          rewardSchemes = responseData;
+        });
+      } else {
+        error_handling.errorValidation(
+            context, response.statusCode, response.body, false);
+      }
+    } catch (e) {
+      error_handling.errorValidation(context, 500,
+          'An error occurred while fetching reward schemes', false);
     }
   }
 
@@ -424,7 +452,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Hi ${userName ?? 'Guest'}',
+                'Hi ${USER_FULL_NAME ?? 'Guest'}',
                 style: TextStyle(
                   fontSize: getScreenWidth(24),
                   fontFamily: bold,
