@@ -256,6 +256,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
             // } else {
             //   id = offer['id'].toString();
             // }
+            // offer['productPrice'] = offer['productPrice'] ?? '0';
             offer['id'] = offer['_id'];
             return offer;
           }).toList();
@@ -674,7 +675,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                                                   8)),
                                                     ),
                                                     child: Text(
-                                                      'Price: ₹${offer['productPrice'] ?? '980'}',
+                                                      'Price: ₹${offer['productPrice'] ?? '0'}',
                                                       style: TextStyle(
                                                         fontSize:
                                                             getScreenWidth(12),
