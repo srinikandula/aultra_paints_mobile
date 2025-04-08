@@ -237,31 +237,32 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
           // print('=====responseee=========${data}');
           productOffers = data.map((offer) {
             String id;
-            if (offer['id'] == null || offer['id'].toString().isEmpty) {
-              // Use productCode as primary identifier, fallback to productId, then to timestamp
-              String? productCode = offer['productCode']?.toString();
-              if (productCode != null && productCode.isNotEmpty) {
-                id = productCode;
-              } else {
-                String? productId = offer['productId']?.toString();
-                if (productId != null && productId.isNotEmpty) {
-                  id = productId;
-                } else {
-                  // Use index-based ID to ensure uniqueness
-                  id =
-                      'product_${DateTime.now().millisecondsSinceEpoch}_${data.indexOf(offer)}';
-                }
-              }
-              offer['id'] = id;
-            } else {
-              id = offer['id'].toString();
-            }
+            // if (offer['id'] == null || offer['id'].toString().isEmpty) {
+            //   // Use productCode as primary identifier, fallback to productId, then to timestamp
+            //   String? productCode = offer['productCode']?.toString();
+            //   if (productCode != null && productCode.isNotEmpty) {
+            //     id = productCode;
+            //   } else {
+            //     String? productId = offer['productId']?.toString();
+            //     if (productId != null && productId.isNotEmpty) {
+            //       id = productId;
+            //     } else {
+            //       // Use index-based ID to ensure uniqueness
+            //       id =
+            //           'product_${DateTime.now().millisecondsSinceEpoch}_${data.indexOf(offer)}';
+            //     }
+            //   }
+            //   offer['id'] = id;
+            // } else {
+            //   id = offer['id'].toString();
+            // }
+            offer['id'] = offer['_id'];
             return offer;
           }).toList();
 
-          for (var offer in productOffers) {
-            // print('=====Total=========${offer}');
-          }
+          // for (var offer in productOffers) {
+          //   // print('=====Total=========${offer}');
+          // }
         });
         setState(() => isLoading = false);
         return true;
