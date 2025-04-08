@@ -175,53 +175,53 @@ class _LayoutPageState extends State<LayoutPage> {
                   ],
                 ),
               ),
-              Stack(
-                children: [
-                  if (USER_ACCOUNT_TYPE == 'Dealer')
-                    IconButton(
-                      icon: Icon(
-                        Icons.shopping_cart,
-                        color: appThemeColor,
-                        size: screenHeight * 0.028,
-                      ),
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/cart');
-                      },
-                    ),
-                  if (USER_ACCOUNT_TYPE == 'Dealer')
-                    Consumer<CartProvider>(
-                      builder: (context, cart, child) {
-                        return Positioned(
-                          right: 0,
-                          child: cart.items.isEmpty
-                              ? Container(
-                                  width: 20,
-                                  height: 20,
-                                )
-                              : Container(
-                                  padding: EdgeInsets.all(2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  constraints: BoxConstraints(
-                                    minWidth: 20,
-                                    minHeight: 20,
-                                  ),
-                                  child: Text(
-                                    '${cart.items.length}',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                        );
-                      },
-                    ),
-                ],
-              ),
+              // Stack(
+              //   children: [
+              //     if (USER_ACCOUNT_TYPE == 'Dealer')
+              //       IconButton(
+              //         icon: Icon(
+              //           Icons.shopping_cart,
+              //           color: appThemeColor,
+              //           size: screenHeight * 0.028,
+              //         ),
+              //         onPressed: () {
+              //           Navigator.pushNamed(context, '/cart');
+              //         },
+              //       ),
+              //     if (USER_ACCOUNT_TYPE == 'Dealer')
+              //       Consumer<CartProvider>(
+              //         builder: (context, cart, child) {
+              //           return Positioned(
+              //             right: 0,
+              //             child: cart.items.isEmpty
+              //                 ? Container(
+              //                     width: 20,
+              //                     height: 20,
+              //                   )
+              //                 : Container(
+              //                     padding: EdgeInsets.all(2),
+              //                     decoration: BoxDecoration(
+              //                       color: Colors.red,
+              //                       borderRadius: BorderRadius.circular(10),
+              //                     ),
+              //                     constraints: BoxConstraints(
+              //                       minWidth: 20,
+              //                       minHeight: 20,
+              //                     ),
+              //                     child: Text(
+              //                       '${cart.items.length}',
+              //                       style: TextStyle(
+              //                         color: Colors.white,
+              //                         fontSize: 12,
+              //                       ),
+              //                       textAlign: TextAlign.center,
+              //                     ),
+              //                   ),
+              //           );
+              //         },
+              //       ),
+              //   ],
+              // ),
               InkWell(
                 onTap: () {
                   Navigator.pushNamed(context, '/qrScanner').then((result) {
