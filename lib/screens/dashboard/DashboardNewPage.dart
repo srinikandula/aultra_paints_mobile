@@ -1,8 +1,5 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -10,13 +7,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 import '../../providers/cart_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../services/error_handling.dart';
 import '../../utility/Colors.dart';
 import '../../utility/Fonts.dart';
 import '../../utility/Utils.dart';
-
-import '../../../services/config.dart';
+import '../../services/config.dart';
 import '../../utility/size_config.dart';
+
 import '../ProductDetailsScreen.dart';
 
 class DashboardNewPage extends StatefulWidget {
@@ -31,7 +29,6 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  var accessToken;
   var USER_ID;
   var USER_FULL_NAME;
   var USER_EMAIL;
@@ -102,7 +99,13 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
 
   Future<void> fetchLocalStorageData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    accessToken = prefs.getString('accessToken') ?? '';
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    // Wait for auth to be initialized
+    if (!authProvider.isInitialized) {
+      await authProvider.initialize();
+    }
+
     USER_ID = prefs.getString('USER_ID') ?? '';
     USER_FULL_NAME = prefs.getString('USER_FULL_NAME') ?? '';
     USER_EMAIL = prefs.getString('USER_EMAIL') ?? '';
@@ -114,20 +117,20 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
           .setUserId(USER_ID);
     }
 
-    if (accessToken != null &&
-        accessToken.isNotEmpty &&
-        USER_ID != null &&
-        USER_ID.isNotEmpty) {
+    if (authProvider.isAuthenticated && USER_ID != null && USER_ID.isNotEmpty) {
       getDashboardDetails();
     }
   }
 
   Future<void> getDashboardDetails() async {
-    if (USER_ID == null ||
-        USER_ID.isEmpty ||
-        accessToken == null ||
-        accessToken.isEmpty) {
-      print('Missing user ID or access token for dashboard details');
+    if (USER_ID == null || USER_ID.isEmpty) {
+      print('Missing user ID for dashboard details');
+      return;
+    }
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (!authProvider.isAuthenticated) {
+      print('User not authenticated');
       return;
     }
 
@@ -137,10 +140,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     var apiUrl = BASE_URL + GET_USER_DETAILS + USER_ID;
 
     try {
-      response = await http.get(Uri.parse(apiUrl), headers: {
-        "Content-Type": "application/json",
-        "Authorization": accessToken
-      });
+      response =
+          await http.get(Uri.parse(apiUrl), headers: authProvider.authHeaders);
 
       if (response.statusCode == 200) {
         Navigator.pop(context);
@@ -186,6 +187,12 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
             getProductOffers(''); // Load more data when scrolled to bottom
           }
         });
+      } else if (response.statusCode == 401) {
+        // Handle unauthorized error
+        Navigator.pop(context);
+        // Clear auth and redirect to login
+        await authProvider.clearAuth();
+        Navigator.of(context).pushReplacementNamed('/login');
       } else {
         Navigator.pop(context);
         error_handling.errorValidation(
@@ -205,18 +212,21 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     if (isLoading) return;
     setState(() => isLoading = true);
 
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (!authProvider.isAuthenticated) {
+      setState(() => isLoading = false);
+      return;
+    }
+
     Utils.clearToasts(context);
     // Utils.returnScreenLoader(context);
     http.Response response;
     var apiUrl = BASE_URL + GET_PRODUCT_OFFERS;
-    print(apiUrl);
+
     try {
       response = await http.post(
         Uri.parse(apiUrl),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": accessToken
-        },
+        headers: authProvider.authHeaders,
         body: json.encode({'page': currentPage, 'limit': 100}),
       );
       final responseData = json.decode(response.body);
@@ -224,6 +234,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
         setState(() {
           // Ensure each offer has a valid ID
           var data = responseData['data'] as List;
+          // print('=====responseee=========${data}');
           productOffers = data.map((offer) {
             String id;
             if (offer['id'] == null || offer['id'].toString().isEmpty) {
@@ -242,27 +253,31 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                 }
               }
               offer['id'] = id;
-              // print('Generated ID for offer: $id'); // Debug log
             } else {
               id = offer['id'].toString();
-              // print('Existing ID for offer: $id'); // Debug log
             }
             return offer;
           }).toList();
 
-          // Debug log all offer IDs
-          // print('All offer IDs:');
           for (var offer in productOffers) {
-            // print('Offer ID: ${offer['id']}, Product: ${offer['productOfferDescription']}');
+            // print('=====Total=========${offer}');
           }
         });
         setState(() => isLoading = false);
         return true;
+      } else if (response.statusCode == 401) {
+        // Handle unauthorized error
+        setState(() => isLoading = false);
+        // Clear auth and redirect to login
+        await authProvider.clearAuth();
+        Navigator.of(context).pushReplacementNamed('/login');
       } else {
+        setState(() => isLoading = false);
         error_handling.errorValidation(
             context, response.statusCode, response.body, false);
       }
     } catch (e) {
+      setState(() => isLoading = false);
       error_handling.errorValidation(context, 500,
           'An error occurred while fetching product offers', false);
     }
@@ -273,15 +288,11 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     // Utils.returnScreenLoader(context);
     http.Response response;
     var apiUrl = BASE_URL + GET_REWARDS_SCHEMES;
-    print(apiUrl);
 
     try {
       response = await http.get(
         Uri.parse(apiUrl),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": accessToken
-        },
+        headers: Provider.of<AuthProvider>(context, listen: false).authHeaders,
         // body: json.encode({'dealerCode': dealerCode}),
       );
       if (response.statusCode == 200) {
@@ -302,7 +313,6 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
   }
 
   Future<bool> _onWillPop() async {
-    // print('back button hitted');
     Utils.clearToasts(context);
     if (Platform.isAndroid) {
       SystemNavigator.pop();
@@ -753,25 +763,27 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                                                       getScreenWidth(
                                                                           16)),
                                                               onPressed: () {
-                                                                if (quantity ==
-                                                                    0) {
-                                                                  cart.addItem(
-                                                                    offer['id'] ??
-                                                                        '',
-                                                                    offer['productOfferDescription'] ??
-                                                                        '',
-                                                                    double.parse(
-                                                                        offer['productPrice']?.toString() ??
-                                                                            '0'),
-                                                                    offer['productOfferImageUrl'] ??
-                                                                        '',
-                                                                  );
-                                                                } else if (quantity <
+                                                                if (quantity <
                                                                     CartProvider
                                                                         .maxQuantity) {
-                                                                  cart.incrementQuantity(
+                                                                  if (quantity ==
+                                                                      0) {
+                                                                    cart.addItem(
                                                                       offer['id'] ??
-                                                                          '');
+                                                                          '',
+                                                                      offer['productOfferDescription'] ??
+                                                                          '',
+                                                                      double.parse(
+                                                                          offer['productPrice']?.toString() ??
+                                                                              '0'),
+                                                                      offer['productOfferImageUrl'] ??
+                                                                          '',
+                                                                    );
+                                                                  } else {
+                                                                    cart.incrementQuantity(
+                                                                        offer['id'] ??
+                                                                            '');
+                                                                  }
                                                                 } else {
                                                                   ScaffoldMessenger.of(
                                                                           context)
@@ -779,9 +791,6 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                                                     SnackBar(
                                                                       content: Text(
                                                                           'Maximum quantity reached'),
-                                                                      duration: Duration(
-                                                                          seconds:
-                                                                              1),
                                                                     ),
                                                                   );
                                                                 }

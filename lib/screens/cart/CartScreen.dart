@@ -12,6 +12,8 @@ class CartScreen extends StatelessWidget {
     final cart = Provider.of<CartProvider>(context);
     final cartItems = cart.items.values.toList();
 
+    print('cartItems====>${cartItems}');
+
     return Scaffold(
       appBar: AppBar(
         title: Text(

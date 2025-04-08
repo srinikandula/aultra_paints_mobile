@@ -9,6 +9,7 @@ import 'package:aultra_paints_mobile/screens/pointsLedger/pointsLedgerPage.dart'
 import 'package:aultra_paints_mobile/services/UserViewModel.dart';
 import 'package:aultra_paints_mobile/screens/cart/CartScreen.dart';
 import 'package:aultra_paints_mobile/providers/cart_provider.dart';
+import 'package:aultra_paints_mobile/providers/auth_provider.dart';
 
 import '/screens/authentication/otp/OtpPage.dart';
 import 'screens/orders/createOrder/CreateOrders.dart';
@@ -39,6 +40,9 @@ Future<void> main() async {
       ),
       ChangeNotifierProvider<CartProvider>(
         create: (context) => CartProvider(),
+      ),
+      ChangeNotifierProvider<AuthProvider>(
+        create: (context) => AuthProvider(),
       ),
     ],
     child: MyApp(),
@@ -74,6 +78,12 @@ class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     WidgetsFlutterBinding.ensureInitialized();
+    
+    // Initialize auth provider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<AuthProvider>(context, listen: false).initialize();
+    });
+    
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
@@ -104,6 +114,11 @@ class MyAppState extends State<MyApp> {
         "/painterPopUpPage": (context) => const PainterPopUpPage(),
         "/pointsLedgerPage": (context) => LayoutPage(child: PointsLedgerPage()),
         "/cart": (context) => const CartScreen(),
+      },
+      onUnknownRoute: (settings) {
+        return MaterialPageRoute(
+          builder: (context) => const LoginPage(),
+        );
       },
     );
   }

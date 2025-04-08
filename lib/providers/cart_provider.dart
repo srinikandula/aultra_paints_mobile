@@ -32,17 +32,23 @@ class CartItem {
       return CartItem(
         id: json['id'] as String,
         name: json['name'] as String,
-        quantity: json['quantity'] as int,
+        quantity:
+            json['quantity'] as int? ?? 1, // Default to 1 if quantity is null
         price: (json['price'] is int)
             ? (json['price'] as int).toDouble()
             : json['price'] as double,
         imageUrl: json['imageUrl'] as String,
       );
     } catch (e) {
-      print('Error creating CartItem from JSON: $e');
-      print('JSON data: $json');
+      // print('Error creating CartItem from JSON: $e');
+      // print('JSON data: $json');
       rethrow;
     }
+  }
+
+  @override
+  String toString() {
+    return 'CartItem(id: $id, name: $name, quantity: $quantity, price: $price)';
   }
 }
 
@@ -67,27 +73,23 @@ class CartProvider with ChangeNotifier {
   }
 
   Future<void> setUserId(String? userId) async {
-    print('Setting cart user ID: $userId (previous: $_userId)');
+    // print('Setting cart user ID: $userId (previous: $_userId)');
 
     try {
       if (_userId != userId) {
         // Save current cart data before switching user
         if (_userId != null && _items.isNotEmpty) {
-          print(
-              'Saving cart for previous user: $_userId with ${_items.length} items');
+          // print(
+          //     'Saving cart for previous user: $_userId with ${_items.length} items');
           await saveCart();
           print('Previous cart saved successfully');
         }
 
-        // Clear items and set new user ID
         _items = {};
         _userId = userId;
 
-        // Load new user's cart data
         if (userId != null) {
-          print('Loading cart for new user: $userId');
           await _loadCartFromPrefs();
-          print('Cart loaded successfully with ${_items.length} items');
         }
 
         notifyListeners();
@@ -108,25 +110,29 @@ class CartProvider with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final cartKey = 'cart_${_userId}';
       final cartData = prefs.getString(cartKey);
-      print('Loading cart from key: $cartKey, data: $cartData');
 
-      _items = {}; // Clear existing items before loading
+      _items = {};
 
       if (cartData != null && cartData.isNotEmpty) {
         try {
           final decodedData = json.decode(cartData) as Map<String, dynamic>;
-          print('Decoded cart data: $decodedData');
 
           decodedData.forEach((key, value) {
             try {
-              final cartItem = CartItem.fromJson(value as Map<String, dynamic>);
-              _items[key] = cartItem;
-              print('Loaded item: $key with quantity: ${cartItem.quantity}');
+              if (value is Map<String, dynamic>) {
+                final cartItem = CartItem.fromJson(value);
+                if (cartItem.quantity > 0) {
+                  _items[cartItem.id] = cartItem;
+                }
+              } else {
+                print('Invalid cart item data format for key $key: $value');
+              }
             } catch (e) {
               print('Error loading cart item $key: $e');
             }
           });
           print('Successfully loaded ${_items.length} items');
+          notifyListeners(); // Notify listeners after loading cart data
         } catch (e) {
           print('Error decoding cart data: $e');
         }
@@ -135,40 +141,28 @@ class CartProvider with ChangeNotifier {
       }
     } catch (e) {
       print('Error loading cart data: $e');
-      _items = {};
     }
   }
 
   Future<void> saveCart() async {
-    if (_userId == null) {
-      print('Cannot save cart: no user ID set');
-      return;
-    }
+    if (_userId == null) return;
 
     try {
       final prefs = await SharedPreferences.getInstance();
       final cartKey = 'cart_${_userId}';
 
-      if (_items.isEmpty) {
-        print('Cart is empty, removing saved data for user: $_userId');
-        await prefs.remove(cartKey);
-        return;
-      }
-
-      final cartData = <String, dynamic>{};
-      _items.forEach((key, value) {
-        try {
-          cartData[key] = value.toJson();
-        } catch (e) {
-          print('Error converting item $key to JSON: $e');
-        }
-      });
+      // Convert cart items to JSON format
+      final cartData = Map<String, dynamic>.fromEntries(
+        _items.entries
+            .map((entry) => MapEntry(entry.key, entry.value.toJson())),
+      );
 
       final encodedData = json.encode(cartData);
-      print('Saving cart data: $encodedData');
+      // print('Saving cart data: $encodedData');
+
       await prefs.setString(cartKey, encodedData);
 
-      // Verify the save
+      // Verify the saved data
       final savedData = prefs.getString(cartKey);
       if (savedData == encodedData) {
         print('Cart data verified and saved successfully');
@@ -188,131 +182,110 @@ class CartProvider with ChangeNotifier {
       return;
     }
 
-    if (_items.containsKey(productId)) {
-      print('Item exists in cart, updating quantity');
-      // Change quantity
-      _items.update(
-        productId,
-        (existingCartItem) => CartItem(
-          id: existingCartItem.id,
-          name: existingCartItem.name,
-          quantity: existingCartItem.quantity + 1,
-          price: existingCartItem.price,
-          imageUrl: existingCartItem.imageUrl,
-        ),
-      );
-    } else {
-      print('Adding new item to cart');
-      _items.putIfAbsent(
-        productId,
-        () => CartItem(
-          id: productId,
-          name: name,
-          quantity: 1,
-          price: price,
-          imageUrl: imageUrl,
-        ),
-      );
-    }
-
-    saveCart();
-    notifyListeners();
-    print('Added/Updated item in cart. Total items: ${_items.length}');
-  }
-
-  void removeItem(String productId) {
-    print('Removing item from cart - ID: $productId, User: $_userId');
-
-    if (productId.isEmpty || _userId == null) {
-      print('Cannot remove item: productId is empty or no user is set');
+    // Ensure we don't add items with invalid data
+    if (name.isEmpty || price <= 0 || imageUrl.isEmpty) {
+      print('Cannot add item: invalid product data');
       return;
     }
 
-    _items.remove(productId);
-    saveCart();
-    notifyListeners();
-    print('Removed item from cart. Total items: ${_items.length}');
+    if (_items.containsKey(productId)) {
+      print('Item exists in cart, updating quantity');
+      // Change quantity
+      final existingItem = _items[productId]!;
+      if (existingItem.quantity < maxQuantity) {
+        _items[productId] = CartItem(
+          id: productId, // Ensure we use the same ID
+          name: existingItem.name,
+          quantity: existingItem.quantity + 1,
+          price: existingItem.price,
+          imageUrl: existingItem.imageUrl,
+        );
+        saveCart().then((_) => notifyListeners());
+      }
+    } else {
+      print('Adding new item to cart');
+      _items[productId] = CartItem(
+        id: productId,
+        name: name,
+        quantity: 1,
+        price: price,
+        imageUrl: imageUrl,
+      );
+      saveCart().then((_) => notifyListeners());
+    }
+    print('Added/Updated item in cart. Total items: ${_items.length}');
   }
 
   void incrementQuantity(String productId) {
-    print('Incrementing quantity - ID: $productId, User: $_userId');
-    print('Current cart state before increment: ${_items.toString()}');
+    // print('Incrementing quantity - ID: $productId, User: $_userId');
+    // print('Current cart state before increment: ${_items.toString()}');
 
     if (productId.isEmpty || _userId == null) {
-      print('Cannot increment: productId is empty or no user is set');
+      // print('Cannot increment: productId is empty or no user is set');
       return;
     }
 
     if (_items.containsKey(productId)) {
       final item = _items[productId]!;
       if (item.quantity < maxQuantity) {
-        print('Current quantity before increment: ${item.quantity}');
-        
-        // Create new cart item with incremented quantity
-        final updatedItem = CartItem(
-          id: item.id,
+        _items[productId] = CartItem(
+          id: productId,
           name: item.name,
           quantity: item.quantity + 1,
           price: item.price,
           imageUrl: item.imageUrl,
         );
-        
-        // Update the items map
-        _items[productId] = updatedItem;
-        
-        print('New quantity after increment: ${updatedItem.quantity}');
-        
-        // Notify listeners first to update UI immediately
-        notifyListeners();
-        // Then save to storage
-        saveCart();
-      } else {
-        print('Cannot increment: maximum quantity reached');
+        saveCart().then((_) => notifyListeners());
       }
-    } else {
-      print('Product ID not found in cart');
     }
   }
 
   void decrementQuantity(String productId) {
-    print('Decrementing quantity - ID: $productId, User: $_userId');
+    // print('Decrementing quantity - ID: $productId, User: $_userId');
 
     if (productId.isEmpty || _userId == null) {
-      print('Cannot decrement: productId is empty or no user is set');
+      // print('Cannot decrement: productId is empty or no user is set');
       return;
     }
 
     if (_items.containsKey(productId)) {
-      if (_items[productId]!.quantity > 1) {
-        _items.update(
-          productId,
-          (existingCartItem) => CartItem(
-            id: existingCartItem.id,
-            name: existingCartItem.name,
-            quantity: existingCartItem.quantity - 1,
-            price: existingCartItem.price,
-            imageUrl: existingCartItem.imageUrl,
-          ),
+      final item = _items[productId]!;
+      if (item.quantity > 1) {
+        _items[productId] = CartItem(
+          id: productId,
+          name: item.name,
+          quantity: item.quantity - 1,
+          price: item.price,
+          imageUrl: item.imageUrl,
         );
       } else {
         _items.remove(productId);
       }
-      saveCart();
-      notifyListeners();
-      print(
-          'Decremented quantity. New quantity: ${_items[productId]?.quantity}');
+      saveCart().then((_) => notifyListeners());
+      // print('Decremented quantity for item: $productId');
     }
   }
 
+  void removeItem(String productId) {
+    // print('Removing item from cart - ID: $productId, User: $_userId');
+
+    if (productId.isEmpty || _userId == null) {
+      // print('Cannot remove item: productId is empty or no user is set');
+      return;
+    }
+
+    _items.remove(productId);
+    saveCart().then((_) => notifyListeners());
+    // print('Removed item from cart. Total items: ${_items.length}');
+  }
+
   int getQuantity(String productId) {
-    if (productId.isEmpty) return 0;
     return _items[productId]?.quantity ?? 0;
   }
 
   void clear() {
     _items = {};
-    saveCart();
-    notifyListeners();
+    saveCart().then((_) => notifyListeners());
     print('Cleared cart');
   }
 }

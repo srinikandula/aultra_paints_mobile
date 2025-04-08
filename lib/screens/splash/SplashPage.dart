@@ -97,10 +97,10 @@ class _SplashPageState extends State<SplashPage> {
   Future<void> certificateCheck() async {
     try {
       HttpClient client = await createHttpClientWithCertificate();
-      final request =
-          await client.getUrl(Uri.parse('https://app.aultrapaints.com/')); //mobile
-          // await client.getUrl(Uri.parse('https://erp.aultrapaints.com/')); //web
-          // await client.getUrl(Uri.parse('https://dealerportal.mllqa.com/'));
+      final request = await client
+          .getUrl(Uri.parse('https://app.aultrapaints.com/')); //mobile
+      // await client.getUrl(Uri.parse('https://erp.aultrapaints.com/')); //web
+      // await client.getUrl(Uri.parse('https://dealerportal.mllqa.com/'));
       final response = await request.close();
 
       debugPrint('Response status code: ${response.statusCode}');

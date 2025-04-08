@@ -14,6 +14,7 @@ import '../../../utility/validations.dart';
 import '../../../utility/size_config.dart';
 import '../../../utility/FooterButton.dart';
 import '../../../providers/cart_provider.dart';
+import '../../../providers/auth_provider.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -126,27 +127,30 @@ class _OtpPageState extends State<OtpPage> {
     print('userdata structure====>${json.encode(userData)}');
     FocusScope.of(context).unfocus();
 
-    // Save user data first
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var tempToken = "Bearer " + userData['token'];
-    await prefs.setString('accessToken', tempToken);  
-    await prefs.setString('USER_ID', userData['id']);
-    await prefs.setString('USER_FULL_NAME', userData['fullName']);  
-    await prefs.setString('USER_MOBILE_NUMBER', userData['mobile']);
-    await prefs.setString('USER_ACCOUNT_TYPE', userData['accountType']);
-
-    // Optional fields - set empty string if null
-    await prefs.setString('USER_EMAIL', '');  
-    await prefs.setString('USER_PARENT_DEALER_CODE', userData['parentDealerCode'] ?? '');
-    await prefs.setString('userParentDealerMobile', '');  
-    await prefs.setString('userParentDealerName', '');    
-
-    // Set the user ID in CartProvider to load their cart data
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
+    var tempToken = "Bearer " + userData['token'];
+    await authProvider.setAuthData(
+      accessToken: tempToken,
+      userId: userData['id'] ?? '',
+      userFullName: userData['fullName'] ?? '',
+      userMobileNumber: userData['mobile'] ?? '',
+      userAccountType: userData['accountType'] ?? '',
+      userEmail: userData['email'] ?? '',
+      userParentDealerCode: userData['parentDealerCode'] ?? '',
+      userParentDealerMobile: userData['parentDealerMobile'] ?? '',
+      userParentDealerName: userData['parentDealerName'] ?? '',
+    );
+
+    // Initialize cart with user ID
     await cartProvider.setUserId(userData['id']);
 
     Navigator.pushNamedAndRemoveUntil(
-        context, '/dashboardPage', (Route<dynamic> route) => false);
+      context,
+      '/dashboardPage',
+      (route) => false,
+    );
   }
 
   Widget returnOTPfields() {

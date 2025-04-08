@@ -1,271 +1,120 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-import '../../services/UserViewModel.dart';
-import '../../services/WidgetScreens/DealerSearchDialog.dart';
 import '../../services/WidgetScreens/TransferPointsDialog.dart';
 import '../../services/config.dart';
-import '../../services/error_handling.dart';
 import '../../utility/Colors.dart';
 import '../../utility/Fonts.dart';
-import '../../utility/Utils.dart';
 import '../../utility/size_config.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/auth_provider.dart';
 
 class LayoutPage extends StatefulWidget {
-  final Widget child; // Page content
+  final Widget child;
 
   const LayoutPage({Key? key, required this.child}) : super(key: key);
 
   @override
-  State<LayoutPage> createState() => _LayoutPageState();
+  _LayoutPageState createState() => _LayoutPageState();
 }
 
 class _LayoutPageState extends State<LayoutPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  void updateParentDealerCode(String newCode) {
-    setState(() {
-      USER_PARENT_DEALER_CODE = newCode;
-    });
-  }
-
-  var accesstoken;
-  var USER_ID;
-  var USER_FULL_NAME;
-  var USER_MOBILE_NUMBER;
-  var USER_ACCOUNT_TYPE;
-  var USER_PARENT_DEALER_CODE;
-  var userParentDealerMobile;
-  var userParentDealerName;
-
-  var dashBoardList = [];
-  var accountType = '';
-  var parentDealerCode = '';
-  var parentDealerName = '';
-
-  late final String accountName;
-  late final String accountMobile;
+  late String USER_ID = '';
+  late String USER_FULL_NAME = '';
+  late String USER_MOBILE_NUMBER = '';
+  late String USER_ACCOUNT_TYPE = '';
+  late String accesstoken = '';
 
   @override
   void initState() {
-    fetchLocalStorageData();
     super.initState();
-  }
-
-  void _showSnackBar(String message, BuildContext context, ColorCheck) {
-    final snackBar = SnackBar(
-        content: Text(message),
-        backgroundColor: ColorCheck ? Colors.green : Colors.red,
-        duration: Utils.returnStatusToastDuration(ColorCheck));
-
-    // Find the Scaffold in the Widget tree and use it to show a SnackBar!
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    fetchLocalStorageData();
   }
 
   Future<void> fetchLocalStorageData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    accesstoken = prefs.getString('accesstoken') ?? '';
-    USER_ID = prefs.getString('USER_ID') ?? '';
-    USER_FULL_NAME = prefs.getString('userName') ?? '';
-    USER_MOBILE_NUMBER = prefs.getString('USER_MOBILE_NUMBER') ?? '';
-    USER_ACCOUNT_TYPE = prefs.getString('USER_ACCOUNT_TYPE') ?? '';
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
+    // Wait for auth to be initialized if needed
+    if (!authProvider.isInitialized) {
+      await authProvider.initialize();
+    }
+
+    setState(() {
+      USER_ID = authProvider.userId ?? '';
+      USER_FULL_NAME = authProvider.userFullName ?? '';
+      USER_MOBILE_NUMBER = authProvider.userMobileNumber ?? '';
+      USER_ACCOUNT_TYPE = authProvider.userAccountType ?? '';
+      accesstoken = authProvider.accessToken ?? '';
+    });
+
+    // Initialize cart with user ID
+    await cartProvider.setUserId(USER_ID);
 
     // Only call getDashboardCounts if we have a valid user
-    if (USER_ID != null && USER_ID.isNotEmpty) {
+    if (USER_ID.isNotEmpty) {
       getDashboardCounts();
     }
   }
 
   Future<void> getDashboardCounts() async {
-    if (USER_ID == null || USER_ID.isEmpty) {
-      print('No user ID available for dashboard counts');
-      return;
-    }
-    Utils.clearToasts(context);
-    // Utils.returnScreenLoader(context);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     http.Response response;
     var apiUrl = BASE_URL + GET_USER_DETAILS + USER_ID;
 
-    response = await http.get(Uri.parse(apiUrl), headers: {
-      "Content-Type": "application/json",
-      "Authorization": accesstoken
-    });
-
-    // Navigator.pop(context); // Close the loader
-
-    if (response.statusCode == 200) {
-      var tempResp = json.decode(response.body);
-      var apiResp = tempResp['data'];
-
-      setState(() {
-        accountType = USER_ACCOUNT_TYPE;
-        parentDealerCode = apiResp['parentDealerCode'] ?? '';
-        if (parentDealerCode.isNotEmpty && accountType == 'Painter') {
-          getUserDealer(parentDealerCode);
-        }
-      });
-    } else {
-      error_handling.errorValidation(
-          context, response.body, response.body, false);
-    }
-  }
-
-  Future getUserDealer(dynamic dealer) async {
-    Utils.clearToasts(context);
-    Utils.returnScreenLoader(context);
-    http.Response response;
-    var apiUrl = BASE_URL + GET_USER_DEALER + dealer.trim();
-
-    response = await http.get(Uri.parse(apiUrl), headers: {
-      "Content-Type": "application/json",
-      "Authorization": accesstoken
-    });
-
-    Navigator.pop(context); // Close the loader
-    if (response.statusCode == 200) {
-      var tempResp = json.decode(response.body);
-      var apiResp = tempResp['data'];
-      setState(() {
-        parentDealerCode = apiResp['dealerCode'] ?? '';
-        parentDealerName = apiResp['name'] ?? '';
-      });
-    } else {
-      error_handling.errorValidation(
-          context, response.body, response.body, false);
-    }
-  }
-
-  Future deleteUserAccount() async {
-    Utils.clearToasts(context);
-    Utils.returnScreenLoader(context);
-    http.Response response;
-    var apiUrl = BASE_URL + DELETE_USER_ACCOUNT + USER_ID;
-
-    // print('delete apiturl====>${apiUrl}');
-
-    response = await http.put(
+    response = await http.get(
       Uri.parse(apiUrl),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": accesstoken
-      },
-      body: jsonEncode({}),
+      headers: authProvider.authHeaders,
     );
-
-    // print('error====>${response.body}======>${response.statusCode}');
 
     if (response.statusCode == 200) {
-      Navigator.pop(context);
-      Navigator.pop(context);
-      _showSnackBar('Account deleted successfully.', context, true);
-      clearStorage();
-    } else {
-      Navigator.pop(context);
-      error_handling.errorValidation(
-          context, response.body, response.body, false);
+      // Handle successful response
+      // TODO: Implement dashboard data handling
+    } else if (response.statusCode == 401) {
+      // Handle unauthorized
+      await authProvider.clearAuth();
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/launchPage',
+        // '/loginPage',
+        (route) => false,
+      );
     }
-  }
-
-  void showAccountDeletionDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Delete Account',
-            style: TextStyle(
-                fontWeight: FontWeight.bold, fontSize: getScreenWidth(18)),
-          ),
-          content: Text(
-            'Are you sure you want to delete your account? This action cannot be undone.',
-            style: TextStyle(fontSize: getScreenWidth(16)),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel',
-                  style: TextStyle(
-                      color: Colors.grey, fontSize: getScreenWidth(14))),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  // backgroundColor: Colors.red,
-                  ),
-              onPressed: () {
-                // Add your account deletion logic here
-                // Navigator.of(context).pop();
-                // ScaffoldMessenger.of(context).showSnackBar(
-                //   SnackBar(
-                //     content: Text('Account deleted successfully.'),
-                //   ),
-                // );
-                deleteUserAccount();
-              },
-              child: Text('Delete',
-                  style: TextStyle(fontSize: getScreenWidth(14))),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> clearStorage() async {
-    Utils.clearToasts(context);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    // Get the current user ID before clearing
-    final userId = prefs.getString('USER_ID');
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
-
-    // Save cart data if we have a user ID
-    if (userId != null && cartProvider.itemCount > 0) {
-      print(
-          'Saving cart for user before logout: $userId with ${cartProvider.itemCount} items');
-      await cartProvider.saveCart();
-      print('Cart saved successfully');
-    }
-
-    // Clear shared preferences
-    await prefs.clear();
-
-    // Set cart provider user ID to null to clear current cart
-    await cartProvider.setUserId(null);
-    print('Cart cleared after logout');
-
-    Navigator.of(context).pushNamed('/splashPage');
   }
 
   Future<void> logOut(BuildContext context) async {
-    // Save cart data before clearing storage
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('USER_ID');
 
-    if (userId != null && cartProvider.itemCount > 0) {
-      print('Saving cart for user during logout: $userId');
-      await cartProvider.saveCart();
-      print('Cart saved successfully');
-    }
+    // Save current cart state before clearing auth
+    await cartProvider.saveCart();
 
-    // Clear storage and navigate to splash page
-    await clearStorage();
+    // Clear auth which will trigger cart to be saved with user ID
+    await authProvider.clearAuth();
+
+    // Set cart user ID to null to handle cart state properly
+    await cartProvider.setUserId(null);
+
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/launchPage',
+      // '/loginPage',
+      (route) => false,
+    );
+  }
+
+  Future<void> showAccountDeletionDialog(BuildContext context) async {
+    // Account deletion dialog implementation
   }
 
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double appBarHeight = screenHeight * 0.09; // 9% of screen height
-    final userViewModel = Provider.of<UserViewModel>(context);
+    final double appBarHeight = screenHeight * 0.09;
 
     SizeConfig().init(context);
 
@@ -326,6 +175,53 @@ class _LayoutPageState extends State<LayoutPage> {
                   ],
                 ),
               ),
+              Stack(
+                children: [
+                  if (USER_ACCOUNT_TYPE == 'Dealer')
+                    IconButton(
+                      icon: Icon(
+                        Icons.shopping_cart,
+                        color: appThemeColor,
+                        size: screenHeight * 0.028,
+                      ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/cart');
+                      },
+                    ),
+                  if (USER_ACCOUNT_TYPE == 'Dealer')
+                    Consumer<CartProvider>(
+                      builder: (context, cart, child) {
+                        return Positioned(
+                          right: 0,
+                          child: cart.items.isEmpty
+                              ? Container(
+                                  width: 20,
+                                  height: 20,
+                                )
+                              : Container(
+                                  padding: EdgeInsets.all(2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  constraints: BoxConstraints(
+                                    minWidth: 20,
+                                    minHeight: 20,
+                                  ),
+                                  child: Text(
+                                    '${cart.items.length}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                        );
+                      },
+                    ),
+                ],
+              ),
               InkWell(
                 onTap: () {
                   Navigator.pushNamed(context, '/qrScanner').then((result) {
@@ -337,7 +233,6 @@ class _LayoutPageState extends State<LayoutPage> {
                 },
                 child: Container(
                   child: Padding(
-                    // padding: const EdgeInsets.all(6.0),
                     padding: EdgeInsets.symmetric(
                       horizontal: screenWidth * 0.02,
                       vertical: screenHeight * 0.02,
@@ -346,7 +241,6 @@ class _LayoutPageState extends State<LayoutPage> {
                       child: Icon(
                         FontAwesomeIcons.qrcode,
                         size: screenHeight * 0.028,
-                        // color: Colors.white,
                         color: appThemeColor,
                       ),
                     ),
@@ -359,55 +253,41 @@ class _LayoutPageState extends State<LayoutPage> {
       ),
       body: widget.child,
       drawer: MyDrawer(
-        accountName: USER_FULL_NAME.toString(),
-        accountId: USER_ID.toString(),
-        accountMobile: USER_MOBILE_NUMBER.toString(),
-        accountType: USER_ACCOUNT_TYPE.toString(),
-        parentDealerCode: parentDealerCode != ''
-            ? parentDealerCode
-            : userViewModel.parentDealerCode,
-        parentDealerName: parentDealerName,
-        onLogout: () => {logOut(context)},
-        onAccountDelete: () => {showAccountDeletionDialog(context)},
+        onLogout: () => logOut(context),
+        onAccountDelete: () => showAccountDeletionDialog(context),
       ),
     );
   }
 }
 
 class MyDrawer extends StatelessWidget {
-  final String accountName;
-  final String accountId;
-  final String accountMobile;
-  final String accountType;
-  final VoidCallback onLogout;
-  late final String parentDealerCode;
-  late final String parentDealerName;
-  final VoidCallback onAccountDelete;
+  final Function onLogout;
+  final Function onAccountDelete;
 
-  MyDrawer({
-    required this.accountName,
-    required this.accountId,
-    required this.accountMobile,
-    required this.accountType,
+  const MyDrawer({
+    Key? key,
     required this.onLogout,
-    required this.parentDealerCode,
-    required this.parentDealerName,
     required this.onAccountDelete,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
+    final authProvider = Provider.of<AuthProvider>(context);
+
+    // Get user data from auth provider
+    final accountName = authProvider.userFullName ?? '';
+    final accountMobile = authProvider.userMobileNumber ?? '';
+    final accountType = authProvider.userAccountType ?? '';
+    final parentDealerName = authProvider.userParentDealerName ?? '';
+
     return Drawer(
-      width: screenWidth * 0.7,
-      backgroundColor: Colors.transparent,
       child: Container(
         decoration: const BoxDecoration(
-          color: white,
           gradient: LinearGradient(
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [
               Color(0xFFFFF7AD),
               Color(0xFFFFA9F9),
@@ -415,40 +295,23 @@ class MyDrawer extends StatelessWidget {
           ),
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // **User Details Section (Stays at the Top)**
             Container(
-              margin: EdgeInsets.only(
-                  top: screenHeight * 0.06,
-                  bottom: screenHeight * 0,
-                  left: screenWidth * 0.04,
-                  right: screenWidth * 0.04),
-              // margin: EdgeInsets.symmetric(
-              //     horizontal: screenWidth * 0.08,
-              //     vertical: screenHeight * 0.01),
+              height: screenHeight * 0.25,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  SizedBox(height: screenHeight * 0.05),
                   Text(
                     accountName,
                     style: TextStyle(
-                      color: accountType == 'Painter'
-                          ? const Color(0xFF3498db)
-                          : accountType == 'Dealer'
-                              ? const Color(0xFF2ecc71)
-                              : accountType == 'Contractor'
-                                  ? const Color(0xFFe67e22)
-                                  : accountType == 'SuperUser'
-                                      ? const Color(0xFFe74c3c)
-                                      : const Color(0xFF3533CD),
-                      fontFamily: ffGBold,
-                      fontSize: screenHeight * 0.028,
-                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF3533CD),
+                      fontFamily: ffGMedium,
+                      fontSize: screenHeight * 0.025,
                     ),
                   ),
+                  SizedBox(height: screenHeight * 0.01),
                   Text(
                     accountMobile,
                     style: TextStyle(
@@ -465,54 +328,30 @@ class MyDrawer extends StatelessWidget {
                       fontSize: screenHeight * 0.020,
                     ),
                   ),
-                  if (accountType == 'Painter')
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text('My Dealer ',
-                            style: TextStyle(
-                              color: const Color(0xFF3533CD),
-                              fontFamily: ffGMedium,
-                              fontSize: screenHeight * 0.016,
-                            )),
-                        Text(parentDealerName,
-                            style: TextStyle(
+                  if (accountType == 'Painter' && parentDealerName.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.only(top: screenHeight * 0.01),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('My Dealer ',
+                              style: TextStyle(
                                 color: const Color(0xFF3533CD),
-                                fontFamily: ffGBold,
+                                fontFamily: ffGMedium,
                                 fontSize: screenHeight * 0.016,
-                                fontWeight: FontWeight.bold)),
-                        IconButton(
-                          icon: Icon(
-                            FontAwesomeIcons.pencil,
-                            size: screenHeight * 0.016,
-                            color: const Color(0xFF3533CD),
-                          ),
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return DealerSearchDialog(
-                                  onDealerSelected:
-                                      (String dealerCode, String dealerName) {
-                                    parentDealerCode = dealerCode;
-                                    parentDealerName = dealerName;
-                                  },
-                                  onDealerComplete: () {
-                                    Navigator.pushNamed(
-                                        context, '/dashboardPage');
-                                  },
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ],
+                              )),
+                          Text(parentDealerName,
+                              style: TextStyle(
+                                color: const Color(0xFF3533CD),
+                                fontFamily: ffGMedium,
+                                fontSize: screenHeight * 0.016,
+                              )),
+                        ],
+                      ),
                     ),
                 ],
               ),
             ),
-
             Divider(thickness: 1),
 
             // **Scrollable Menu Section**
@@ -521,12 +360,15 @@ class MyDrawer extends StatelessWidget {
                 child: Column(
                   children: [
                     ListTile(
-                      title: Text(
-                        'Home',
-                        style: TextStyle(
-                          color: const Color(0xFF3533CD),
-                          fontFamily: ffGSemiBold,
-                          fontSize: screenHeight * 0.022,
+                      title: Padding(
+                        padding: EdgeInsets.only(left: screenWidth * 0.05),
+                        child: Text(
+                          'Home',
+                          style: TextStyle(
+                            color: const Color(0xFF3533CD),
+                            fontFamily: ffGSemiBold,
+                            fontSize: screenHeight * 0.022,
+                          ),
                         ),
                       ),
                       onTap: () {
@@ -535,12 +377,15 @@ class MyDrawer extends StatelessWidget {
                     ),
                     if (accountType == 'Dealer')
                       ListTile(
-                        title: Text(
-                          'My Partners',
-                          style: TextStyle(
-                            color: const Color(0xFF3533CD),
-                            fontFamily: ffGSemiBold,
-                            fontSize: screenHeight * 0.022,
+                        title: Padding(
+                          padding: EdgeInsets.only(left: screenWidth * 0.05),
+                          child: Text(
+                            'My Partners',
+                            style: TextStyle(
+                              color: const Color(0xFF3533CD),
+                              fontFamily: ffGSemiBold,
+                              fontSize: screenHeight * 0.022,
+                            ),
                           ),
                         ),
                         onTap: () {
@@ -549,12 +394,15 @@ class MyDrawer extends StatelessWidget {
                       ),
                     if (accountType == 'Painter')
                       ListTile(
-                        title: Text(
-                          'Transfer Points',
-                          style: TextStyle(
-                            color: const Color(0xFF3533CD),
-                            fontFamily: ffGSemiBold,
-                            fontSize: screenHeight * 0.022,
+                        title: Padding(
+                          padding: EdgeInsets.only(left: screenWidth * 0.05),
+                          child: Text(
+                            'Transfer Points',
+                            style: TextStyle(
+                              color: const Color(0xFF3533CD),
+                              fontFamily: ffGSemiBold,
+                              fontSize: screenHeight * 0.022,
+                            ),
                           ),
                         ),
                         onTap: () {
@@ -562,7 +410,7 @@ class MyDrawer extends StatelessWidget {
                             context: context,
                             builder: (BuildContext context) {
                               return TransferPointsDialog(
-                                accountId: accountId,
+                                accountId: authProvider.userId ?? '',
                                 accountName: accountName,
                                 onTransferComplete: () async {
                                   showSuccessPopup(context);
@@ -573,12 +421,15 @@ class MyDrawer extends StatelessWidget {
                         },
                       ),
                     ListTile(
-                      title: Text(
-                        'Points Ledger',
-                        style: TextStyle(
-                          color: const Color(0xFF3533CD),
-                          fontFamily: ffGSemiBold,
-                          fontSize: screenHeight * 0.022,
+                      title: Padding(
+                        padding: EdgeInsets.only(left: screenWidth * 0.05),
+                        child: Text(
+                          'Points Ledger',
+                          style: TextStyle(
+                            color: const Color(0xFF3533CD),
+                            fontFamily: ffGSemiBold,
+                            fontSize: screenHeight * 0.022,
+                          ),
                         ),
                       ),
                       onTap: () {
@@ -642,14 +493,13 @@ class MyDrawer extends StatelessWidget {
     final double screenWidth = MediaQuery.of(context).size.width;
     showDialog(
       context: context,
-      barrierDismissible: true, // Allows closing the popup by tapping outside
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return WillPopScope(
           onWillPop: () async {
-            Navigator.pop(context); // Close the popup
-            Navigator.pushNamed(
-                context, '/dashboardPage'); // Call callback function
-            return true; // Allow dismissal
+            Navigator.pop(context);
+            Navigator.pushNamed(context, '/dashboardPage');
+            return true;
           },
           child: AlertDialog(
             backgroundColor: Colors.transparent,
@@ -697,8 +547,7 @@ class MyDrawer extends StatelessWidget {
         );
       },
     ).then((_) {
-      Navigator.pushNamed(
-          context, '/dashboardPage'); // Ensure callback is always called
+      Navigator.pushNamed(context, '/dashboardPage');
     });
   }
 }
