@@ -42,58 +42,119 @@ class CartScreen extends StatelessWidget {
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(8),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: NetworkImage(cartItems[i].imageUrl),
-                      backgroundColor: Colors.transparent,
-                    ),
-                    title: Text(
-                      cartItems[i].name,
-                      style: TextStyle(fontFamily: 'Roboto'),
-                    ),
-                    subtitle: Text(
-                      'Total: ₹${(cartItems[i].price * cartItems[i].quantity).toStringAsFixed(2)}',
-                      style: TextStyle(fontFamily: 'Roboto'),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.remove, size: 20),
-                          onPressed: () {
-                            cart.decrementQuantity(cartItems[i].id);
-                          },
-                          style: IconButton.styleFrom(
-                            backgroundColor: Color(0xFF6A1B9A).withOpacity(0.1),
-                            padding: EdgeInsets.all(4),
+                  child: Row(
+                    children: [
+                      // Product image
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(cartItems[i].imageUrl),
+                        backgroundColor: Colors.transparent,
+                      ),
+                      SizedBox(width: 12),
+                      // Product details
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              cartItems[i].name,
+                              style: TextStyle(
+                                fontFamily: 'Roboto',
+                                fontSize: 16,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Total: ₹${(cartItems[i].price * cartItems[i].quantity).toStringAsFixed(2)}',
+                              style: TextStyle(
+                                fontFamily: 'Roboto',
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Quantity controls
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.remove, size: 20),
+                            onPressed: cartItems[i].quantity > 1
+                                ? () => cart.decrementQuantity(cartItems[i].id)
+                                : null,
+                            style: IconButton.styleFrom(
+                              backgroundColor: cartItems[i].quantity > 1
+                                  ? Color(0xFF6A1B9A).withOpacity(0.1)
+                                  : Colors.grey.withOpacity(0.1),
+                              padding: EdgeInsets.all(4),
+                            ),
                           ),
-                        ),
-                        Text(
-                          '${cartItems[i].quantity}',
-                          style: TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 16,
+                          Container(
+                            width: 30,
+                            child: Text(
+                              '${cartItems[i].quantity}',
+                              style: TextStyle(
+                                fontFamily: 'Roboto',
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.add, size: 20),
-                          onPressed: () {
-                            cart.incrementQuantity(cartItems[i].id);
-                          },
-                          style: IconButton.styleFrom(
-                            backgroundColor: Color(0xFF6A1B9A).withOpacity(0.1),
-                            padding: EdgeInsets.all(4),
+                          IconButton(
+                            icon: Icon(Icons.add, size: 20),
+                            onPressed: cartItems[i].quantity <
+                                    CartProvider.maxQuantity
+                                ? () => cart.incrementQuantity(cartItems[i].id)
+                                : () {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content:
+                                            Text('Maximum quantity reached'),
+                                        duration: Duration(seconds: 1),
+                                      ),
+                                    );
+                                  },
+                            style: IconButton.styleFrom(
+                              backgroundColor: cartItems[i].quantity <
+                                      CartProvider.maxQuantity
+                                  ? Color(0xFF6A1B9A).withOpacity(0.1)
+                                  : Colors.grey.withOpacity(0.1),
+                              padding: EdgeInsets.all(4),
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () {
-                            cart.removeItem(cartItems[i].id);
-                          },
-                          color: Colors.red,
-                        ),
-                      ],
-                    ),
+                          IconButton(
+                            icon: Icon(Icons.delete, size: 20),
+                            onPressed: () {
+                              cart.removeItem(cartItems[i].id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Item removed from cart'),
+                                  duration: Duration(seconds: 1),
+                                  action: SnackBarAction(
+                                    label: 'UNDO',
+                                    onPressed: () {
+                                      cart.addItem(
+                                        cartItems[i].id,
+                                        cartItems[i].name,
+                                        cartItems[i].price,
+                                        cartItems[i].imageUrl,
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.red.withOpacity(0.1),
+                              padding: EdgeInsets.all(4),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -135,7 +196,8 @@ class CartScreen extends StatelessWidget {
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF6A1B9A),
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),

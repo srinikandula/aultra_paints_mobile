@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 import '../../services/UserViewModel.dart';
 import '../../services/WidgetScreens/DealerSearchDialog.dart';
@@ -14,8 +15,7 @@ import '../../utility/Colors.dart';
 import '../../utility/Fonts.dart';
 import '../../utility/Utils.dart';
 import '../../utility/size_config.dart';
-
-import 'package:http/http.dart' as http;
+import '../../providers/cart_provider.dart';
 
 class LayoutPage extends StatefulWidget {
   final Widget child; // Page content
@@ -68,22 +68,58 @@ class _LayoutPageState extends State<LayoutPage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  fetchLocalStorageData() async {
+  Future<void> fetchLocalStorageData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     accesstoken = prefs.getString('accessToken');
-    USER_FULL_NAME = prefs.getString('USER_FULL_NAME');
     USER_ID = prefs.getString('USER_ID');
+    USER_FULL_NAME = prefs.getString('USER_FULL_NAME');
     USER_MOBILE_NUMBER = prefs.getString('USER_MOBILE_NUMBER');
     USER_ACCOUNT_TYPE = prefs.getString('USER_ACCOUNT_TYPE');
 
+    // Don't initialize cart here since it's already done in OtpPage
+    // This prevents double initialization
     getDashboardCounts();
   }
 
-  clearStorage() async {
+  Future<void> clearStorage() async {
     Utils.clearToasts(context);
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.clear();
+    
+    // Get the current user ID before clearing
+    final userId = prefs.getString('USER_ID');
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    
+    // Save cart data if we have a user ID
+    if (userId != null && cartProvider.itemCount > 0) {
+      print('Saving cart for user before logout: $userId with ${cartProvider.itemCount} items');
+      await cartProvider.saveCart();
+      print('Cart saved successfully');
+    }
+    
+    // Clear shared preferences
+    await prefs.clear();
+    
+    // Set cart provider user ID to null to clear current cart
+    await cartProvider.setUserId(null);
+    print('Cart cleared after logout');
+    
     Navigator.of(context).pushNamed('/splashPage');
+  }
+
+  Future logOut(context) async {
+    // Save cart data before clearing storage
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('USER_ID');
+
+    if (userId != null && cartProvider.itemCount > 0) {
+      print('Saving cart for user during logout: $userId');
+      await cartProvider.saveCart();
+      print('Cart saved successfully');
+    }
+
+    // Clear storage and navigate to splash page
+    await clearStorage();
   }
 
   Future getDashboardCounts() async {
@@ -141,10 +177,6 @@ class _LayoutPageState extends State<LayoutPage> {
     }
   }
 
-  void logOut(context) async {
-    clearStorage();
-  }
-
   Future deleteUserAccount() async {
     Utils.clearToasts(context);
     Utils.returnScreenLoader(context);
@@ -183,7 +215,6 @@ class _LayoutPageState extends State<LayoutPage> {
         return AlertDialog(
           title: Text(
             'Delete Account',
-
             style: TextStyle(
                 fontWeight: FontWeight.bold, fontSize: getScreenWidth(18)),
           ),
@@ -196,7 +227,6 @@ class _LayoutPageState extends State<LayoutPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-
               child: Text('Cancel',
                   style: TextStyle(
                       color: Colors.grey, fontSize: getScreenWidth(14))),
@@ -366,7 +396,6 @@ class MyDrawer extends StatelessWidget {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
     final double unitHeightValue = MediaQuery.of(context).size.height;
-
     return Drawer(
       width: screenWidth * 0.7,
       backgroundColor: Colors.transparent,
@@ -433,7 +462,6 @@ class MyDrawer extends StatelessWidget {
                       fontSize: unitHeightValue * 0.020,
                     ),
                   ),
-
                   if (accountType == 'Painter')
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
