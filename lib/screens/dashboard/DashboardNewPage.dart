@@ -363,214 +363,14 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     return false;
   }
 
-  void _showOfferBottomSheet(BuildContext context, Map<String, dynamic> offer) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Container(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                Color(0xFFFFF7AD),
-                Color(0xFFFFA9F9),
-              ],
-            ),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Stack(
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      margin: EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[600],
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: getScreenWidth(16),
-                        vertical: getScreenHeight(16)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            IconButton(
-                              icon: Icon(
-                                Icons.cancel,
-                                color: Colors.grey[800],
-                                size: getScreenWidth(28),
-                              ),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          width: double.infinity,
-                          margin: EdgeInsets.only(bottom: getScreenHeight(16)),
-                          child: ClipRRect(
-                            borderRadius:
-                                BorderRadius.circular(getScreenWidth(12)),
-                            child: FadeInImage.assetNetwork(
-                              placeholder: 'assets/images/app_file_icon.png',
-                              image: offer['productOfferImageUrl'] ?? '',
-                              fit: BoxFit.cover,
-                              imageErrorBuilder: (context, error, stackTrace) {
-                                return Image.asset(
-                                  'assets/images/app_file_icon.png',
-                                  fit: BoxFit.cover,
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                        if (offer['productOfferDescription'] != null)
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(getScreenWidth(12)),
-                            margin:
-                                EdgeInsets.only(bottom: getScreenHeight(16)),
-                            child: Text(
-                              offer['productOfferDescription'] ?? '',
-                              style: TextStyle(
-                                fontSize: getScreenWidth(16),
-                                color: Colors.black87,
-                                height: getScreenHeight(1.5),
-                                fontFamily: bold,
-                              ),
-                            ),
-                          ),
-                        if (USER_ACCOUNT_TYPE == 'Dealer') ...[
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: getScreenWidth(8),
-                              vertical: getScreenHeight(4),
-                            ),
-                            // decoration: BoxDecoration(
-                            //   color: accentColor.withOpacity(0.7),
-                            //   borderRadius:
-                            //       BorderRadius.circular(getScreenWidth(8)),
-                            // ),
-                            child: Text(
-                              'Price: ₹${offer['productPrice'] ?? '0'}',
-                              style: TextStyle(
-                                fontSize: getScreenWidth(14),
-                                fontFamily: bold,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: getScreenHeight(16)),
-                          Consumer<CartProvider>(
-                            builder: (context, cart, child) {
-                              int quantity =
-                                  cart.getQuantity(offer['id'] ?? '');
-                              return Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.remove),
-                                    onPressed: () {
-                                      if (quantity > 0) {
-                                        cart.decrementQuantity(
-                                            offer['id'] ?? '');
-                                      }
-                                    },
-                                    style: IconButton.styleFrom(
-                                      backgroundColor: quantity > 0
-                                          ? primaryColor.withOpacity(0.1)
-                                          : Colors.grey.withOpacity(0.1),
-                                      padding: EdgeInsets.zero,
-                                    ),
-                                  ),
-                                  SizedBox(width: getScreenWidth(5)),
-                                  Text(
-                                    quantity.toString(),
-                                    style: TextStyle(
-                                      fontSize: getScreenWidth(18),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(width: getScreenWidth(5)),
-                                  IconButton(
-                                    icon: Icon(Icons.add),
-                                    onPressed: () {
-                                      if (quantity < CartProvider.maxQuantity) {
-                                        if (quantity == 0) {
-                                          cart.addItem(
-                                            offer['id'] ?? '',
-                                            offer['productOfferDescription'] ??
-                                                '',
-                                            double.parse(offer['productPrice']
-                                                    ?.toString() ??
-                                                '0'),
-                                            offer['productOfferImageUrl'] ?? '',
-                                          );
-                                        } else {
-                                          cart.incrementQuantity(
-                                              offer['id'] ?? '');
-                                        }
-                                      } else {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                                'Maximum quantity reached'),
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    style: IconButton.styleFrom(
-                                      backgroundColor:
-                                          quantity < CartProvider.maxQuantity
-                                              ? primaryColor.withOpacity(0.1)
-                                              : Colors.grey.withOpacity(0.1),
-                                      padding: EdgeInsets.zero,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                          SizedBox(height: getScreenHeight(16)),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+  void _showDetailsBottomSheet(BuildContext context, Map<String, dynamic> data,
+      {bool isOffer = true}) {
+    final imageUrl =
+        isOffer ? data['productOfferImageUrl'] : data['rewardSchemeImageUrl'];
+    final description = isOffer
+        ? data['productOfferDescription']
+        : data['rewardSchemeDescription'];
 
-  void _showRewardSchemeBottomSheet(
-      BuildContext context, Map<String, dynamic> scheme) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -647,7 +447,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                 BorderRadius.circular(getScreenWidth(12)),
                             child: FadeInImage.assetNetwork(
                               placeholder: 'assets/images/app_file_icon.png',
-                              image: scheme['rewardSchemeImageUrl'] ?? '',
+                              image: imageUrl ?? '',
                               width: double.infinity,
                               height: MediaQuery.of(context).size.height * 0.4,
                               fit: BoxFit.contain,
@@ -666,14 +466,19 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                             ),
                           ),
                         ),
-                        if (scheme['rewardSchemeDescription'] != null)
+                        if (description != null)
                           Container(
                             width: double.infinity,
                             padding: EdgeInsets.all(getScreenWidth(12)),
                             margin:
                                 EdgeInsets.only(bottom: getScreenHeight(16)),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.circular(getScreenWidth(12)),
+                            ),
                             child: Text(
-                              scheme['rewardSchemeDescription'] ?? '',
+                              description ?? '',
                               style: TextStyle(
                                 fontSize: getScreenWidth(16),
                                 color: Colors.black87,
@@ -681,6 +486,97 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                 fontFamily: bold,
                               ),
                             ),
+                          ),
+                        if (isOffer && USER_ACCOUNT_TYPE == 'Dealer')
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: getScreenWidth(8),
+                              vertical: getScreenHeight(4),
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.circular(getScreenWidth(8)),
+                            ),
+                            child: Text(
+                              'Price: ₹${data['productPrice'] ?? '0'}',
+                              style: TextStyle(
+                                fontSize: getScreenWidth(14),
+                                fontFamily: bold,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ),
+                        if (isOffer && USER_ACCOUNT_TYPE == 'Dealer')
+                          Consumer<CartProvider>(
+                            builder: (ctx, cart, child) {
+                              int quantity = cart.getQuantity(data['id'] ?? '');
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.remove),
+                                    onPressed: () {
+                                      if (quantity > 0) {
+                                        cart.decrementQuantity(
+                                            data['id'] ?? '');
+                                      }
+                                    },
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: quantity > 0
+                                          ? primaryColor.withOpacity(0.1)
+                                          : Colors.grey.withOpacity(0.1),
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                  ),
+                                  SizedBox(width: getScreenWidth(5)),
+                                  Text(
+                                    '$quantity',
+                                    style: TextStyle(
+                                      fontSize: getScreenWidth(18),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(width: getScreenWidth(5)),
+                                  IconButton(
+                                    icon: Icon(Icons.add),
+                                    onPressed: () {
+                                      if (quantity < CartProvider.maxQuantity) {
+                                        if (quantity == 0) {
+                                          cart.addItem(
+                                            data['id'] ?? '',
+                                            data['productOfferDescription'] ??
+                                                '',
+                                            double.parse(data['productPrice']
+                                                    ?.toString() ??
+                                                '0'),
+                                            data['productOfferImageUrl'] ?? '',
+                                          );
+                                        } else {
+                                          cart.incrementQuantity(
+                                              data['id'] ?? '');
+                                        }
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                'Maximum quantity reached'),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    style: IconButton.styleFrom(
+                                      backgroundColor:
+                                          quantity < CartProvider.maxQuantity
+                                              ? primaryColor.withOpacity(0.1)
+                                              : Colors.grey.withOpacity(0.1),
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                       ],
                     ),
@@ -844,22 +740,18 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          // margin: EdgeInsets.symmetric(horizontal: getScreenWidth(16)),
-          // padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
-          child: Text(
-            'Ongoing Offers',
-            style: TextStyle(
-              decorationThickness: 1.5,
-              fontSize: unitHeightValue * 0.03,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF3533CD),
-            ),
-            textAlign: TextAlign.center,
+        Text(
+          'Ongoing Offers',
+          style: TextStyle(
+            decorationThickness: 1.5,
+            fontSize: unitHeightValue * 0.03,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF3533CD),
           ),
+          textAlign: TextAlign.center,
         ),
         SizedBox(
-          height: getScreenHeight(USER_ACCOUNT_TYPE == 'Dealer' ? 315 : 290),
+          height: getScreenHeight(USER_ACCOUNT_TYPE == 'Dealer' ? 315 : 300),
           child: Container(
             margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
             child: PageView.builder(
@@ -870,7 +762,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                 if (index < productOffers.length) {
                   final item = productOffers[index];
                   return GestureDetector(
-                    onTap: () => _showOfferBottomSheet(context, item),
+                    onTap: () =>
+                        _showDetailsBottomSheet(context, item, isOffer: true),
                     child: Container(
                       width: getScreenWidth(200),
                       margin: EdgeInsets.symmetric(
@@ -891,11 +784,11 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                         ],
                       ),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           SizedBox(
-                            height: getScreenHeight(200),
+                            height: getScreenHeight(210),
                             child: ClipRRect(
                               borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(getScreenWidth(16))),
@@ -924,7 +817,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                 children: [
                                   Text(
                                     item['productOfferDescription'] ?? '',
-                                    maxLines: 3,
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: getScreenWidth(12),
@@ -933,15 +826,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                     ),
                                   ),
                                   SizedBox(
-                                    height: (item['productOfferDescription']
-                                                    ?.split('\n')
-                                                    .length ??
-                                                1) >
-                                            1
-                                        ? getScreenHeight(2)
-                                        : getScreenHeight(8),
+                                    height: getScreenHeight(2),
                                   ),
-                                  // SizedBox(height: getScreenHeight(4)),
                                   Visibility(
                                     visible: USER_ACCOUNT_TYPE == 'Dealer',
                                     child: Row(
@@ -1075,7 +961,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                 ],
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -1123,8 +1009,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                     }
                     final scheme = rewardSchemes[index];
                     return GestureDetector(
-                      onTap: () =>
-                          _showRewardSchemeBottomSheet(context, scheme),
+                      onTap: () => _showDetailsBottomSheet(context, scheme,
+                          isOffer: false),
                       child: Transform.scale(
                         scale: scale,
                         child: Align(
