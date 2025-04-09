@@ -469,17 +469,17 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                               horizontal: getScreenWidth(8),
                               vertical: getScreenHeight(4),
                             ),
-                            decoration: BoxDecoration(
-                              color: accentColor.withOpacity(0.7),
-                              borderRadius:
-                                  BorderRadius.circular(getScreenWidth(8)),
-                            ),
+                            // decoration: BoxDecoration(
+                            //   color: accentColor.withOpacity(0.7),
+                            //   borderRadius:
+                            //       BorderRadius.circular(getScreenWidth(8)),
+                            // ),
                             child: Text(
                               'Price: ₹${offer['productPrice'] ?? '0'}',
                               style: TextStyle(
                                 fontSize: getScreenWidth(14),
                                 fontFamily: bold,
-                                color: Colors.white,
+                                color: Colors.green,
                               ),
                             ),
                           ),
@@ -506,7 +506,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                       padding: EdgeInsets.zero,
                                     ),
                                   ),
-                                  // SizedBox(width: getScreenWidth(16)),
+                                  SizedBox(width: getScreenWidth(5)),
                                   Text(
                                     quantity.toString(),
                                     style: TextStyle(
@@ -514,7 +514,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  SizedBox(width: getScreenWidth(16)),
+                                  SizedBox(width: getScreenWidth(5)),
                                   IconButton(
                                     icon: Icon(Icons.add),
                                     onPressed: () {
@@ -716,12 +716,11 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
             controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.symmetric(horizontal: getScreenWidth(10)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   returnNameRewards(),
-                  // returnNewProductsScroll(),
                   returnProductsScroll(),
                   returnRewardsScroll(),
                 ],
@@ -737,7 +736,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     final double screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
-      margin: EdgeInsets.only(bottom: getScreenHeight(16)),
+      margin: EdgeInsets.only(bottom: getScreenHeight(10)),
       padding: EdgeInsets.symmetric(
         horizontal: getScreenWidth(16),
         vertical: getScreenHeight(8),
@@ -824,7 +823,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
   returnProductsScroll() {
     PageController _pageController = PageController(viewportFraction: 0.6);
 
-    Timer.periodic(Duration(seconds: 2), (Timer timer) {
+    Timer.periodic(Duration(seconds: 6), (Timer timer) {
       if (_pageController.hasClients && productOffers.isNotEmpty) {
         int nextPage = (_pageController.page?.toInt() ?? 0) + 1;
         if (nextPage >= productOffers.length) {
@@ -832,7 +831,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
         }
         _pageController.animateToPage(
           nextPage,
-          duration: Duration(milliseconds: 500),
+          duration: Duration(seconds: 3),
           curve: Curves.easeInOut,
         );
       }
@@ -846,8 +845,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          margin: EdgeInsets.symmetric(horizontal: getScreenWidth(16)),
-          padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
+          // margin: EdgeInsets.symmetric(horizontal: getScreenWidth(16)),
+          // padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
           child: Text(
             'Ongoing Offers',
             style: TextStyle(
@@ -860,7 +859,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
           ),
         ),
         SizedBox(
-          height: getScreenHeight(USER_ACCOUNT_TYPE == 'Dealer' ? 260 : 240),
+          height: getScreenHeight(USER_ACCOUNT_TYPE == 'Dealer' ? 315 : 290),
           child: Container(
             margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
             child: PageView.builder(
@@ -879,7 +878,8 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                           vertical: screenHeight * 0.01),
                       padding: EdgeInsets.only(top: getScreenHeight(4)),
                       decoration: BoxDecoration(
-                        color: const Color(0x33800180),
+                        // color: const Color(0x33800180),
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(getScreenWidth(20)),
                         boxShadow: [
                           BoxShadow(
@@ -895,7 +895,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           SizedBox(
-                            height: getScreenHeight(140),
+                            height: getScreenHeight(200),
                             child: ClipRRect(
                               borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(getScreenWidth(16))),
@@ -916,7 +916,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                           Expanded(
                             child: Padding(
                               padding: EdgeInsets.symmetric(
-                                  vertical: getScreenWidth(8),
+                                  vertical: getScreenHeight(5),
                                   horizontal: getScreenWidth(8)),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -924,7 +924,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                 children: [
                                   Text(
                                     item['productOfferDescription'] ?? '',
-                                    maxLines: 2,
+                                    maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: getScreenWidth(12),
@@ -932,7 +932,16 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
                                       color: Colors.black,
                                     ),
                                   ),
-                                  SizedBox(height: getScreenHeight(4)),
+                                  SizedBox(
+                                    height: (item['productOfferDescription']
+                                                    ?.split('\n')
+                                                    .length ??
+                                                1) >
+                                            1
+                                        ? getScreenHeight(2)
+                                        : getScreenHeight(8),
+                                  ),
+                                  // SizedBox(height: getScreenHeight(4)),
                                   Visibility(
                                     visible: USER_ACCOUNT_TYPE == 'Dealer',
                                     child: Row(
@@ -1088,7 +1097,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
+          // padding: EdgeInsets.symmetric(vertical: getScreenHeight(10)),
           child: Text(
             'Reward Schemes',
             style: TextStyle(
