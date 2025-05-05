@@ -436,6 +436,38 @@ class MyDrawer extends StatelessWidget {
                         Navigator.pushNamed(context, '/pointsLedgerPage');
                       },
                     ),
+                    ListTile(
+                      title: Padding(
+                        padding: EdgeInsets.only(left: screenWidth * 0.05),
+                        child: Text(
+                          'Products',
+                          style: TextStyle(
+                            color: const Color(0xFF3533CD),
+                            fontFamily: ffGSemiBold,
+                            fontSize: screenHeight * 0.022,
+                          ),
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/ProductsCatalogScreen');
+                      },
+                    ),
+                    ListTile(
+                      title: Padding(
+                        padding: EdgeInsets.only(left: screenWidth * 0.05),
+                        child: Text(
+                          'My Orders',
+                          style: TextStyle(
+                            color: const Color(0xFF3533CD),
+                            fontFamily: ffGSemiBold,
+                            fontSize: screenHeight * 0.022,
+                          ),
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/pointsLedgerPage');
+                      },
+                    ),
                   ],
                 ),
               ),

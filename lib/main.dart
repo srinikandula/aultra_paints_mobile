@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:aultra_paints_mobile/screens/LayOut/LayOutPage.dart';
+import 'package:aultra_paints_mobile/screens/catalog/ProductsCatalogScreen.dart';
 import 'package:aultra_paints_mobile/screens/dashboard/DashboardNewPage.dart';
 import 'package:aultra_paints_mobile/screens/dashboard/PainterPopUpPage.dart';
 import 'package:aultra_paints_mobile/screens/launch/launchPage.dart';
@@ -29,7 +30,17 @@ import 'screens/splash/SplashPage.dart';
 import '/screens/dashboard/DashboardPage.dart';
 import '/screens/authentication/signup/SignupPage.dart';
 
+void configLoading() {
+  EasyLoading.instance
+    ..loadingStyle = EasyLoadingStyle.dark
+    ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+    ..maskType = EasyLoadingMaskType.black
+    ..userInteractions = false
+    ..dismissOnTap = false;
+}
+
 Future<void> main() async {
+  configLoading();
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider<LoginViewModel>(
@@ -47,53 +58,13 @@ Future<void> main() async {
     ],
     child: MyApp(),
   ));
-  configLoading();
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  State createState() {
-    return MyAppState();
-  }
-}
-
-void configLoading() {
-  EasyLoading.instance
-    ..displayDuration = const Duration(milliseconds: 2000)
-    ..indicatorType = EasyLoadingIndicatorType.fadingCube
-    ..loadingStyle = EasyLoadingStyle.dark
-    ..indicatorSize = 45.0
-    ..radius = 10.0
-    ..progressColor = Colors.yellow
-    ..backgroundColor = Colors.green
-    ..indicatorColor = Colors.yellow
-    ..textColor = Colors.yellow
-    ..maskColor = Colors.blue.withOpacity(0.5)
-    ..userInteractions = true
-    ..dismissOnTap = false
-    ..customAnimation = CustomAnimation();
-}
-
-class MyAppState extends State<MyApp> {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    WidgetsFlutterBinding.ensureInitialized();
-    
-    // Initialize auth provider
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<AuthProvider>(context, listen: false).initialize();
-    });
-    
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      statusBarBrightness:
-          Platform.isAndroid ? Brightness.dark : Brightness.light,
-      systemNavigationBarColor: Colors.white,
-      systemNavigationBarDividerColor: Colors.grey,
-      systemNavigationBarIconBrightness: Brightness.dark,
-    ));
     return MaterialApp(
+      builder: EasyLoading.init(),
       // title: '',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -101,7 +72,6 @@ class MyAppState extends State<MyApp> {
       ),
       home: const SplashPage(),
       // home: const DashboardPage(),
-      builder: EasyLoading.init(),
       routes: {
         "/splashPage": (context) => const SplashPage(),
         "/launchPage": (context) => const LaunchPage(),
@@ -113,7 +83,9 @@ class MyAppState extends State<MyApp> {
         "/qrScanner": (context) => const QrScanner(),
         "/painterPopUpPage": (context) => const PainterPopUpPage(),
         "/pointsLedgerPage": (context) => LayoutPage(child: PointsLedgerPage()),
-        "/cart": (context) => const CartScreen(),
+        "/cart": (context) => CartScreen(),
+        "/ProductsCatalogScreen": (context) =>
+            LayoutPage(child: ProductsCatalogScreen()),
       },
       onUnknownRoute: (settings) {
         return MaterialPageRoute(

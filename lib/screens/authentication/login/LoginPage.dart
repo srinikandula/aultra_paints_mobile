@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../services/error_handling.dart';
 import '../../../utility/loader.dart';
 import '/utility/check_internet.dart';
 import '/utility/size_config.dart';
@@ -98,22 +99,13 @@ class _LoginPageState extends State<LoginPage> {
         onLogin(tempFirstValue);
       } else {
         Loader.hideLoader(context);
-        _showSnackBar(
-          apiResp['message'],
-          context,
-          false,
-        );
+        error_handling.errorValidation(
+            context, response.statusCode, response.body, false);
       }
     } catch (e) {
-      // Handle errors
-      print('Error at catch: $e');
       Loader.hideLoader(context);
-      _showSnackBar(
-        "An error occurred: ${e.toString()}",
-        context,
-        false,
-      );
       print('Error: $e');
+      error_handling.errorValidation(context, '', e.toString(), false);
     }
   }
 

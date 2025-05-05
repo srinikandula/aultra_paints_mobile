@@ -10,12 +10,9 @@ import 'package:http/http.dart' as http;
 import '../../providers/cart_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/error_handling.dart';
-import '../../utility/Fonts.dart';
 import '../../utility/Utils.dart';
 import '../../services/config.dart';
 import '../../utility/size_config.dart';
-
-import '../ProductDetailsScreen.dart';
 
 class DashboardNewPage extends StatefulWidget {
   const DashboardNewPage({
@@ -42,11 +39,11 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
     {"title": "Reward Points ", "count": '0'},
   ];
 
-  // var productOffers = [];
-  List<dynamic> productOffers = []; // Store product offers
-  int currentPage = 1; // Current page for API pagination
-  bool isLoading = false; // Whether more data is being fetched
-  bool hasMore = true; // Check if more data is available
+  List<dynamic> productOffers = [];
+  int currentPage = 1;
+  bool isLoading = false;
+  bool hasMore = true;
+
   ScrollController _scrollController = ScrollController();
 
   bool saveOtpButtonLoader = false;
@@ -93,7 +90,6 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
       }
     });
 
-    // Start auto-scroll timer for product offers
     _startProductOffersAutoScroll();
   }
 
@@ -227,9 +223,7 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
           }
         });
       } else if (response.statusCode == 401) {
-        // Handle unauthorized error
         Navigator.pop(context);
-        // Clear auth and redirect to login
         await authProvider.clearAuth();
         Navigator.of(context).pushReplacementNamed('/login');
       } else {
@@ -268,41 +262,17 @@ class _DashboardNewPageState extends State<DashboardNewPage> {
         headers: authProvider.authHeaders,
         body: json.encode({'page': currentPage, 'limit': 100}),
       );
-      final responseData = json.decode(response.body);
+
       if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print('productOffers responseData====>${responseData}');
         setState(() {
           // Ensure each offer has a valid ID
           var data = responseData['data'] as List;
-          // print('=====responseee=========${data}');
           productOffers = data.map((offer) {
-            String id;
-            // if (offer['id'] == null || offer['id'].toString().isEmpty) {
-            //   // Use productCode as primary identifier, fallback to productId, then to timestamp
-            //   String? productCode = offer['productCode']?.toString();
-            //   if (productCode != null && productCode.isNotEmpty) {
-            //     id = productCode;
-            //   } else {
-            //     String? productId = offer['productId']?.toString();
-            //     if (productId != null && productId.isNotEmpty) {
-            //       id = productId;
-            //     } else {
-            //       // Use index-based ID to ensure uniqueness
-            //       id =
-            //           'product_${DateTime.now().millisecondsSinceEpoch}_${data.indexOf(offer)}';
-            //     }
-            //   }
-            //   offer['id'] = id;
-            // } else {
-            //   id = offer['id'].toString();
-            // }
-            // offer['productPrice'] = offer['productPrice'] ?? '0';
             offer['id'] = offer['_id'];
             return offer;
           }).toList();
-
-          // for (var offer in productOffers) {
-          //   // print('=====Total=========${offer}');
-          // }
         });
         setState(() => isLoading = false);
         return true;
