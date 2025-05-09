@@ -19,6 +19,7 @@ import '../../services/config.dart';
 import '../../utility/size_config.dart';
 
 import '../ProductDetailsScreen.dart';
+import '../cart/CartScreen.dart';
 
 class ProductsCatalogScreen extends StatefulWidget {
   @override
@@ -148,8 +149,6 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -166,10 +165,7 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.04,
-                vertical: 16.0,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: getScreenWidth(10)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -181,10 +177,58 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
                       color: const Color(0xFF3533CD),
                     ),
                   ),
+                  Consumer<CartProvider>(
+                    builder: (context, cart, child) {
+                      return Stack(
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.shopping_cart,
+                              color: Color(0xFF3533CD),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CartScreen()),
+                              );
+                            },
+                          ),
+                          if (cart.itemCount > 0)
+                            Positioned(
+                              right: 6,
+                              top: 6,
+                              child: Container(
+                                padding: EdgeInsets.all(2),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                constraints: BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Text(
+                                  '${cart.itemCount}',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
-            returnCatalogScroll(),
+            Expanded(
+              child: returnCatalogScroll(),
+            ),
           ],
         ),
       ),
@@ -192,85 +236,63 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
   }
 
   returnCatalogScroll() {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double unitHeightValue = MediaQuery.of(context).size.height;
-
-    return Expanded(
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-        child: ListView.builder(
-          scrollDirection: Axis.vertical,
-          itemCount: (catalogOffers.length / 2).ceil(),
-          itemBuilder: (context, index) {
-            int firstIndex = index * 2;
-            int secondIndex = firstIndex + 1;
-            return Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _showDetailsBottomSheet(
-                        context, catalogOffers[firstIndex],
-                        isOffer: true),
-                    child: _buildCatalogCard(catalogOffers[firstIndex]),
-                  ),
-                ),
-                Expanded(
-                  child: secondIndex < catalogOffers.length
-                      ? GestureDetector(
-                          onTap: () => _showDetailsBottomSheet(
-                              context, catalogOffers[secondIndex],
-                              isOffer: true),
-                          child: _buildCatalogCard(catalogOffers[secondIndex]),
-                        )
-                      : SizedBox.shrink(),
-                ),
-              ],
-            );
-          },
-        ),
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: getScreenWidth(10)),
+      child: GridView.count(
+        crossAxisCount: 2,
+        mainAxisSpacing: 8.0,
+        crossAxisSpacing: 8.0,
+        childAspectRatio: 0.75, // More compact card
+        children: List.generate(catalogOffers.length, (index) {
+          return GestureDetector(
+            onTap: () => _showDetailsBottomSheet(context, catalogOffers[index],
+                isOffer: true),
+            child: _buildCatalogCard(catalogOffers[index]),
+          );
+        }),
       ),
     );
   }
 
   Widget _buildCatalogCard(Map<String, dynamic> item) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-      padding: EdgeInsets.all(8.0),
+      margin: EdgeInsets.symmetric(
+          horizontal: getScreenWidth(2), vertical: getScreenHeight(2)),
+      padding: EdgeInsets.symmetric(horizontal: getScreenWidth(10)),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(getScreenWidth(10)),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 3),
+            blurRadius: 8,
+            offset: Offset(0, 2),
           ),
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12.0),
-            child: FadeInImage.assetNetwork(
-              placeholder: 'assets/images/app_file_icon.png',
-              image: item['productOfferImageUrl'] ?? '',
-              height: 120,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              imageErrorBuilder: (context, error, stackTrace) {
-                return Image.asset(
-                  'assets/images/app_file_icon.png',
-                  height: 120,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                );
-              },
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(getScreenWidth(12)),
+              child: FadeInImage.assetNetwork(
+                placeholder: 'assets/images/app_file_icon.png',
+                image: item['productOfferImageUrl'] ?? '',
+                width: double.infinity,
+                fit: BoxFit.contain,
+                imageErrorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/images/app_file_icon.png',
+                    width: double.infinity,
+                    fit: BoxFit.contain,
+                  );
+                },
+              ),
             ),
           ),
-          SizedBox(height: 8),
+          // SizedBox(height: getScreenHeight(8)),
           Text(
             item['productOfferDescription'] ?? 'No Description',
             maxLines: 2,
@@ -280,15 +302,15 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 4),
+          SizedBox(height: getScreenHeight(4)),
           Text(
             'Price: ₹${item['productPrice'] ?? '0'}',
             style: TextStyle(
-              fontSize: 12,
+              fontSize: getScreenWidth(12),
               color: Colors.grey[700],
             ),
           ),
-          SizedBox(height: 8),
+          // SizedBox(height: getScreenHeight(8)),
           Consumer<CartProvider>(
             builder: (context, cart, child) {
               int quantity = cart.getQuantity(item['id'] ?? '');
@@ -303,20 +325,22 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
                   ),
                   Text(
                     '$quantity',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: getScreenWidth(16),
+                        fontWeight: FontWeight.bold),
                   ),
                   IconButton(
                     icon: Icon(Icons.add),
                     onPressed: () {
-                      if (quantity > 0) {
-                        cart.incrementQuantity(item['id'] ?? '');
-                      } else {
+                      if (quantity == 0) {
                         cart.addItem(
                           item['id'] ?? '',
-                          item['productOfferDescription'] ?? 'Unknown',
-                          item['productPrice'] ?? 0.0,
+                          item['productOfferDescription'] ?? '',
+                          double.parse(item['productPrice']?.toString() ?? '0'),
                           item['productOfferImageUrl'] ?? '',
                         );
+                      } else {
+                        cart.incrementQuantity(item['id'] ?? '');
                       }
                     },
                   ),

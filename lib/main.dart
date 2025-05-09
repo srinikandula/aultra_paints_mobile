@@ -13,6 +13,7 @@ import 'package:aultra_paints_mobile/providers/cart_provider.dart';
 import 'package:aultra_paints_mobile/providers/auth_provider.dart';
 
 import '/screens/authentication/otp/OtpPage.dart';
+import 'screens/myOrders/myOrdersPage.dart';
 import 'screens/orders/createOrder/CreateOrders.dart';
 import 'screens/orders/createProduct/CreateProduct.dart';
 import 'screens/orders/orderDetails/OrderDetails.dart';
@@ -86,6 +87,7 @@ class MyApp extends StatelessWidget {
         "/cart": (context) => CartScreen(),
         "/ProductsCatalogScreen": (context) =>
             LayoutPage(child: ProductsCatalogScreen()),
+        "/myOrdersPage": (context) => LayoutPage(child: MyOrdersPage()),
       },
       onUnknownRoute: (settings) {
         return MaterialPageRoute(

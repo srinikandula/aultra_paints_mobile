@@ -10,6 +10,11 @@ const IOS_APP_VERSION = '1.0.0';
 //dealer 92-123456,
 //admin 91-123456,
 
+//Super User
+//Sales Executive
+//Dealer
+//Painter
+
 const POST_SEND_LOGIN_OTP = "auth/loginWithOTP"; //send otp
 const POST_VERIFY_LOGIN_OTP = "auth/verifyOTP"; //verify otp
 const POST_LOGIN_DETAILS = "auth/login"; //login
@@ -39,6 +44,8 @@ const POST_SCANNED_DATA = "transaction/redeemPoints"; //new api with POST
 // const GET_PRODUCT_OFFERS = "productOffers/getProductOffers";
 const GET_PRODUCT_OFFERS = "productOffers/searchProductOffers";
 const GET_CATALOG_SEARCH = "productCatlog/search"; //new api for catalog
+
+const GET_CART_ORDERS_LIST = "order/orders";
 
 const CREATE_CHECKOUT = "/order/create"; //checkout
 

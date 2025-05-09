@@ -465,7 +465,7 @@ class MyDrawer extends StatelessWidget {
                         ),
                       ),
                       onTap: () {
-                        Navigator.pushNamed(context, '/pointsLedgerPage');
+                        Navigator.pushNamed(context, '/myOrdersPage');
                       },
                     ),
                   ],
