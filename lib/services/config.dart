@@ -45,6 +45,8 @@ const POST_SCANNED_DATA = "transaction/redeemPoints"; //new api with POST
 const GET_PRODUCT_OFFERS = "productOffers/searchProductOffers";
 const GET_CATALOG_SEARCH = "productCatlog/search"; //new api for catalog
 
+const UPDATE_ORDER_STATUS = "order/updateOrderStatus"; // update order status
+
 const GET_CART_ORDERS_LIST = "order/orders";
 
 const CREATE_CHECKOUT = "/order/create"; //checkout

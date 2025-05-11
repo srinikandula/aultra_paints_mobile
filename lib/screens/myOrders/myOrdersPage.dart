@@ -273,13 +273,16 @@ class _MyOrdersPageState extends State<MyOrdersPage>
         }
 
         return InkWell(
-          onTap: () {
-            Navigator.push(
+          onTap: () async {
+            final result = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => OrderDetailsScreen(order: order),
               ),
             );
+            if (result == true) {
+              _reloadOrders();
+            }
           },
           child: Card(
             margin: EdgeInsets.symmetric(
