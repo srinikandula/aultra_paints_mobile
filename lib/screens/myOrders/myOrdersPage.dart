@@ -98,17 +98,19 @@ class _MyOrdersPageState extends State<MyOrdersPage>
       final apiUrl = BASE_URL + GET_CART_ORDERS_LIST;
       var query = {
         'page': currentPage,
-        'limit': 10,
+        'limit': 1000,
       };
-      final response = await http.get(
+      final response = await http.post(
         Uri.parse(apiUrl),
         headers: {
           "Content-Type": "application/json",
           "Authorization": accesstoken!,
         },
+        body: json.encode(query),
       );
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
+        print('responseData======>${responseData}');
 
         if (responseData['orders'] is List) {
           List<dynamic> newData = responseData['orders'];

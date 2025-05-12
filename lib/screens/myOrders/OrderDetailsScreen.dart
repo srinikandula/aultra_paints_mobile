@@ -7,14 +7,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'order_status_action.dart';
 import '../../services/config.dart';
 import '../../services/error_handling.dart';
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   final Map<String, dynamic> order;
+
   const OrderDetailsScreen({Key? key, required this.order}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    print('order====>${order}');
+    final accountType =
+        Provider.of<AuthProvider>(context).userAccountType ?? '';
+    print('accountType====>${accountType}');
     final String orderId = order['orderId']?.toString() ?? '-';
 
     final String status =
@@ -242,7 +247,8 @@ class OrderDetailsScreen extends StatelessWidget {
                 ),
                 // Bottom button (fixed)
                 Visibility(
-                  // visible: order['status'] == 'PENDING',
+                  visible: order['status'] == 'PENDING' &&
+                      accountType == 'SalesExecutive',
                   child: Padding(
                     padding: EdgeInsets.only(
                       left: getScreenWidth(20),
@@ -301,30 +307,33 @@ class OrderDetailsScreen extends StatelessWidget {
   Future<void> _updateOrderStatusApi(
       BuildContext context, String status) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
+    Utils.returnScreenLoader(context);
     try {
       final prefs = await SharedPreferences.getInstance();
       final accessToken = prefs.getString('accessToken') ?? '';
       final apiUrl = BASE_URL + UPDATE_ORDER_STATUS;
+      final tempBody = json.encode({
+        'orderId': order['orderId'],
+        'isVerified': status == 'APPROVED'
+            ? 1
+            : status == 'REJECTED'
+                ? 0
+                : null,
+      });
       final response = await http.put(
         Uri.parse(apiUrl),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': accessToken,
         },
-        body: json.encode({
-          'orderId': order['orderId'],
-          'isVerified': status == 'Verified'
-              ? 1
-              : status == 'Rejected'
-                  ? 0
-                  : null,
-        }),
+        body: tempBody,
       );
       final responseData = json.decode(response.body);
       if (response.statusCode == 200) {
+        Navigator.pop(context);
         scaffoldMessenger.showSnackBar(
           SnackBar(
-              content: Text('Order status updated to $status'),
+              content: Text(responseData['message'] ?? 'Order status updated'),
               backgroundColor: Colors.green),
         );
         Navigator.pop(context, true);
@@ -333,6 +342,7 @@ class OrderDetailsScreen extends StatelessWidget {
             responseData['message'] ?? 'Failed', false);
       }
     } catch (e) {
+      Navigator.pop(context, true);
       scaffoldMessenger.showSnackBar(
         SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
       );

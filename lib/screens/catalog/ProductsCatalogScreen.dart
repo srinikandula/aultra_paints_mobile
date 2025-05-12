@@ -177,52 +177,53 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
                       color: const Color(0xFF3533CD),
                     ),
                   ),
-                  Consumer<CartProvider>(
-                    builder: (context, cart, child) {
-                      return Stack(
-                        children: [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.shopping_cart,
-                              color: Color(0xFF3533CD),
+                  if (USER_ACCOUNT_TYPE == 'Dealer')
+                    Consumer<CartProvider>(
+                      builder: (context, cart, child) {
+                        return Stack(
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.shopping_cart,
+                                color: Color(0xFF3533CD),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CartScreen()),
+                                );
+                              },
                             ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => CartScreen()),
-                              );
-                            },
-                          ),
-                          if (cart.itemCount > 0)
-                            Positioned(
-                              right: 6,
-                              top: 6,
-                              child: Container(
-                                padding: EdgeInsets.all(2),
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                constraints: BoxConstraints(
-                                  minWidth: 16,
-                                  minHeight: 16,
-                                ),
-                                child: Text(
-                                  '${cart.itemCount}',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
+                            if (cart.itemCount > 0)
+                              Positioned(
+                                right: 6,
+                                top: 6,
+                                child: Container(
+                                  padding: EdgeInsets.all(2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                  textAlign: TextAlign.center,
+                                  constraints: BoxConstraints(
+                                    minWidth: 16,
+                                    minHeight: 16,
+                                  ),
+                                  child: Text(
+                                    '${cart.itemCount}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
                               ),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
+                          ],
+                        );
+                      },
+                    ),
                 ],
               ),
             ),
@@ -311,43 +312,45 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
             ),
           ),
           // SizedBox(height: getScreenHeight(8)),
-          Consumer<CartProvider>(
-            builder: (context, cart, child) {
-              int quantity = cart.getQuantity(item['id'] ?? '');
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.remove),
-                    onPressed: quantity > 0
-                        ? () => cart.decrementQuantity(item['id'] ?? '')
-                        : null,
-                  ),
-                  Text(
-                    '$quantity',
-                    style: TextStyle(
-                        fontSize: getScreenWidth(16),
-                        fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.add),
-                    onPressed: () {
-                      if (quantity == 0) {
-                        cart.addItem(
-                          item['id'] ?? '',
-                          item['productOfferDescription'] ?? '',
-                          double.parse(item['productPrice']?.toString() ?? '0'),
-                          item['productOfferImageUrl'] ?? '',
-                        );
-                      } else {
-                        cart.incrementQuantity(item['id'] ?? '');
-                      }
-                    },
-                  ),
-                ],
-              );
-            },
-          ),
+          if (USER_ACCOUNT_TYPE == 'Dealer')
+            Consumer<CartProvider>(
+              builder: (context, cart, child) {
+                int quantity = cart.getQuantity(item['id'] ?? '');
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.remove),
+                      onPressed: quantity > 0
+                          ? () => cart.decrementQuantity(item['id'] ?? '')
+                          : null,
+                    ),
+                    Text(
+                      '$quantity',
+                      style: TextStyle(
+                          fontSize: getScreenWidth(16),
+                          fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.add),
+                      onPressed: () {
+                        if (quantity == 0) {
+                          cart.addItem(
+                            item['id'] ?? '',
+                            item['productOfferDescription'] ?? '',
+                            double.parse(
+                                item['productPrice']?.toString() ?? '0'),
+                            item['productOfferImageUrl'] ?? '',
+                          );
+                        } else {
+                          cart.incrementQuantity(item['id'] ?? '');
+                        }
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
         ],
       ),
     );
@@ -477,7 +480,7 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
                               ),
                             ),
                           ),
-                        if (isOffer && USER_ACCOUNT_TYPE == 'Dealer')
+                        if (USER_ACCOUNT_TYPE == 'Dealer') ...[
                           Container(
                             padding: EdgeInsets.symmetric(
                               horizontal: getScreenWidth(8),
@@ -497,7 +500,6 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
                               ),
                             ),
                           ),
-                        if (isOffer && USER_ACCOUNT_TYPE == 'Dealer')
                           Consumer<CartProvider>(
                             builder: (ctx, cart, child) {
                               int quantity = cart.getQuantity(data['id'] ?? '');
@@ -568,6 +570,7 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
                               );
                             },
                           ),
+                        ],
                       ],
                     ),
                   ),

@@ -9,6 +9,7 @@ const IOS_APP_VERSION = '1.0.0';
 //painter 94-123456,
 //dealer 92-123456,
 //admin 91-123456,
+//sales executive 771-123456
 
 //Super User
 //Sales Executive
