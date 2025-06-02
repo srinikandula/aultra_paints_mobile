@@ -42,12 +42,22 @@ class CartScreen extends StatelessWidget {
     var apiUrl = BASE_URL + CREATE_CHECKOUT;
 
     List<Map<String, dynamic>> itemsJson = cartItems.map((item) {
+      var volume;
+      var actualId;
+      if (item.id.contains('_')) {
+        actualId = item.id.split('_')[0];
+        volume = item.id.split('_')[1];
+      } else {
+        actualId = item.id;
+        volume = '';
+      }
       return {
-        "_id": item.id,
+        "_id": actualId,
         "productOfferDescription": item.name,
         "quantity": item.quantity,
         "productPrice": item.price,
-        "productOfferImageUrl": item.imageUrl
+        "productOfferImageUrl": item.imageUrl,
+        "volume": volume,
       };
     }).toList();
 
@@ -167,7 +177,7 @@ class CartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
     final cartItems = cart.items.values.toList();
-    print('cartItems====>${cartItems}');
+    // print('cartItems====>${cartItems}');
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(

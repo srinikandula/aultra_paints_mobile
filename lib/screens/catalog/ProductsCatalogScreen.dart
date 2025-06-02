@@ -507,8 +507,8 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
                               ),
                             if (USER_ACCOUNT_TYPE == 'Dealer') ...[
                               Container(
-                                width: getScreenWidth(300),
-                                height: getScreenHeight(40),
+                                width: double.infinity,
+                                height: getScreenHeight(30),
                                 child: ListView.builder(
                                   scrollDirection: Axis.horizontal,
                                   itemCount: data['productPrices']?.length ?? 0,
@@ -530,15 +530,23 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
                                           vertical: getScreenHeight(4),
                                         ),
                                         decoration: BoxDecoration(
-                                          color: Colors.white,
+                                          color: selectedProductPrice ==
+                                                  price['price'].toString()
+                                              ? const Color(0xFF7A0180)
+                                              : Colors.white,
                                           borderRadius: BorderRadius.circular(
                                             getScreenWidth(8),
                                           ),
                                         ),
                                         child: Text(
                                           '${price['volume'] ?? '0'}',
+                                          textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: getScreenWidth(14),
+                                            color: selectedProductPrice ==
+                                                    price['price'].toString()
+                                                ? Colors.white
+                                                : Colors.black87,
                                           ),
                                         ),
                                       ),
@@ -546,114 +554,123 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
                                   },
                                 ),
                               ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: getScreenWidth(8),
-                                      vertical: getScreenHeight(4),
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(
-                                          getScreenWidth(8)),
-                                    ),
-                                    child: Text(
-                                      'Price: ₹${selectedProductPrice}',
-                                      style: TextStyle(
-                                        fontSize: getScreenWidth(14),
-                                        fontFamily: bold,
-                                        color: Colors.green,
+                              Container(
+                                margin: EdgeInsets.only(
+                                  top: getScreenHeight(20),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: getScreenWidth(8),
+                                        vertical: getScreenHeight(4),
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(
+                                            getScreenWidth(8)),
+                                      ),
+                                      child: Text(
+                                        'Price: ₹${selectedProductPrice}',
+                                        style: TextStyle(
+                                          fontSize: getScreenWidth(14),
+                                          fontFamily: bold,
+                                          color: Colors.green,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Consumer<CartProvider>(
-                                    builder: (ctx, cart, child) {
-                                      final price =
-                                          data['productPrices']?.firstWhere(
-                                        (p) =>
-                                            p['price'].toString() ==
-                                            selectedProductPrice,
-                                        orElse: () => data['productPrices'][0],
-                                      );
-                                      final cartKey =
-                                          '${data['id']}_${price['volume']}';
-                                      int quantity = cart.getQuantity(cartKey);
-                                      return Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          IconButton(
-                                            icon: Icon(Icons.remove),
-                                            onPressed: () {
-                                              if (quantity > 0) {
-                                                cart.decrementQuantity(cartKey);
-                                              }
-                                            },
-                                            style: IconButton.styleFrom(
-                                              backgroundColor: quantity > 0
-                                                  ? primaryColor
-                                                      .withOpacity(0.1)
-                                                  : Colors.grey
-                                                      .withOpacity(0.1),
-                                              padding: EdgeInsets.zero,
-                                            ),
-                                          ),
-                                          SizedBox(width: getScreenWidth(5)),
-                                          Text(
-                                            '$quantity',
-                                            style: TextStyle(
-                                              fontSize: getScreenWidth(18),
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          SizedBox(width: getScreenWidth(5)),
-                                          IconButton(
-                                            icon: Icon(Icons.add),
-                                            onPressed: () {
-                                              if (quantity <
-                                                  CartProvider.maxQuantity) {
-                                                if (quantity == 0) {
-                                                  cart.addItem(
-                                                    cartKey,
-                                                    data['productOfferDescription'] ??
-                                                        '',
-                                                    double.parse(price['price']
-                                                        .toString()),
-                                                    data['productOfferImageUrl'] ??
-                                                        '',
-                                                  );
-                                                } else {
-                                                  cart.incrementQuantity(
+                                    Consumer<CartProvider>(
+                                      builder: (ctx, cart, child) {
+                                        final price =
+                                            data['productPrices']?.firstWhere(
+                                          (p) =>
+                                              p['price'].toString() ==
+                                              selectedProductPrice,
+                                          orElse: () =>
+                                              data['productPrices'][0],
+                                        );
+                                        final cartKey =
+                                            '${data['id']}_${price['volume']}';
+                                        int quantity =
+                                            cart.getQuantity(cartKey);
+                                        return Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            IconButton(
+                                              icon: Icon(Icons.remove),
+                                              onPressed: () {
+                                                if (quantity > 0) {
+                                                  cart.decrementQuantity(
                                                       cartKey);
                                                 }
-                                              } else {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                        'Maximum quantity reached'),
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                            style: IconButton.styleFrom(
-                                              backgroundColor: quantity <
-                                                      CartProvider.maxQuantity
-                                                  ? primaryColor
-                                                      .withOpacity(0.1)
-                                                  : Colors.grey
-                                                      .withOpacity(0.1),
-                                              padding: EdgeInsets.zero,
+                                              },
+                                              style: IconButton.styleFrom(
+                                                backgroundColor: quantity > 0
+                                                    ? primaryColor
+                                                        .withOpacity(0.1)
+                                                    : Colors.grey
+                                                        .withOpacity(0.1),
+                                                padding: EdgeInsets.zero,
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                ],
+                                            SizedBox(width: getScreenWidth(5)),
+                                            Text(
+                                              '$quantity',
+                                              style: TextStyle(
+                                                fontSize: getScreenWidth(18),
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            SizedBox(width: getScreenWidth(5)),
+                                            IconButton(
+                                              icon: Icon(Icons.add),
+                                              onPressed: () {
+                                                if (quantity <
+                                                    CartProvider.maxQuantity) {
+                                                  if (quantity == 0) {
+                                                    cart.addItem(
+                                                      cartKey,
+                                                      data['productOfferDescription'] ??
+                                                          '',
+                                                      double.parse(
+                                                          price['price']
+                                                              .toString()),
+                                                      data['productOfferImageUrl'] ??
+                                                          '',
+                                                    );
+                                                  } else {
+                                                    cart.incrementQuantity(
+                                                        cartKey);
+                                                  }
+                                                } else {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                          'Maximum quantity reached'),
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                              style: IconButton.styleFrom(
+                                                backgroundColor: quantity <
+                                                        CartProvider.maxQuantity
+                                                    ? primaryColor
+                                                        .withOpacity(0.1)
+                                                    : Colors.grey
+                                                        .withOpacity(0.1),
+                                                padding: EdgeInsets.zero,
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
                               )
                             ],
                           ],
