@@ -259,14 +259,33 @@ class CartScreen extends StatelessWidget {
                           child: Padding(
                             padding: EdgeInsets.symmetric(
                                 vertical: getScreenWidth(8),
-                                horizontal: getScreenWidth(16)),
+                                horizontal: getScreenWidth(2)),
                             child: Row(
                               children: [
                                 // Product image
-                                CircleAvatar(
-                                  backgroundImage:
-                                      NetworkImage(cartItems[i].imageUrl),
-                                  backgroundColor: Colors.transparent,
+                                Column(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage:
+                                          NetworkImage(cartItems[i].imageUrl),
+                                      backgroundColor: Colors.transparent,
+                                    ),
+                                    if (cartItems[i].id.contains('_')) ...[
+                                      SizedBox(height: getScreenWidth(2)),
+                                      Text(
+                                        cartItems[i]
+                                            .id
+                                            .split('_')
+                                            .sublist(1)
+                                            .join('_'),
+                                        style: TextStyle(
+                                          fontSize: getScreenWidth(12),
+                                          color: Colors.blueGrey,
+                                          fontFamily: 'Roboto',
+                                        ),
+                                      ),
+                                    ],
+                                  ],
                                 ),
                                 SizedBox(width: getScreenWidth(12)),
                                 // Product details

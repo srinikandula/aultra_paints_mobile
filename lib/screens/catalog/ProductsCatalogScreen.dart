@@ -571,8 +571,16 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
                                   ),
                                   Consumer<CartProvider>(
                                     builder: (ctx, cart, child) {
-                                      int quantity =
-                                          cart.getQuantity(data['id'] ?? '');
+                                      final price =
+                                          data['productPrices']?.firstWhere(
+                                        (p) =>
+                                            p['price'].toString() ==
+                                            selectedProductPrice,
+                                        orElse: () => data['productPrices'][0],
+                                      );
+                                      final cartKey =
+                                          '${data['id']}_${price['volume']}';
+                                      int quantity = cart.getQuantity(cartKey);
                                       return Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -581,8 +589,7 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
                                             icon: Icon(Icons.remove),
                                             onPressed: () {
                                               if (quantity > 0) {
-                                                cart.decrementQuantity(
-                                                    data['id'] ?? '');
+                                                cart.decrementQuantity(cartKey);
                                               }
                                             },
                                             style: IconButton.styleFrom(
@@ -610,19 +617,17 @@ class _ProductsCatalogScreenState extends State<ProductsCatalogScreen> {
                                                   CartProvider.maxQuantity) {
                                                 if (quantity == 0) {
                                                   cart.addItem(
-                                                    data['id'] ?? '',
+                                                    cartKey,
                                                     data['productOfferDescription'] ??
                                                         '',
-                                                    double.parse(
-                                                        data['productPrice']
-                                                                ?.toString() ??
-                                                            '0'),
+                                                    double.parse(price['price']
+                                                        .toString()),
                                                     data['productOfferImageUrl'] ??
                                                         '',
                                                   );
                                                 } else {
                                                   cart.incrementQuantity(
-                                                      data['id'] ?? '');
+                                                      cartKey);
                                                 }
                                               } else {
                                                 ScaffoldMessenger.of(context)
