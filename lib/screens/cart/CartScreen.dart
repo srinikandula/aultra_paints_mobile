@@ -49,7 +49,7 @@ class CartScreen extends StatelessWidget {
         volume = item.id.split('_')[1];
       } else {
         actualId = item.id;
-        volume = '';
+        volume = "0";
       }
       return {
         "_id": actualId,

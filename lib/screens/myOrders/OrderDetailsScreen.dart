@@ -194,11 +194,25 @@ class OrderDetailsScreen extends StatelessWidget {
                                     style: TextStyle(
                                         fontWeight: FontWeight.w500,
                                         fontSize: getScreenWidth(16))),
-                                subtitle: Text('Qty: ${item['quantity'] ?? 1}',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: getScreenWidth(16),
-                                        color: Color(0xFF6A1B9A))),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Qty: ${item['quantity'] ?? ""}',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: getScreenWidth(16),
+                                            color: Color(0xFF6A1B9A))),
+                                    Visibility(
+                                      visible: item['volume'] != "0",
+                                      child: Text(
+                                          'Volume: ${item['volume'] ?? ""}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: getScreenWidth(16),
+                                              color: Color(0xFF6A1B9A))),
+                                    ),
+                                  ],
+                                ),
                                 trailing: Text('₹${item['productPrice'] ?? 0}',
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -334,7 +348,8 @@ class OrderDetailsScreen extends StatelessWidget {
         scaffoldMessenger.showSnackBar(
           SnackBar(
               content: Text(responseData['message'] ?? 'Order status updated'),
-              backgroundColor: Colors.green),
+              backgroundColor:
+                  status == 'APPROVED' ? Colors.green : Colors.red),
         );
         Navigator.pop(context, true);
       } else {
