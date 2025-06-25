@@ -1,20 +1,23 @@
 // const BASE_URL = 'http://localhost:8080/api/'; //QA
 // const BASE_URL = 'http://192.168.1.4:4300/api/'; //QA
 
-// const BASE_URL = 'https://api.aultrapaints.com/api/'; //Admin
-const BASE_URL = 'https://mapp.aultrapaints.com/api/'; //QA
+const BASE_URL = 'https://api.aultrapaints.com/api/'; //Admin
+// const BASE_URL = 'https://mapp.aultrapaints.com/api/'; //QA
 
 const IOS_APP_VERSION = '1.0.0';
 
 //painter 94-123456,
 //dealer 92-123456,
-//admin 91-123456,
+//super user 91-123456,
 //sales executive 771-123456
 
 //Super User
 //Sales Executive
 //Dealer
 //Painter
+
+//com.aup.aultrapaints is current prod - new app
+//com.ap.aultrapaints is old prod - old app
 
 const POST_SEND_LOGIN_OTP = "auth/loginWithOTP"; //send otp
 const POST_VERIFY_LOGIN_OTP = "auth/verifyOTP"; //verify otp
