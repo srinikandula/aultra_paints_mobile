@@ -1,14 +1,19 @@
 import 'dart:io';
 
 import 'package:aultra_paints_mobile/screens/LayOut/LayOutPage.dart';
+import 'package:aultra_paints_mobile/screens/catalog/ProductsCatalogScreen.dart';
 import 'package:aultra_paints_mobile/screens/dashboard/DashboardNewPage.dart';
 import 'package:aultra_paints_mobile/screens/dashboard/PainterPopUpPage.dart';
 import 'package:aultra_paints_mobile/screens/launch/launchPage.dart';
 import 'package:aultra_paints_mobile/screens/painter/PainterPage.dart';
 import 'package:aultra_paints_mobile/screens/pointsLedger/pointsLedgerPage.dart';
 import 'package:aultra_paints_mobile/services/UserViewModel.dart';
+import 'package:aultra_paints_mobile/screens/cart/CartScreen.dart';
+import 'package:aultra_paints_mobile/providers/cart_provider.dart';
+import 'package:aultra_paints_mobile/providers/auth_provider.dart';
 
 import '/screens/authentication/otp/OtpPage.dart';
+import 'screens/myOrders/myOrdersPage.dart';
 import 'screens/orders/createOrder/CreateOrders.dart';
 import 'screens/orders/createProduct/CreateProduct.dart';
 import 'screens/orders/orderDetails/OrderDetails.dart';
@@ -26,7 +31,17 @@ import 'screens/splash/SplashPage.dart';
 import '/screens/dashboard/DashboardPage.dart';
 import '/screens/authentication/signup/SignupPage.dart';
 
+void configLoading() {
+  EasyLoading.instance
+    ..loadingStyle = EasyLoadingStyle.dark
+    ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+    ..maskType = EasyLoadingMaskType.black
+    ..userInteractions = false
+    ..dismissOnTap = false;
+}
+
 Future<void> main() async {
+  configLoading();
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider<LoginViewModel>(
@@ -35,50 +50,22 @@ Future<void> main() async {
       ChangeNotifierProvider<UserViewModel>(
         create: (context) => UserViewModel(),
       ),
+      ChangeNotifierProvider<CartProvider>(
+        create: (context) => CartProvider(),
+      ),
+      ChangeNotifierProvider<AuthProvider>(
+        create: (context) => AuthProvider(),
+      ),
     ],
     child: MyApp(),
   ));
-  configLoading();
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  State createState() {
-    return MyAppState();
-  }
-}
-
-void configLoading() {
-  EasyLoading.instance
-    ..displayDuration = const Duration(milliseconds: 2000)
-    ..indicatorType = EasyLoadingIndicatorType.fadingCube
-    ..loadingStyle = EasyLoadingStyle.dark
-    ..indicatorSize = 45.0
-    ..radius = 10.0
-    ..progressColor = Colors.yellow
-    ..backgroundColor = Colors.green
-    ..indicatorColor = Colors.yellow
-    ..textColor = Colors.yellow
-    ..maskColor = Colors.blue.withOpacity(0.5)
-    ..userInteractions = true
-    ..dismissOnTap = false
-    ..customAnimation = CustomAnimation();
-}
-
-class MyAppState extends State<MyApp> {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    WidgetsFlutterBinding.ensureInitialized();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      statusBarBrightness:
-          Platform.isAndroid ? Brightness.dark : Brightness.light,
-      systemNavigationBarColor: Colors.white,
-      systemNavigationBarDividerColor: Colors.grey,
-      systemNavigationBarIconBrightness: Brightness.dark,
-    ));
     return MaterialApp(
+      builder: EasyLoading.init(),
       // title: '',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -86,7 +73,6 @@ class MyAppState extends State<MyApp> {
       ),
       home: const SplashPage(),
       // home: const DashboardPage(),
-      builder: EasyLoading.init(),
       routes: {
         "/splashPage": (context) => const SplashPage(),
         "/launchPage": (context) => const LaunchPage(),
@@ -98,6 +84,15 @@ class MyAppState extends State<MyApp> {
         "/qrScanner": (context) => const QrScanner(),
         "/painterPopUpPage": (context) => const PainterPopUpPage(),
         "/pointsLedgerPage": (context) => LayoutPage(child: PointsLedgerPage()),
+        "/cart": (context) => CartScreen(),
+        "/ProductsCatalogScreen": (context) =>
+            LayoutPage(child: ProductsCatalogScreen()),
+        "/myOrdersPage": (context) => LayoutPage(child: MyOrdersPage()),
+      },
+      onUnknownRoute: (settings) {
+        return MaterialPageRoute(
+          builder: (context) => const LoginPage(),
+        );
       },
     );
   }

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../services/error_handling.dart';
 import '../../../utility/loader.dart';
 import '/utility/check_internet.dart';
 import '/utility/size_config.dart';
@@ -98,22 +99,13 @@ class _LoginPageState extends State<LoginPage> {
         onLogin(tempFirstValue);
       } else {
         Loader.hideLoader(context);
-        _showSnackBar(
-          apiResp['message'],
-          context,
-          false,
-        );
+        error_handling.errorValidation(
+            context, response.statusCode, response.body, false);
       }
     } catch (e) {
-      // Handle errors
-      print('Error at catch: $e');
       Loader.hideLoader(context);
-      _showSnackBar(
-        "An error occurred: ${e.toString()}",
-        context,
-        false,
-      );
       print('Error: $e');
+      error_handling.errorValidation(context, '', e.toString(), false);
     }
   }
 
@@ -245,8 +237,14 @@ class _LoginPageState extends State<LoginPage> {
                                       child: SizedBox(
                                         height: screenHeight * 0.06,
                                         child: TextField(
-                                          // keyboardType: TextInputType.number,
-                                          keyboardType: TextInputType.text,
+                                          keyboardType: TextInputType.number,
+                                          // keyboardType: TextInputType.text,
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter
+                                                .digitsOnly,
+                                            LengthLimitingTextInputFormatter(
+                                                10),
+                                          ],
                                           onTapOutside: (event) {
                                             FocusManager.instance.primaryFocus
                                                 ?.unfocus();
@@ -378,7 +376,9 @@ class _LoginPageState extends State<LoginPage> {
                                   child: Column(children: [
                                     Text("DIDN'T HAVE ACCOUNT",
                                         style: TextStyle(
-                                          color: const Color(0xFF7A0180),
+                                          color: QA_Build_Check
+                                              ? Color.fromARGB(255, 1, 128, 48)
+                                              : Color(0xFF7A0180),
                                           fontSize: unitHeightValue * 0.016,
                                           fontWeight: FontWeight.w400,
                                         )),

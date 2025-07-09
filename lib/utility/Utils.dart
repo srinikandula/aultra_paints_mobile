@@ -14,6 +14,16 @@ import 'Fonts.dart';
 //1234567890123456
 
 class Utils {
+  /// Formats an ISO date string (e.g. 2025-05-05T10:43:52.261Z) to 'yyyy-MM-dd HH:mm'
+  static String formatDate(String isoDate) {
+    try {
+      final date = DateTime.parse(isoDate).toLocal();
+      return DateFormat('yyyy-MM-dd HH:mm').format(date);
+    } catch (e) {
+      return isoDate;
+    }
+  }
+
   static var labelLarge;
 
   static List<Widget> modelBuilder<M>(

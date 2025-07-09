@@ -29,13 +29,14 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
   TextEditingController pointsController = TextEditingController();
   bool pointEnterErr = false;
   TextEditingController otpController = TextEditingController();
-  bool otpSent = false;  // To track OTP state
-  String rewardBalance = "0";  // Fetch from API if needed
+  bool otpSent = false; // To track OTP state
+  String rewardBalance = "0"; // Fetch from API if needed
   @override
   void initState() {
     fetchLocalStorageData();
     super.initState();
   }
+
   fetchLocalStorageData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     accesstoken = prefs.getString('accessToken');
@@ -58,15 +59,16 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
       var tempResp = json.decode(response.body);
       var apiResp = tempResp['data'];
 
-      setState(() {  // Update the UI when data is fetched
+      setState(() {
+        // Update the UI when data is fetched
         rewardBalance = apiResp['rewardPoints'].toString();
       });
     } else {
       Navigator.pop(context);
-      error_handling.errorValidation(context, response.statusCode, response.body, false);
+      error_handling.errorValidation(
+          context, response.statusCode, response.body, false);
     }
   }
-
 
   void _showSnackBar(String message, BuildContext context, ColorCheck) {
     final snackBar = SnackBar(
@@ -106,7 +108,6 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
 
   void sendOTP() async {
     // Call Send OTP API
-
   }
 
   @override
@@ -187,7 +188,11 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                               alignment: Alignment.center,
                               child: Text(
                                 "Reward Point Balance:",
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: unitHeightValue * 0.02, color: const Color(0xFF3533CD),),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: unitHeightValue * 0.02,
+                                  color: const Color(0xFF3533CD),
+                                ),
                               ),
                             ),
 
@@ -198,7 +203,8 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                                 alignment: Alignment.center,
                                 decoration: const BoxDecoration(
                                   border: Border(
-                                    left: BorderSide(color: Colors.black, width: 1),
+                                    left: BorderSide(
+                                        color: Colors.black, width: 1),
                                   ),
                                 ),
                                 child: Text(
@@ -227,7 +233,11 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                               alignment: Alignment.center,
                               child: Text(
                                 "Transfer Points:",
-                                style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF3533CD), fontSize: unitHeightValue * 0.02,),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF3533CD),
+                                  fontSize: unitHeightValue * 0.02,
+                                ),
                               ),
                             ),
 
@@ -238,7 +248,8 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                                 alignment: Alignment.center,
                                 decoration: const BoxDecoration(
                                   border: Border(
-                                    left: BorderSide(color: Colors.black, width: 1),
+                                    left: BorderSide(
+                                        color: Colors.black, width: 1),
                                   ),
                                 ),
                                 child: TextField(
@@ -248,10 +259,10 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                                   style: TextStyle(
                                       fontSize: unitHeightValue * 0.02,
                                       color: const Color(0xFF3533CD),
-                                      fontWeight: FontWeight.bold
-                                  ),
+                                      fontWeight: FontWeight.bold),
                                   decoration: const InputDecoration(
-                                    border: InputBorder.none, // Avoid double borders
+                                    border: InputBorder
+                                        .none, // Avoid double borders
                                     hintText: "Enter",
                                   ),
                                   enabled: !otpSent,
@@ -262,15 +273,18 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                                         if (points <= 0) {
                                           pointsController.clear();
                                           pointEnterErr = true;
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(content: Text("Points must be greater than 0"))
-                                          );
-                                        } else if (points > int.parse(rewardBalance)) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                                  content: Text(
+                                                      "Points must be greater than 0")));
+                                        } else if (points >
+                                            int.parse(rewardBalance)) {
                                           pointsController.clear();
                                           pointEnterErr = true;
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(content: Text("Points cannot exceed balance of $rewardBalance"))
-                                          );
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                                  content: Text(
+                                                      "Points cannot exceed balance of $rewardBalance")));
                                         }
                                       }
                                     }
@@ -326,8 +340,9 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                           if (pointsController.text.isEmpty) {
                             pointEnterErr = true;
                             ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Please enter points to transfer"))
-                            );
+                                const SnackBar(
+                                    content: Text(
+                                        "Please enter points to transfer")));
                             return;
                           }
                           pointEnterErr = false;
@@ -338,12 +353,12 @@ class _TransferPointsDialogState extends State<TransferPointsDialog> {
                           backgroundColor: Colors.transparent,
                           shadowColor: Colors.transparent,
                         ),
-                        child: Text("Transfer",
+                        child: Text(
+                          "Transfer",
                           style: TextStyle(
                               fontSize: unitHeightValue * 0.02,
                               color: Colors.white,
-                              fontWeight: FontWeight.w300
-                          ),
+                              fontWeight: FontWeight.w300),
                         ),
                       ),
                     ),
