@@ -6,6 +6,9 @@ const BASE_URL = 'https://api.aultrapaints.com/api/'; //Admin
 
 const IOS_APP_VERSION = '1.0.0';
 
+const QA_Build_Check =
+    BASE_URL == "https://mapp.aultrapaints.com/api/" ? true : false;
+
 //painter 94-123456,
 //dealer 92-123456,
 //super user 91-123456,
@@ -18,6 +21,8 @@ const IOS_APP_VERSION = '1.0.0';
 
 //com.aup.aultrapaints is current prod - new app
 //com.ap.aultrapaints is old prod - old app
+
+// flutter build apk //to update version number
 
 const POST_SEND_LOGIN_OTP = "auth/loginWithOTP"; //send otp
 const POST_VERIFY_LOGIN_OTP = "auth/verifyOTP"; //verify otp

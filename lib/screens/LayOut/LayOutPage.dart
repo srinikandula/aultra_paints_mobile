@@ -393,7 +393,7 @@ class MyDrawer extends StatelessWidget {
                           Navigator.pushNamed(context, '/painters');
                         },
                       ),
-                    if (accountType == 'Painter')
+                    if (accountType == 'Painter' || accountType == 'Dealer')
                       ListTile(
                         title: Padding(
                           padding: EdgeInsets.only(left: screenWidth * 0.05),

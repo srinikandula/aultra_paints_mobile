@@ -376,7 +376,9 @@ class _LoginPageState extends State<LoginPage> {
                                   child: Column(children: [
                                     Text("DIDN'T HAVE ACCOUNT",
                                         style: TextStyle(
-                                          color: const Color(0xFF7A0180),
+                                          color: QA_Build_Check
+                                              ? Color.fromARGB(255, 1, 128, 48)
+                                              : Color(0xFF7A0180),
                                           fontSize: unitHeightValue * 0.016,
                                           fontWeight: FontWeight.w400,
                                         )),
